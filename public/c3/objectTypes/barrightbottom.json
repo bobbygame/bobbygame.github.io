@@ -1,0 +1,63 @@
+{
+	"name": "barRightBottom",
+	"plugin-id": "Sprite",
+	"sid": 548207274570479,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "solid",
+			"name": "刚体",
+			"sid": 934092494416844
+		}
+	],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 50,
+						"height": 50,
+						"originX": 0,
+						"originY": 0,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 1679379,
+						"collisionPoly": {
+							"points": [
+								0.36,
+								0.36,
+								0.5,
+								0.02,
+								0.56,
+								0.42,
+								0.56,
+								0.5,
+								0.56,
+								0.56,
+								0.5,
+								0.96,
+								0.36,
+								0.62,
+								0,
+								0.5
+							]
+						},
+						"useCollisionPoly": true,
+						"duration": 1
+					}
+				],
+				"sid": 546281307551953,
+				"name": "Animation 1",
+				"isLooping": false,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}

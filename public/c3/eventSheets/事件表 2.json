@@ -1,0 +1,56 @@
+{
+	"name": "事件表 2",
+	"events": [
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "is-touching-object",
+					"objectClass": "Touch",
+					"sid": 159552901014626,
+					"parameters": {
+						"object": "Myblog"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "go-to-url",
+					"objectClass": "浏览器",
+					"sid": 310507801795958,
+					"parameters": {
+						"url": "\"https://duters-wu.gitee.io\"",
+						"target": "self"
+					}
+				}
+			],
+			"sid": 635303897473470
+		},
+		{
+			"eventType": "block",
+			"conditions": [
+				{
+					"id": "is-touching-object",
+					"objectClass": "Touch",
+					"sid": 355431543806131,
+					"parameters": {
+						"object": "Dlut"
+					}
+				}
+			],
+			"actions": [
+				{
+					"id": "go-to-url",
+					"objectClass": "浏览器",
+					"sid": 175323266354447,
+					"parameters": {
+						"url": "\"https://www.dlut.edu.cn\"",
+						"target": "self"
+					}
+				}
+			],
+			"sid": 141893580404177
+		}
+	],
+	"sid": 626327231040740
+}

@@ -1,0 +1,10 @@
+{
+	"name": "分享",
+	"plugin-id": "Share",
+	"sid": 264437290732245,
+	"singleglobal-inst": {
+		"type": "分享",
+		"properties": {},
+		"uid": 1862
+	}
+}

@@ -1,0 +1,15 @@
+{
+	"name": "Level",
+	"plugin-id": "Text",
+	"sid": 398908730747708,
+	"isGlobal": true,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Anchor",
+			"name": "锚点",
+			"sid": 949562574072370
+		}
+	],
+	"effectTypes": []
+}

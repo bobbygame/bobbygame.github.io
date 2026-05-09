@@ -1,0 +1,32 @@
+{
+	"name": "finallyBobby",
+	"plugin-id": "TiledBg",
+	"sid": 483162128584687,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"image": {
+		"width": 480,
+		"height": 640,
+		"originX": -165.99903609383102,
+		"originY": -401.1348410495132,
+		"originalSource": "",
+		"exportFormat": "png",
+		"exportQuality": 0.8,
+		"imageSpriteId": 5128831,
+		"collisionPoly": {
+			"points": [
+				0.23958333333333334,
+				0.9546875,
+				0.23958333333333334,
+				0.8201622278382572,
+				0.7604166666666666,
+				0.8201622278382572,
+				0.7604166666666666,
+				0.9546875
+			]
+		},
+		"useCollisionPoly": true
+	}
+}

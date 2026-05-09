@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bobby Carrot Dev Shell</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+    }
+    header a { color: #8ae3ff; font-weight: 600; text-decoration: none; }
+    header a:hover { text-decoration: underline; }
+    main { padding: 12px 16px; }
+    #app { width: 100%; height: calc(100vh - 60px); }
+    canvas { background: #000; border: 1px solid #30363d; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>Bobby Carrot (open runtime)</div>
+    <nav>
+      <a href="/" target="_blank" rel="noreferrer">原版构建 /</a>
+    </nav>
+  </header>
+  <main>
+    <div id="app"></div>
+  </main>
+  <script>
+    window.addEventListener('unhandledrejection', function (e) {
+      try {
+        var reason = e.reason || {};
+        var msg = (typeof reason === 'string') ? reason : (reason && reason.message) || '';
+        if (msg && msg.indexOf('Access to storage is not allowed') !== -1) {
+          e.preventDefault();
+          return false;
+        }
+      } catch (_) {}
+    });
+    window.C3_RegisterSW = function () {};
+  </script>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

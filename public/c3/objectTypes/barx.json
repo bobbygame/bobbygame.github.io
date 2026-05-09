@@ -1,0 +1,63 @@
+{
+	"name": "barX",
+	"plugin-id": "Sprite",
+	"sid": 510248766996056,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "solid",
+			"name": "刚体",
+			"sid": 650380953532022
+		}
+	],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 50,
+						"height": 50,
+						"originX": 0,
+						"originY": 0,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 5098356,
+						"collisionPoly": {
+							"points": [
+								0.14,
+								0.14,
+								0.5,
+								0.28,
+								0.84,
+								0.14,
+								0.96,
+								0.5,
+								0.84,
+								0.84,
+								0.5,
+								0.72,
+								0.14,
+								0.84,
+								0.02,
+								0.5
+							]
+						},
+						"useCollisionPoly": true,
+						"duration": 1
+					}
+				],
+				"sid": 246471450278248,
+				"name": "Animation 1",
+				"isLooping": false,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}

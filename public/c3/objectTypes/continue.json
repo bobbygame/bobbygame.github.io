@@ -1,0 +1,22 @@
+{
+	"name": "Continue",
+	"plugin-id": "Text",
+	"sid": 524791130822477,
+	"isGlobal": true,
+	"instanceVariables": [
+		{
+			"name": "canClick",
+			"type": "boolean",
+			"desc": "",
+			"sid": 977424550584924
+		}
+	],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Anchor",
+			"name": "锚点",
+			"sid": 775483402672087
+		}
+	],
+	"effectTypes": []
+}

@@ -1,0 +1,599 @@
+{
+	"projectFormatVersion": 1,
+	"savedWithRelease": 27602,
+	"name": "bobby carrot",
+	"runtime": "c3",
+	"useWorker": "auto",
+	"bundleAddons": false,
+	"usedAddons": [
+		{
+			"type": "plugin",
+			"id": "Sprite",
+			"name": "Sprite",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Keyboard",
+			"name": "Keyboard",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Audio",
+			"name": "音频",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Text",
+			"name": "Text",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Touch",
+			"name": "Touch",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "TiledBg",
+			"name": "平铺背景",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Arr",
+			"name": "Array",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Browser",
+			"name": "浏览器",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "LocalStorage",
+			"name": "Local storage",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "AJAX",
+			"name": "AJAX",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "C2WebSocket",
+			"name": "WebSocket",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Button",
+			"name": "按钮",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "AdvancedRandom",
+			"name": "高级随机",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Dictionary",
+			"name": "Dictionary",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "List",
+			"name": "列表",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Share",
+			"name": "分享",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Date",
+			"name": "日期",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "video",
+			"name": "视频",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "filechooser",
+			"name": "文件选择",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "TextBox",
+			"name": "文字输入",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "sliderbar",
+			"name": "滑动条",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "plugin",
+			"id": "Tilemap",
+			"name": "Tilemap",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "scrollto",
+			"name": "视野跟随",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "TileMovement",
+			"name": "网格移动",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "MoveTo",
+			"name": "移动到",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Physics",
+			"name": "物理",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Pathfinding",
+			"name": "寻路",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "custom",
+			"name": "自定义",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Flash",
+			"name": "闪烁",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Anchor",
+			"name": "锚点",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "solid",
+			"name": "实体",
+			"author": "Scirra",
+			"version": "r276.2",
+			"bundled": false
+		}
+	],
+	"uniqueId": "aptkl4dqace",
+	"objectTypes": {
+		"items": [
+			"bobby",
+			"Keyboard",
+			"音频",
+			"carrot1",
+			"CarrotNum",
+			"Timer",
+			"upCtrl",
+			"rightCtrl",
+			"leftCtrl",
+			"downCtrl",
+			"Touch",
+			"channel",
+			"bornPlace",
+			"barX",
+			"barY",
+			"wall",
+			"CarrotN",
+			"barLeftTop",
+			"barRightTop",
+			"barLeftBottom",
+			"barRightBottom",
+			"carrotMark",
+			"finallyBobby",
+			"conveyorBeltX",
+			"浏览器",
+			"LocalStorage",
+			"AJAX",
+			"WebSocket",
+			"trap",
+			"Level",
+			"conveyorBeltY",
+			"sucecess",
+			"TimeUse",
+			"Steps",
+			"按钮",
+			"Continue",
+			"stone",
+			"高级随机",
+			"stoneAngle",
+			"conveyorBeltButton",
+			"stoneButton",
+			"lock",
+			"key",
+			"loadGame",
+			"TheEnd",
+			"Dictionary",
+			"列表",
+			"分享",
+			"日期",
+			"视频",
+			"文件选择",
+			"文字输入",
+			"滑动条",
+			"restartLevel",
+			"Sprite",
+			"Dlut",
+			"Myblog",
+			"Tilemap",
+			"Tilemap2",
+			"Tilemap3",
+			"Tilemap4",
+			"Tilemap5",
+			"Tilemap6",
+			"Tilemap7",
+			"Tilemap8",
+			"Tilemap9",
+			"Tilemap10",
+			"Tilemap11",
+			"Tilemap12",
+			"Tilemap13",
+			"Tilemap14",
+			"Tilemap15",
+			"Tilemap16",
+			"Tilemap17",
+			"Tilemap18",
+			"Tilemap19",
+			"Tilemap20",
+			"Tilemap21",
+			"Tilemap22",
+			"Tilemap23",
+			"Tilemap24",
+			"Tilemap25",
+			"Tilemap26",
+			"Tilemap27",
+			"Tilemap28",
+			"Tilemap29",
+			"Tilemap30"
+		],
+		"subfolders": []
+	},
+	"autosaveData": null,
+	"containers": [],
+	"families": {
+		"items": [],
+		"subfolders": []
+	},
+	"layouts": {
+		"items": [
+			"map1",
+			"map2",
+			"map3",
+			"map4",
+			"map5",
+			"map6",
+			"map7",
+			"map8",
+			"map9",
+			"map10",
+			"map11",
+			"map12",
+			"map13",
+			"map14",
+			"map15",
+			"map16",
+			"map17",
+			"map18",
+			"map19",
+			"map20",
+			"map21",
+			"map22",
+			"map23",
+			"map24",
+			"map25",
+			"map26",
+			"map27",
+			"map28",
+			"map29",
+			"map30",
+			"end"
+		],
+		"subfolders": []
+	},
+	"eventSheets": {
+		"items": [
+			"事件表 1",
+			"事件表 2"
+		],
+		"subfolders": []
+	},
+	"rootFileFolders": {
+		"script": {
+			"items": [],
+			"subfolders": []
+		},
+		"sound": {
+			"items": [
+				{
+					"name": "go.webm",
+					"type": "audio/webm; codecs=opus",
+					"sid": 572453134910724
+				},
+				{
+					"name": "dead.mp3",
+					"type": "audio/mpeg",
+					"sid": 183658502189042
+				},
+				{
+					"name": "lock2.mp3",
+					"type": "audio/mpeg",
+					"sid": 449991197154230
+				}
+			],
+			"subfolders": []
+		},
+		"music": {
+			"items": [
+				{
+					"name": "main.mp3",
+					"type": "audio/mpeg",
+					"sid": 362970696265573
+				},
+				{
+					"name": "success.mp3",
+					"type": "audio/mpeg",
+					"sid": 896822608565958
+				}
+			],
+			"subfolders": []
+		},
+		"video": {
+			"items": [],
+			"subfolders": []
+		},
+		"font": {
+			"items": [
+				{
+					"name": "comic.ttf",
+					"type": "application/font-sfnt",
+					"sid": 753288435463682
+				},
+				{
+					"name": "comicbd.ttf",
+					"type": "application/font-sfnt",
+					"sid": 108904728067388
+				},
+				{
+					"name": "comici.ttf",
+					"type": "application/font-sfnt",
+					"sid": 160109142142168
+				},
+				{
+					"name": "comicz.ttf",
+					"type": "application/font-sfnt",
+					"sid": 222640132528353
+				},
+				{
+					"name": "bgothm.ttf",
+					"type": "application/font-sfnt",
+					"sid": 605584817712058
+				}
+			],
+			"subfolders": []
+		},
+		"icon": {
+			"items": [
+				{
+					"name": "loading-logo.png",
+					"type": "image/png",
+					"sid": 980075248973564,
+					"icon-info": {
+						"purpose": "loading-logo"
+					}
+				},
+				{
+					"name": "icon-256.png",
+					"type": "image/png",
+					"sid": 304319447096721,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-16.png",
+					"type": "image/png",
+					"sid": 357021378868014,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-128.png",
+					"type": "image/png",
+					"sid": 461364567528869,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-32.png",
+					"type": "image/png",
+					"sid": 268012843269665,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-512.png",
+					"type": "image/png",
+					"sid": 441676973275893,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				},
+				{
+					"name": "icon-64.png",
+					"type": "image/png",
+					"sid": 751769158560947,
+					"icon-info": {
+						"purpose": "app-icon"
+					}
+				}
+			],
+			"subfolders": []
+		},
+		"general": {
+			"items": [],
+			"subfolders": []
+		}
+	},
+	"timelines": {
+		"items": [],
+		"subfolders": [
+			{
+				"items": [],
+				"subfolders": []
+			}
+		]
+	},
+	"properties": {
+		"description": "bobby carrot",
+		"version": "1.0.0.0",
+		"author": "beiyipu",
+		"authorEmail": "",
+		"authorWebsite": "",
+		"appId": "com.bobby.carrot",
+		"pixelRounding": false,
+		"useLoaderLayout": false,
+		"fullscreenMode": "letterbox-scale",
+		"fullscreenQuality": "high",
+		"viewportFit": "auto",
+		"backgroundColor": [
+			0,
+			0,
+			0,
+			0
+		],
+		"splashColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"useThemeColor": false,
+		"themeColor": [
+			1,
+			1,
+			1,
+			0
+		],
+		"orientations": "portrait",
+		"webgpu": "auto",
+		"gpuPreference": "high-performance",
+		"scriptsType": "module",
+		"framerateMode": "vsync",
+		"compositingMode": "standard",
+		"sampling": "trilinear",
+		"downscaling": "medium",
+		"renderingMode": "auto",
+		"anisotropicFiltering": "auto",
+		"maxSpriteSheetSize": 2048,
+		"loaderStyle": "splash",
+		"preloadSounds": true,
+		"cordovaiOSScheme": "app",
+		"cordovaAndroidScheme": "file"
+	},
+	"viewportWidth": 480,
+	"viewportHeight": 640,
+	"firstLayout": null
+}

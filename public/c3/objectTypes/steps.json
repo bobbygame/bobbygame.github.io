@@ -1,0 +1,15 @@
+{
+	"name": "Steps",
+	"plugin-id": "Text",
+	"sid": 667558222319238,
+	"isGlobal": true,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Anchor",
+			"name": "锚点",
+			"sid": 723530441212775
+		}
+	],
+	"effectTypes": []
+}

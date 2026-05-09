@@ -1,0 +1,63 @@
+{
+	"name": "barY",
+	"plugin-id": "Sprite",
+	"sid": 108685259487084,
+	"isGlobal": false,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "solid",
+			"name": "刚体",
+			"sid": 908822446280770
+		}
+	],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 50,
+						"height": 50,
+						"originX": 0,
+						"originY": 0,
+						"originalSource": "",
+						"exportFormat": "png",
+						"exportQuality": 0.8,
+						"imageSpriteId": 8915561,
+						"collisionPoly": {
+							"points": [
+								0.425,
+								0,
+								0.635,
+								0,
+								0.635,
+								0,
+								0.635,
+								0.5151515151515151,
+								0.635,
+								1,
+								0.635,
+								1,
+								0.425,
+								1,
+								0.395,
+								0.5151515151515151
+							]
+						},
+						"useCollisionPoly": true,
+						"duration": 1
+					}
+				],
+				"sid": 986501276449353,
+				"name": "Animation 1",
+				"isLooping": false,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 5
+			}
+		],
+		"subfolders": []
+	}
+}

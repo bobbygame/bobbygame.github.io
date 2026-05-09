@@ -1,0 +1,26 @@
+{
+	"name": "Dictionary",
+	"plugin-id": "Dictionary",
+	"sid": 211672943748931,
+	"isGlobal": true,
+	"instanceVariables": [
+		{
+			"name": "yellow",
+			"type": "boolean",
+			"desc": "",
+			"sid": 383762340700000
+		},
+		{
+			"name": "red",
+			"type": "boolean",
+			"desc": "",
+			"sid": 841320162655182
+		},
+		{
+			"name": "blue",
+			"type": "boolean",
+			"desc": "",
+			"sid": 685747354608589
+		}
+	]
+}

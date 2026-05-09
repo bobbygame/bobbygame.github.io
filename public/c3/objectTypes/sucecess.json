@@ -1,0 +1,15 @@
+{
+	"name": "sucecess",
+	"plugin-id": "Text",
+	"sid": 820285648656983,
+	"isGlobal": true,
+	"instanceVariables": [],
+	"behaviorTypes": [
+		{
+			"behaviorId": "Anchor",
+			"name": "锚点",
+			"sid": 468506565500813
+		}
+	],
+	"effectTypes": []
+}

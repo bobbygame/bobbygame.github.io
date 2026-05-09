@@ -1,0 +1,10 @@
+{
+	"name": "浏览器",
+	"plugin-id": "Browser",
+	"sid": 992567169889288,
+	"singleglobal-inst": {
+		"type": "浏览器",
+		"properties": {},
+		"uid": 146
+	}
+}

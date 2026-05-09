@@ -1,0 +1,13 @@
+{
+	"name": "高级随机",
+	"plugin-id": "AdvancedRandom",
+	"sid": 219552211458287,
+	"singleglobal-inst": {
+		"type": "高级随机",
+		"properties": {
+			"seed": "",
+			"seeded-random": false
+		},
+		"uid": 309
+	}
+}
