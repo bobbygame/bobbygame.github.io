@@ -11,12 +11,12 @@ class AudioManager {
 
   private preload() {
     const soundMap: Record<SoundEffect, string> = {
-      move: '/game/media/go.webm',
-      collect: '/game/media/go.webm',
-      button: '/game/media/lock2.mp3',
-      die: '/game/media/dead.mp3',
-      win: '/game/media/success.mp3',
-      unlock: '/game/media/lock2.mp3',
+      move: '/assets/audio/go.webm',
+      collect: '/assets/audio/go.webm',
+      button: '/assets/audio/lock2.mp3',
+      die: '/assets/audio/dead.mp3',
+      win: '/assets/audio/success.mp3',
+      unlock: '/assets/audio/lock2.mp3',
     };
 
     for (const [key, path] of Object.entries(soundMap)) {
@@ -26,7 +26,7 @@ class AudioManager {
       this.sounds.set(key as SoundEffect, audio);
     }
 
-    this.bgMusic = new Audio('/game/media/main.mp3');
+    this.bgMusic = new Audio('/assets/audio/main.mp3');
     this.bgMusic.loop = true;
     this.bgMusic.volume = 0.3;
     this.bgMusic.preload = 'auto';

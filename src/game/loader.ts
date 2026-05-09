@@ -1,5 +1,4 @@
-import { loadLayout } from '../data/loaders';
-import { parseTilemapData } from '../data/parseTilemap';
+import { loadLayout, parseTilemapData } from './layout';
 import type { GameState, LayoutFile, Entity, EntityKind } from './types';
 import { getRequiredCarrots } from './config';
 

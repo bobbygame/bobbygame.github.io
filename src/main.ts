@@ -4,7 +4,7 @@ import { handleArrival, armTrapIfLeft } from './game/interactions';
 import { ButtonSystem } from './game/buttons';
 import { Renderer } from './game/render';
 import { audio } from './game/audio';
-import { loadAssetManifest } from './game/assetManifest';
+import { loadAssetManifest } from './game/assets';
 import { SpriteLoader } from './game/sprites';
 
 const params = new URLSearchParams(window.location.search);

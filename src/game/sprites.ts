@@ -1,4 +1,4 @@
-import type { AssetManifest, ObjectAsset, SpriteFrame } from './assetManifest';
+import type { AssetManifest, ObjectAsset, SpriteFrame } from './assets';
 import type { Entity, GameState } from './types';
 
 export class SpriteLoader {
@@ -33,7 +33,7 @@ export class SpriteLoader {
         reject(e);
       };
     });
-    img.src = name.startsWith('images/') ? `/game/${name}` : `/game/images/${name}`;
+    img.src = name.startsWith('images/') ? `/assets/${name}` : `/assets/images/${name}`;
     return promise;
   }
 

@@ -1,4 +1,4 @@
-import { assetManifest } from '../data/generated';
+import { assetManifest } from '../content/assets';
 
 export interface SpriteFrame {
   sheet: string;

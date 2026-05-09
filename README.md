@@ -3,9 +3,10 @@
 目标：把 Construct 3 导出的 Bobby Carrot 迁移成纯 Vite + TypeScript 项目，本地根路径逐步对齐线上 `https://game.snapre.online`，运行时不加载 Construct runtime 或 Construct 导出的 `data.json`。
 
 - `/`：纯 Vite/TypeScript 游戏入口。
-- `src/data/generated.ts`：项目自有的关卡和素材 manifest，构建时直接打包进 Vite。
-- `public/game/images`、`public/game/media`、`public/game/fonts`：运行时静态素材。
-- `src/`：TypeScript 游戏运行时，负责关卡加载、状态机、碰撞、机关、音频和 Canvas 渲染。
+- `src/main.ts`：浏览器入口。
+- `src/game/`：游戏运行时、状态机、碰撞、机关、音频和 Canvas 渲染。
+- `src/content/`：项目自有数据，关卡按文件拆分。
+- `public/assets/`：运行时静态素材，按 `images`、`audio`、`fonts` 分组。
 - `GAME_DETAILS.md`：线上通关观察与 30 关对象矩阵。
 
 ## 开发
@@ -27,18 +28,19 @@ npm run preview
 ## 目录
 - `src/main.ts`：游戏循环（键盘 ← → ↑ ↓ / WASD），调用系统驱动实体与渲染。
 - `src/game/*`：
-	- `loader.ts`：读取 `src/data/generated.ts` 并构造成运行态实体。
+	- `layout.ts`：自有布局类型、布局读取和 tilemap RLE 解析。
+	- `loader.ts`：读取 `src/content` 并构造成运行态实体。
 	- `movement.ts`：网格移动、基础阻塞（墙/石头/方向石/锁）。
 	- `interactions.ts`：拾取钥匙/胡萝卜、开锁、到达终点、踩陷阱。
-	- `assetManifest.ts`：读取自有素材 manifest。
+	- `assets.ts`：素材 manifest 类型和读取入口。
 	- `render.ts`：Canvas 渲染真实 tilemap、精灵、HUD 和胜利/结束画面。
-- `src/data/parseTilemap.ts`：解析 tilemap RLE 数据。
-- `src/data/types.ts`：自有布局、图层、实例和 tilemap 类型定义。
-- `src/data/generated.ts`：已转换后的布局数据和 spritesheet 坐标。
-- `scripts/export-game-data.mjs`：一次性转换工具，输入外部原始导出的 `data.json`，输出 `src/data/generated.ts`。
+- `src/content/levels/*.ts`：按关卡拆分的布局数据。
+- `src/content/assets.ts`：spritesheet 坐标和动画 manifest。
+- `public/assets/`：图片、音频和字体素材。
+- `scripts/export-game-data.mjs`：一次性转换工具，输入外部原始导出的 `data.json`，输出 `src/content`。
 
 ## 目前已翻译的事件表核心
-- 关卡从 `src/data/generated.ts` 加载；tilemap 和实体使用 atlas 坐标绘制，不依赖 Construct runtime。
+- 关卡从 `src/content/levels` 按需加载；tilemap 和实体使用 atlas 坐标绘制，不依赖 Construct runtime。
 - 玩家网格移动（每格 50px），墙/石头/方向石/锁阻塞，方向石按 sign 粗译的方向阻断规则。
 - 钥匙/锁（按 sign 匹配消耗），胡萝卜计数，终点判定，陷阱击杀（简单结束）。
 - **石块推挤**：向石头移动时自动推动，需后方空地。
