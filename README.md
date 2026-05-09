@@ -1,12 +1,11 @@
 # Bobby Carrot
 
-目标：把 Construct 3 导出的 Bobby Carrot 反解成纯 Vite + TypeScript 项目，本地根路径逐步对齐线上 `https://game.snapre.online`，但生产入口不加载 Construct runtime。
+目标：把 Construct 3 导出的 Bobby Carrot 迁移成纯 Vite + TypeScript 项目，本地根路径逐步对齐线上 `https://game.snapre.online`，运行时不加载 Construct runtime 或 Construct 导出的 `data.json`。
 
 - `/`：纯 Vite/TypeScript 游戏入口。
-- `/game/`：原始 Construct 3 导出，仅作对照基准。
-- `public/game/`：原始 Construct 3 导出和素材来源；纯 Vite 入口只读取其中的图片、音频、字体、`data.json`，不加载 `c3runtime.js`。
-- `public/c3/`：解包后的 C3 源 JSON（事件表、布局、对象类型等）。
-- `src/`：新的 TypeScript 游戏运行时，直接读取 `public/c3/` 的关卡 JSON 和 `public/game/data.json` 的 spritesheet 坐标。
+- `src/data/generated.ts`：项目自有的关卡和素材 manifest，构建时直接打包进 Vite。
+- `public/game/images`、`public/game/media`、`public/game/fonts`：运行时静态素材。
+- `src/`：TypeScript 游戏运行时，负责关卡加载、状态机、碰撞、机关、音频和 Canvas 渲染。
 - `GAME_DETAILS.md`：线上通关观察与 30 关对象矩阵。
 
 ## 开发
@@ -15,7 +14,6 @@
 npm install
 npm run dev
 # 打开 http://localhost:5173/ 查看纯 Vite 版本
-# 打开 http://localhost:5173/game/ 对照原始 Construct 导出
 ```
 
 ## 构建与预览
@@ -29,18 +27,18 @@ npm run preview
 ## 目录
 - `src/main.ts`：游戏循环（键盘 ← → ↑ ↓ / WASD），调用系统驱动实体与渲染。
 - `src/game/*`：
-	- `loader.ts`：读取 `public/c3/layouts/*.json` 并构造成运行态实体。
+	- `loader.ts`：读取 `src/data/generated.ts` 并构造成运行态实体。
 	- `movement.ts`：网格移动、基础阻塞（墙/石头/方向石/锁）。
 	- `interactions.ts`：拾取钥匙/胡萝卜、开锁、到达终点、踩陷阱。
-	- `assetManifest.ts`：从 Construct `data.json` 解析 spritesheet 坐标。
+	- `assetManifest.ts`：读取自有素材 manifest。
 	- `render.ts`：Canvas 渲染真实 tilemap、精灵、HUD 和胜利/结束画面。
-- `src/c3/parseTilemap.ts`：解析 C3 tilemap RLE 数据。
-- `src/c3/types.ts`：简化的类型定义。
-- `public/c3/`：C3 JSON 资产。
-- `public/game/`：原始构建。
+- `src/data/parseTilemap.ts`：解析 tilemap RLE 数据。
+- `src/data/types.ts`：自有布局、图层、实例和 tilemap 类型定义。
+- `src/data/generated.ts`：已转换后的布局数据和 spritesheet 坐标。
+- `scripts/export-game-data.mjs`：一次性转换工具，输入外部原始导出的 `data.json`，输出 `src/data/generated.ts`。
 
 ## 目前已翻译的事件表核心
-- 关卡从 C3 JSON 加载；tilemap 和实体使用原始 atlas 坐标绘制，不依赖 Construct runtime。
+- 关卡从 `src/data/generated.ts` 加载；tilemap 和实体使用 atlas 坐标绘制，不依赖 Construct runtime。
 - 玩家网格移动（每格 50px），墙/石头/方向石/锁阻塞，方向石按 sign 粗译的方向阻断规则。
 - 钥匙/锁（按 sign 匹配消耗），胡萝卜计数，终点判定，陷阱击杀（简单结束）。
 - **石块推挤**：向石头移动时自动推动，需后方空地。
@@ -55,14 +53,12 @@ npm run preview
 ## 不足与待办
 - 物理/寻路行为、事件表其他细节（如特定关卡专用逻辑）未完全等价。
 - 结束页的视频对象目前未复刻。
-- 部分按钮、陷阱、方向石的事件表细节仍需继续从 `public/c3/eventSheets` 翻译。
+- 部分按钮、陷阱、方向石的事件细节仍需继续按线上表现补齐。
 
 ## 下一步建议
 1) 扩展 TS 运行壳：
 	- 解析对象实例行为/变量，驱动实体更新循环。
-	- 将事件表（`public/c3/eventSheets`）转译为 JS/TS 逻辑，或手写状态机取代。
 	- 替换图片 atlas/动画，重建精灵表驱动。
-2) 若要完全摆脱 Construct：
-	- 把关卡数据（tilemap、实例列表）抽成自定义 JSON schema，编写自己的编辑/关卡加载与物理/寻路逻辑。
-	- 渐进迁移：先复刻核心交互（移动、机关、收集、陷阱），再移除依赖的插件（Physics/Pathfinding 等）。
-3) 如果需要，我可以继续把事件表翻译成可读 TS，或搭建一个简易关卡/实体系统。
+2) 继续按线上表现补齐：
+	- 用手写状态机补齐剩余关卡专用逻辑。
+	- 增加关卡回归测试和关键路径截图比对。
