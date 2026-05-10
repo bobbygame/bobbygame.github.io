@@ -31,7 +31,6 @@ const levelLoaders: Record<string, () => Promise<{ default: Layout }>> = {
   "map28": () => import('./levels/map28'),
   "map29": () => import('./levels/map29'),
   "map30": () => import('./levels/map30'),
-  "end": () => import('./levels/end'),
 };
 
 export async function loadLevel(name: string): Promise<Layout> {

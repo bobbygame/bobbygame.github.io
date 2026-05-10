@@ -16,11 +16,13 @@ function fallbackColor(kind: string): string {
   }
 }
 
+function keyAnimationName(sign: string): string {
+  return { 1: 'yellow', 2: 'red', 3: 'blue' }[Number(sign)] ?? 'yellow';
+}
+
 export class Renderer {
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
-  private video?: HTMLVideoElement;
-  private videoRect?: { x: number; y: number; width: number; height: number };
 
   constructor(
     private state: GameState,
@@ -35,10 +37,10 @@ export class Renderer {
     const ctx = this.canvas.getContext('2d');
     if (!ctx) throw new Error('Canvas not supported');
     this.ctx = ctx;
-    this.ctx.imageSmoothingEnabled = true;
+    this.ctx.imageSmoothingEnabled = false;
+    this.canvas.style.imageRendering = 'pixelated';
 
     container.replaceChildren(this.canvas);
-    this.setupEndVideo(container);
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -49,11 +51,11 @@ export class Renderer {
     const height = Math.floor(this.canvas.height * scale);
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
-    this.positionEndVideo(width, height);
   }
 
   draw() {
     const { ctx } = this;
+    ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawTilemap();
     this.drawEntities();
@@ -68,18 +70,12 @@ export class Renderer {
     ctx.fillStyle = '#1fa33a';
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    if (state.mapName === 'end') {
-      ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-      return;
-    }
-
     if (!tileFrame) return;
 
+    const tileSize = state.tileSize;
     const sheet = this.sprites.getObject(state.tilemap.typeName)?.frame?.sheet;
     if (!sheet) return;
 
-    const tileSize = state.tileSize;
     const tilesPerRow = Math.max(1, Math.floor(tileFrame.w / tileSize));
     const maxTileIndex = Math.max(0, Math.floor(tileFrame.w / tileSize) * Math.floor(tileFrame.h / tileSize) - 1);
 
@@ -104,7 +100,7 @@ export class Renderer {
 
   private drawEntities() {
     const ordered = this.state.entities
-      .filter((entity) => !entity.dead && entity.kind !== 'bornPlace')
+      .filter((entity) => !entity.dead)
       .sort((a, b) => {
         if (a.kind === 'player') return 1;
         if (b.kind === 'player') return -1;
@@ -129,11 +125,6 @@ export class Renderer {
       return;
     }
 
-    if (this.state.mapName === 'end') {
-      this.drawEndText(entity);
-      return;
-    }
-
     if (entity.kind === 'other') return;
 
     this.ctx.fillStyle = fallbackColor(entity.kind);
@@ -141,12 +132,10 @@ export class Renderer {
   }
 
   private drawHud() {
-    if (this.state.mapName === 'end') return;
-
     const { ctx, state } = this;
     const remain = Math.max(0, state.requiredCarrots - state.inventory.carrots);
     const time = Math.floor(state.stats.timeElapsed);
-    const level = state.mapName === 'end' ? '30' : state.mapName.replace('map', '');
+    const level = state.mapName.replace('map', '');
 
     ctx.save();
     ctx.font = HUD_FONT;
@@ -161,7 +150,26 @@ export class Renderer {
 
     const carrotFrame = this.sprites.getFrame('carrot1');
     if (carrotFrame) this.sprites.drawSprite(ctx, carrotFrame, 600, 8, 46, 46, -0.25);
+    this.drawInventoryKeys();
     ctx.restore();
+  }
+
+  private drawInventoryKeys() {
+    const activeKeys = Object.keys(this.state.inventory.keys)
+      .filter((key) => this.state.inventory.keys[key])
+      .sort((a, b) => Number(a) - Number(b));
+    if (activeKeys.length === 0) return;
+
+    const size = 50;
+    const gap = 8;
+    const right = this.canvas.width - 14;
+    const y = 60;
+
+    activeKeys.forEach((key, index) => {
+      const x = right - (activeKeys.length - index) * size - (activeKeys.length - index - 1) * gap;
+      const frame = this.sprites.getFrame('key', keyAnimationName(key));
+      if (frame) this.sprites.drawSprite(this.ctx, frame, x, y, size, size);
+    });
   }
 
   private drawOverlay() {
@@ -190,75 +198,6 @@ export class Renderer {
       this.strokeFillText('TRY AGAIN', 205, 350);
       ctx.restore();
     }
-  }
-
-  private drawEndText(entity: Entity) {
-    const textByType: Record<string, string> = {
-      TheEnd: 'THE END',
-      Dlut: 'DLUT',
-      Myblog: 'Myblog(Click Me)',
-    };
-    const text = String(entity.data.text ?? textByType[entity.typeName] ?? '');
-    if (!text) return;
-
-    const color = Array.isArray(entity.data.color)
-      ? entity.data.color as number[]
-      : entity.typeName === 'TheEnd'
-        ? [0, 1, 0, 1]
-        : [1, 1, 1, 1];
-    const font = String(entity.data.font ?? (entity.typeName === 'TheEnd' ? 'comicbd' : 'bgothm'));
-    const size = Number(entity.data.size ?? (entity.typeName === 'TheEnd' ? 30 : 18));
-    const align = String(entity.data['horizontal-alignment'] ?? 'left') as CanvasTextAlign;
-    const vertical = String(entity.data['vertical-alignment'] ?? 'top');
-    const x = align === 'center' ? entity.pos.x + entity.size.x / 2 : entity.pos.x;
-    const y = vertical === 'center' ? entity.pos.y + entity.size.y / 2 : entity.pos.y;
-
-    this.ctx.save();
-    this.ctx.font = `${size}px ${font}, comic, system-ui, sans-serif`;
-    this.ctx.fillStyle = `rgba(${Math.round((color[0] ?? 1) * 255)}, ${Math.round((color[1] ?? 1) * 255)}, ${Math.round((color[2] ?? 1) * 255)}, ${color[3] ?? 1})`;
-    this.ctx.textAlign = align;
-    this.ctx.textBaseline = vertical === 'center' ? 'middle' : 'top';
-    this.ctx.fillText(text, x, y);
-    this.ctx.restore();
-  }
-
-  private setupEndVideo(container: HTMLElement) {
-    if (this.state.mapName !== 'end') return;
-    const videoEntity = this.state.entities.find((entity) => entity.typeName === '视频');
-    const src = String(videoEntity?.data['h264-source'] ?? '');
-    if (!videoEntity || !src) return;
-
-    this.videoRect = {
-      x: videoEntity.pos.x,
-      y: videoEntity.pos.y,
-      width: videoEntity.size.x,
-      height: videoEntity.size.y,
-    };
-    this.video = document.createElement('video');
-    this.video.src = src;
-    this.video.autoplay = true;
-    this.video.loop = true;
-    this.video.muted = true;
-    this.video.playsInline = true;
-    this.video.style.position = 'fixed';
-    this.video.style.objectFit = 'cover';
-    this.video.style.pointerEvents = 'none';
-    this.video.style.zIndex = '2';
-    container.appendChild(this.video);
-    void this.video.play().catch(() => undefined);
-  }
-
-  private positionEndVideo(canvasWidth: number, canvasHeight: number) {
-    if (!this.video || !this.videoRect) return;
-    const left = Math.floor((window.innerWidth - canvasWidth) / 2 + this.videoRect.x * (canvasWidth / this.canvas.width));
-    const top = Math.floor((window.innerHeight - canvasHeight) / 2 + this.videoRect.y * (canvasHeight / this.canvas.height));
-    const width = Math.floor(this.videoRect.width * (canvasWidth / this.canvas.width));
-    const height = Math.floor(this.videoRect.height * (canvasHeight / this.canvas.height));
-
-    this.video.style.left = `${left}px`;
-    this.video.style.top = `${top}px`;
-    this.video.style.width = `${width}px`;
-    this.video.style.height = `${height}px`;
   }
 
   private strokeFillText(text: string, x: number, y: number) {

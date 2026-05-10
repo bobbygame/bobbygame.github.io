@@ -174,13 +174,15 @@ function buildLayouts(project) {
   return layouts;
 }
 
-function buildAssetManifest(project) {
+function buildAssetManifest(project, usedTypes) {
   const objects = {};
 
   for (const raw of asArray(project[3])) {
     if (!Array.isArray(raw) || typeof raw[0] !== 'string') continue;
 
     const name = raw[0];
+    if (usedTypes && !usedTypes.has(name) && !usedTypes.has(normaliseName(name))) continue;
+
     const object = {
       name,
       animations: {},
@@ -221,6 +223,19 @@ function buildAssetManifest(project) {
   return { objects };
 }
 
+function collectUsedTypes(layouts, levelNames) {
+  const usedTypes = new Set();
+  for (const name of levelNames) {
+    for (const layer of asArray(layouts[name]?.layers)) {
+      for (const instance of asArray(layer.instances)) {
+        usedTypes.add(instance.type);
+        usedTypes.add(normaliseName(instance.type));
+      }
+    }
+  }
+  return usedTypes;
+}
+
 if (!fs.existsSync(sourcePath)) {
   console.error(`Missing source export: ${path.relative(root, sourcePath)}`);
   console.error('Usage: node scripts/export-game-data.mjs <path-to-source-data.json>');
@@ -229,11 +244,11 @@ if (!fs.existsSync(sourcePath)) {
 
 const source = JSON.parse(fs.readFileSync(sourcePath, 'utf8'));
 function levelSortKey(name) {
-  return name === 'end' ? Number.MAX_SAFE_INTEGER : Number(name.replace(/^map/, ''));
+  return Number(name.replace(/^map/, ''));
 }
 
 function writeLevel(name, layout) {
-  const constName = name === 'end' ? 'end' : name;
+  const constName = name;
   const source = `import type { Layout } from '../../game/layout';
 
 export const ${constName}: Layout = ${JSON.stringify(layout, null, 2)};
@@ -271,12 +286,14 @@ export const assetManifest: AssetManifest = ${JSON.stringify(assetManifest, null
 
 const project = asArray(source.project);
 const layouts = buildLayouts(project);
-const levelNames = Object.keys(layouts).sort((a, b) => levelSortKey(a) - levelSortKey(b));
+const levelNames = Object.keys(layouts)
+  .filter((name) => /^map\d+$/.test(name))
+  .sort((a, b) => levelSortKey(a) - levelSortKey(b));
 
 fs.mkdirSync(levelsDir, { recursive: true });
 for (const name of levelNames) writeLevel(name, layouts[name]);
 writeIndex(levelNames);
-writeAssets(buildAssetManifest(project));
+writeAssets(buildAssetManifest(project, collectUsedTypes(layouts, levelNames)));
 
 console.log(`Wrote ${levelNames.length} levels to ${path.relative(root, levelsDir)}`);
 console.log(`Wrote ${path.relative(root, path.join(contentDir, 'assets.ts'))}`);

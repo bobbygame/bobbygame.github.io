@@ -26,12 +26,12 @@ export class ButtonSystem {
       const isOn = entitiesAt(this.state, player.pos.x, player.pos.y).includes(btn);
       const wasOn = this.lastButtonState.get(btn.id) ?? false;
 
-      if (isOn && !wasOn && btn.data.open === true) {
-        // toggle all conveyorButton open states
+      if (isOn && !wasOn && Boolean(btn.data.open)) {
+        btn.data.open = false;
         for (const b of entities) {
-          if (b.kind === 'conveyorButton') b.data.open = !b.data.open;
+          if (b.kind === 'conveyorButton' && b.id !== btn.id) b.data.open = !Boolean(b.data.open);
         }
-        // toggle all conveyorBeltX isLeft states and update direction1
+
         for (const belt of entities) {
           if (belt.kind === 'conveyorX') {
             belt.data.direction1 = Number(belt.data.direction1 ?? 0) === 0 ? 1 : 0;
@@ -56,12 +56,12 @@ export class ButtonSystem {
       const isOn = entitiesAt(this.state, player.pos.x, player.pos.y).includes(btn);
       const wasOn = this.lastButtonState.get(btn.id) ?? false;
 
-      if (isOn && !wasOn && btn.data.open === true) {
-        // toggle all stoneButton open states
+      if (isOn && !wasOn && Boolean(btn.data.open)) {
+        btn.data.open = false;
         for (const b of entities) {
-          if (b.kind === 'stoneButton') b.data.open = !b.data.open;
+          if (b.kind === 'stoneButton' && b.id !== btn.id) b.data.open = !Boolean(b.data.open);
         }
-        // increment all stone.sign by 1, wrap at 3
+
         for (const stone of entities) {
           if (stone.kind === 'stone') {
             let sign = Number(stone.data.sign ?? 1);

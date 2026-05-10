@@ -448,18 +448,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "Keyboard": {
-      "name": "Keyboard",
-      "animations": {}
-    },
-    "keyboard": {
-      "name": "Keyboard",
-      "animations": {}
-    },
-    "音频": {
-      "name": "音频",
-      "animations": {}
-    },
     "carrot1": {
       "name": "carrot1",
       "animations": {
@@ -710,14 +698,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "Touch": {
-      "name": "Touch",
-      "animations": {}
-    },
-    "touch": {
-      "name": "Touch",
-      "animations": {}
-    },
     "channel": {
       "name": "channel",
       "animations": {
@@ -916,14 +896,6 @@ export const assetManifest: AssetManifest = {
         "w": 250,
         "h": 250
       }
-    },
-    "CarrotN": {
-      "name": "CarrotN",
-      "animations": {}
-    },
-    "carrotn": {
-      "name": "CarrotN",
-      "animations": {}
     },
     "barLeftTop": {
       "name": "barLeftTop",
@@ -1185,28 +1157,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "finallyBobby": {
-      "name": "finallyBobby",
-      "animations": {},
-      "frame": {
-        "sheet": "images/finallybobby-sheet0.png",
-        "x": 0,
-        "y": 0,
-        "w": 480,
-        "h": 640
-      }
-    },
-    "finallybobby": {
-      "name": "finallyBobby",
-      "animations": {},
-      "frame": {
-        "sheet": "images/finallybobby-sheet0.png",
-        "x": 0,
-        "y": 0,
-        "w": 480,
-        "h": 640
-      }
-    },
     "conveyorBeltX": {
       "name": "conveyorBeltX",
       "animations": {
@@ -1314,34 +1264,6 @@ export const assetManifest: AssetManifest = {
         "w": 50,
         "h": 50
       }
-    },
-    "浏览器": {
-      "name": "浏览器",
-      "animations": {}
-    },
-    "LocalStorage": {
-      "name": "LocalStorage",
-      "animations": {}
-    },
-    "localstorage": {
-      "name": "LocalStorage",
-      "animations": {}
-    },
-    "AJAX": {
-      "name": "AJAX",
-      "animations": {}
-    },
-    "ajax": {
-      "name": "AJAX",
-      "animations": {}
-    },
-    "WebSocket": {
-      "name": "WebSocket",
-      "animations": {}
-    },
-    "websocket": {
-      "name": "WebSocket",
-      "animations": {}
     },
     "trap": {
       "name": "trap",
@@ -1533,10 +1455,6 @@ export const assetManifest: AssetManifest = {
       "name": "Steps",
       "animations": {}
     },
-    "按钮": {
-      "name": "按钮",
-      "animations": {}
-    },
     "Continue": {
       "name": "Continue",
       "animations": {}
@@ -1598,10 +1516,6 @@ export const assetManifest: AssetManifest = {
         "w": 50,
         "h": 50
       }
-    },
-    "高级随机": {
-      "name": "高级随机",
-      "animations": {}
     },
     "stoneAngle": {
       "name": "stoneAngle",
@@ -2091,132 +2005,12 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "loadGame": {
-      "name": "loadGame",
-      "animations": {}
-    },
-    "loadgame": {
-      "name": "loadGame",
-      "animations": {}
-    },
-    "TheEnd": {
-      "name": "TheEnd",
-      "animations": {}
-    },
-    "theend": {
-      "name": "TheEnd",
-      "animations": {}
-    },
-    "Dictionary": {
-      "name": "Dictionary",
-      "animations": {}
-    },
-    "dictionary": {
-      "name": "Dictionary",
-      "animations": {}
-    },
-    "列表": {
-      "name": "列表",
-      "animations": {}
-    },
-    "分享": {
-      "name": "分享",
-      "animations": {}
-    },
-    "日期": {
-      "name": "日期",
-      "animations": {}
-    },
-    "视频": {
-      "name": "视频",
-      "animations": {}
-    },
-    "文件选择": {
-      "name": "文件选择",
-      "animations": {}
-    },
-    "文字输入": {
-      "name": "文字输入",
-      "animations": {}
-    },
-    "滑动条": {
-      "name": "滑动条",
-      "animations": {}
-    },
     "restartLevel": {
       "name": "restartLevel",
       "animations": {}
     },
     "restartlevel": {
       "name": "restartLevel",
-      "animations": {}
-    },
-    "Sprite": {
-      "name": "Sprite",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet0.png",
-              "x": 153,
-              "y": 385,
-              "w": 100,
-              "h": 100
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet0.png",
-        "x": 153,
-        "y": 385,
-        "w": 100,
-        "h": 100
-      }
-    },
-    "sprite": {
-      "name": "Sprite",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet0.png",
-              "x": 153,
-              "y": 385,
-              "w": 100,
-              "h": 100
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet0.png",
-        "x": 153,
-        "y": 385,
-        "w": 100,
-        "h": 100
-      }
-    },
-    "Dlut": {
-      "name": "Dlut",
-      "animations": {}
-    },
-    "dlut": {
-      "name": "Dlut",
-      "animations": {}
-    },
-    "Myblog": {
-      "name": "Myblog",
-      "animations": {}
-    },
-    "myblog": {
-      "name": "Myblog",
       "animations": {}
     },
     "Tilemap": {

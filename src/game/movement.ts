@@ -233,6 +233,7 @@ export class MovementSystem {
     if (!this.state.inventory.keys[color]) return false;
 
     lock.dead = true;
+    delete this.state.inventory.keys[color];
     this.state.events.push(`Unlock ${color}`);
     return true;
   }

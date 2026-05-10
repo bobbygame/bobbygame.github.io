@@ -24,9 +24,15 @@ const kindMap: Record<string, EntityKind> = {
 
 const skipTypes = new Set<string>([
   'continue',
+  'downCtrl',
+  'leftCtrl',
   'restartLevel',
   'restartLevel2',
   'restart',
+  'rightCtrl',
+  'Touch',
+  'touch',
+  'upCtrl',
   'whiteLayer',
 ]);
 
@@ -94,8 +100,8 @@ export async function loadGame(mapName: string): Promise<GameState> {
   }
 
   if (tilemapCols === 0 || tilemapRows === 0) {
-    tilemapCols = mapName === 'end' ? Math.ceil(Number(layout.width ?? 480) / TILE_SIZE) : 13;
-    tilemapRows = mapName === 'end' ? Math.ceil(Number(layout.height ?? 640) / TILE_SIZE) : 16;
+    tilemapCols = 13;
+    tilemapRows = 16;
     tilemapData = new Array(tilemapCols * tilemapRows).fill(0);
   }
 
@@ -108,8 +114,8 @@ export async function loadGame(mapName: string): Promise<GameState> {
     tilemap: {
       cols: tilemapCols,
       rows: tilemapRows,
-      width: mapName === 'end' ? Number(layout.width ?? tilemapCols * TILE_SIZE) : tilemapCols * TILE_SIZE,
-      height: mapName === 'end' ? Number(layout.height ?? tilemapRows * TILE_SIZE) : tilemapRows * TILE_SIZE,
+      width: tilemapCols * TILE_SIZE,
+      height: tilemapRows * TILE_SIZE,
       data: tilemapData,
       typeName: tilemapTypeName,
     },

@@ -14,7 +14,7 @@ function getNextMap(current: string): string | null {
   const match = current.match(/^map(\d+)$/);
   if (!match) return null;
   const num = parseInt(match[1]);
-  if (num >= 30) return 'end';
+  if (num >= 30) return null;
   return `map${num + 1}`;
 }
 

@@ -88,6 +88,7 @@ export function handleArrival(state: GameState) {
       const color = String(e.data.sign ?? '0');
       if (state.inventory.keys[color]) {
         e.dead = true;
+        delete state.inventory.keys[color];
         state.events.push(`Unlock ${color}`);
         audio.play('unlock');
       }
