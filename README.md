@@ -1,66 +1,89 @@
 # Bobby Carrot
 
-目标：把 Construct 3 导出的 Bobby Carrot 迁移成纯 Vite + TypeScript 项目，本地根路径逐步对齐线上 `https://game.snapre.online`，运行时不加载 Construct runtime 或 Construct 导出的 `data.json`。
+Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家控制兔子在 50px 网格地图中移动，收集每关要求的胡萝卜，理解机关规则，最终抵达出口。
 
-- `/`：纯 Vite/TypeScript 游戏入口。
-- `src/main.ts`：浏览器入口。
-- `src/game/`：游戏运行时、状态机、碰撞、机关、音频和 Canvas 渲染。
-- `src/content/`：项目自有数据，关卡按文件拆分。
-- `public/assets/`：运行时静态素材，按 `images`、`audio`、`fonts` 分组。
-- `GAME_DETAILS.md`：线上通关观察与 30 关对象矩阵。
+在线试玩：[https://bobbygame.github.io/bobbygame/](https://bobbygame.github.io/bobbygame/)
 
-## 开发
+## 游戏目标
+
+每一关都是一个小型机关谜题：
+
+- 收集当前关卡要求数量的胡萝卜。
+- 避开或利用陷阱、方向石、传送带、锁和按钮。
+- 找到可行路径，到达终点或打开出口。
+- 在移动端可以使用底部方向舵，桌面端使用方向键或 WASD。
+
+## 关卡设计
+
+项目目前包含 30 个关卡，关卡数据按文件拆分在 `src/content/levels/`。每关由 tilemap、实体实例和机关变量组成，运行时统一转换为游戏状态。
+
+核心设计元素：
+
+- **胡萝卜目标**：每关有独立的收集目标，HUD 中的 `Remain` 会显示剩余数量。
+- **钥匙与锁**：钥匙按颜色匹配锁，开锁后钥匙会被消耗，已持有钥匙会显示在右上角。
+- **方向石**：只能从开口方向进出。兔子踩过后离开格子时，方向石顺时针旋转一次。
+- **石块**：按当前方向限制通行。红色按钮会影响地图内石块方向。
+- **传送带**：按单向方向传送兔子，不能逆向进入。黄色按钮会反转传送带方向。
+- **按钮组**：踩下当前按钮后，同类型其他按钮会反转状态，并触发对应机关变化。
+- **陷阱**：第一次踩下会进入待触发状态，离开后重新变危险；再次踩中会失败。
+- **出口**：满足胡萝卜数量后出口打开，进入后完成关卡。
+
+关卡设计鼓励“先观察，再行动”：很多路线不是靠连续移动完成，而是通过改变机关状态、规划踩踏顺序和利用单向移动完成。
+
+## 本地开发
 
 ```sh
 npm install
 npm run dev
-# 打开 http://localhost:5173/ 查看纯 Vite 版本
 ```
 
-## 构建与预览
+默认地址：`http://localhost:5173/`
+
+指定关卡可以加查询参数：
+
+```txt
+http://localhost:5173/?map=map20
+```
+
+构建：
 
 ```sh
+npm run typecheck
 npm run build
-npm run preview
-# 预览 dist，访问 http://localhost:4173/
 ```
 
-## 目录
-- `src/main.ts`：游戏循环（键盘 ← → ↑ ↓ / WASD），调用系统驱动实体与渲染。
-- `src/game/*`：
-	- `layout.ts`：自有布局类型、布局读取和 tilemap RLE 解析。
-	- `loader.ts`：读取 `src/content` 并构造成运行态实体。
-	- `movement.ts`：网格移动、基础阻塞（墙/石头/方向石/锁）。
-	- `interactions.ts`：拾取钥匙/胡萝卜、开锁、到达终点、踩陷阱。
-	- `assets.ts`：素材 manifest 类型和读取入口。
-	- `render.ts`：Canvas 渲染真实 tilemap、精灵、HUD 和胜利/结束画面。
-- `src/content/levels/*.ts`：按关卡拆分的布局数据。
-- `src/content/assets.ts`：spritesheet 坐标和动画 manifest。
-- `public/assets/`：图片、音频和字体素材。
-- `scripts/export-game-data.mjs`：一次性转换工具，输入外部原始导出的 `data.json`，输出 `src/content`。
+## 项目结构
 
-## 目前已翻译的事件表核心
-- 关卡从 `src/content/levels` 按需加载；tilemap 和实体使用 atlas 坐标绘制，不依赖 Construct runtime。
-- 玩家网格移动（每格 50px），墙/石头/方向石/锁阻塞，方向石按 sign 粗译的方向阻断规则。
-- 钥匙/锁（按 sign 匹配消耗），胡萝卜计数，终点判定，陷阱击杀（简单结束）。
-- **石块推挤**：向石头移动时自动推动，需后方空地。
-- **传送带系统**：conveyorBeltX/Y 按 direction1 推送玩家（0=左/上，1=右/下）；到达格子后自动触发。
-- **传送带按钮**：踩到 conveyorBeltButton 切换所有传送带方向（toggle isLeft/isUp）。
-- **石块按钮**：踩到 stoneButton 旋转所有石头/方向石 sign（石头 1→2→3→1，方向石 1→5 循环）。
-- **时间/步数统计**：实时追踪游戏时间（MM:SS 格式）和移动步数，显示在 HUD 左上角。
-- **音效系统**：收集物品、开锁、按按钮、死亡、胜利时播放对应音效；背景音乐循环播放（可能被浏览器自动播放策略阻止）。
-- **动画状态**：追踪玩家状态（idle/moving/dead）和朝向（← → ↑ ↓），HUD 显示当前动画状态。
-- **胜利/死亡画面**：达到终点显示胜利提示（按任意键继续），死亡后 2 秒自动重启关卡。
+```txt
+src/main.ts                 游戏入口和主循环
+src/game/                   运行时系统
+src/game/movement.ts        网格移动、碰撞、锁、传送带移动
+src/game/interactions.ts    胡萝卜、钥匙、陷阱、出口等到达格处理
+src/game/buttons.ts         红色/黄色按钮和机关联动
+src/game/render.ts          Canvas 渲染、HUD、胜利/失败提示
+src/game/touchControls.ts   移动端方向舵
+src/content/levels/         关卡数据，每关一个文件
+src/content/assets.ts       精灵图坐标和动画配置
+public/assets/              图片、音频、字体素材
+```
 
-## 不足与待办
-- 物理/寻路行为、事件表其他细节（如特定关卡专用逻辑）未完全等价。
-- 结束页的视频对象目前未复刻。
-- 部分按钮、陷阱、方向石的事件细节仍需继续按线上表现补齐。
+## 参与共建
 
-## 下一步建议
-1) 扩展 TS 运行壳：
-	- 解析对象实例行为/变量，驱动实体更新循环。
-	- 替换图片 atlas/动画，重建精灵表驱动。
-2) 继续按线上表现补齐：
-	- 用手写状态机补齐剩余关卡专用逻辑。
-	- 增加关卡回归测试和关键路径截图比对。
+欢迎围绕“关卡设计”和“机关表现”参与贡献。比较适合的贡献方向：
+
+- **新增关卡**：基于现有关卡格式提交新的 `mapXX.ts`，说明目标胡萝卜数量、机关组合和推荐通关思路。
+- **优化关卡**：修复不可达路径、错误机关方向、误导性摆放、过难或过简单的路线。
+- **补齐机制**：如果发现和预期规则不一致，可以提交最小复现场景或直接修复运行时逻辑。
+- **改进素材**：在保持原版像素风的前提下，提升精灵、音效、HUD 和移动端控制体验。
+- **测试与验收**：补充关键关卡的通关路径说明、截图或自动化回归检查。
+
+提交建议：
+
+1. 一个 PR 聚焦一个主题，例如“修复第 4 关传送带方向”或“新增第 31 关”。
+2. 关卡改动请说明变更前后的可通关路径。
+3. 机制改动请说明影响到哪些实体类型，并尽量附带测试关卡或截图。
+4. 提交前运行 `npm run typecheck` 和 `npm run build`。
+
+## 技术说明
+
+当前项目是纯 Vite + TypeScript 工程，运行时不依赖 Construct runtime。地图、精灵、机关和状态机都由仓库内代码和数据驱动，方便社区继续维护和扩展。
