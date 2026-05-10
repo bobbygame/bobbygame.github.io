@@ -1,11 +1,19 @@
 {
   "name": "bobbygame",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
+  "bin": {
+    "bobby-carrot": "dist-tui/cli.js"
+  },
+  "files": [
+    "dist-tui",
+    "README.md"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:tui": "vite build --config vite.tui.config.js",
+    "prepare": "npm run build:tui",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },

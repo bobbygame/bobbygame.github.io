@@ -8,7 +8,7 @@ class AudioManager {
   private muted = false;
 
   constructor() {
-    this.preload();
+    if (typeof Audio !== 'undefined') this.preload();
   }
 
   private preload() {

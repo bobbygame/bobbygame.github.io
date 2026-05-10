@@ -52,6 +52,45 @@ npm run typecheck
 npm run build
 ```
 
+## 终端版本
+
+项目同时提供一个 TUI 版本，可以在终端里直接玩同一套关卡数据：
+
+```sh
+npm install -g github:bobbygame/bobbygame
+bobby-carrot
+```
+
+发布到 npm registry 后，也可以使用 `npm install -g bobbygame` 安装。
+
+本地开发时可以先构建再运行：
+
+```sh
+npm run build:tui
+node dist-tui/cli.js --map map1
+```
+
+TUI 默认使用 emoji 语义渲染：兔子、胡萝卜、木头栅栏、叶子背景、钥匙、锁、按钮、传送带都会用对应图标展示。部分终端对 emoji 宽度处理不一致时，可以切换到 ASCII 模式：
+
+```sh
+node dist-tui/cli.js --map map1 --ascii
+```
+
+终端控制：
+
+- 方向键 / WASD：移动兔子
+- R：重开当前关
+- N：通关后进入下一关
+- Q / Ctrl+C：退出
+
+本地生成 npm 安装包：
+
+```sh
+npm pack
+npm install -g ./bobbygame-0.0.0.tgz
+bobby-carrot
+```
+
 ## 项目结构
 
 ```txt
@@ -62,6 +101,7 @@ src/game/interactions.ts    胡萝卜、钥匙、陷阱、出口等到达格处�
 src/game/buttons.ts         红色/黄色按钮和机关联动
 src/game/render.ts          Canvas 渲染、HUD、胜利/失败提示
 src/game/touchControls.ts   移动端方向舵
+src/tui/cli.ts              终端版本入口和字符渲染
 src/content/levels/         关卡数据，每关一个文件
 src/content/assets.ts       精灵图坐标和动画配置
 public/assets/              图片、音频、字体素材
