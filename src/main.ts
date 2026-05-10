@@ -7,6 +7,7 @@ import { audio } from './game/audio';
 import { loadAssetManifest } from './game/assets';
 import { SpriteLoader } from './game/sprites';
 import { installFonts } from './game/fonts';
+import { VirtualJoystick } from './game/touchControls';
 
 const params = new URLSearchParams(window.location.search);
 const mapName = params.get('map') ?? 'map1';
@@ -32,6 +33,7 @@ async function main() {
   const move = new MovementSystem(state);
   const buttons = new ButtonSystem(state);
   const renderer = new Renderer(state, container, sprites);
+  const joystick = new VirtualJoystick();
 
   // Start background music (may be blocked by autoplay policy)
   audio.playBgMusic();
@@ -76,6 +78,8 @@ async function main() {
       winTimer += dt;
       // Show win screen, wait for key press
     } else {
+      const joystickDirection = joystick.direction();
+      if (joystickDirection) move.setIntent(joystickDirection);
       move.update(dt);
       buttons.update();
       // Only trigger tile interactions when the player has fully arrived on a cell.

@@ -28,6 +28,65 @@
       image-rendering: pixelated;
       touch-action: none;
     }
+
+    .touch-joystick {
+      --joystick-size: clamp(104px, 24vw, 136px);
+      --joystick-ring: rgba(255, 255, 255, 0.18);
+      --joystick-edge: rgba(255, 255, 255, 0.45);
+      --joystick-knob: rgba(255, 232, 88, 0.92);
+      --joystick-shadow: rgba(0, 0, 0, 0.35);
+      position: fixed;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      width: var(--joystick-size);
+      height: var(--joystick-size);
+      display: none;
+      place-items: center;
+      transform: translateX(-50%);
+      z-index: 10;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .touch-joystick__ring,
+    .touch-joystick__knob {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .touch-joystick__ring {
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0 29%, transparent 30%),
+        var(--joystick-ring);
+      border: 2px solid var(--joystick-edge);
+      box-shadow: 0 8px 22px var(--joystick-shadow), inset 0 0 0 8px rgba(0, 0, 0, 0.16);
+    }
+
+    .touch-joystick__knob {
+      width: 44%;
+      height: 44%;
+      background: var(--joystick-knob);
+      border: 2px solid rgba(255, 255, 255, 0.72);
+      box-shadow: 0 6px 16px var(--joystick-shadow), inset 0 -6px 0 rgba(0, 0, 0, 0.16);
+      transition: transform 120ms ease;
+    }
+
+    .touch-joystick--active .touch-joystick__knob {
+      transition: none;
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      .touch-joystick {
+        display: grid;
+      }
+    }
   </style>
 </head>
 <body>
