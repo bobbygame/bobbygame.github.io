@@ -1,5 +1,6 @@
 import type { AssetManifest, ObjectAsset, SpriteFrame } from './assets';
 import type { Entity, GameState } from './types';
+import { assetUrl } from './paths';
 
 export class SpriteLoader {
   private sheets: Map<string, HTMLImageElement> = new Map();
@@ -33,7 +34,7 @@ export class SpriteLoader {
         reject(e);
       };
     });
-    img.src = name.startsWith('images/') ? `/assets/${name}` : `/assets/images/${name}`;
+    img.src = assetUrl(name.startsWith('images/') ? `assets/${name}` : `assets/images/${name}`);
     return promise;
   }
 

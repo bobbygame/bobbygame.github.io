@@ -6,6 +6,7 @@ import { Renderer } from './game/render';
 import { audio } from './game/audio';
 import { loadAssetManifest } from './game/assets';
 import { SpriteLoader } from './game/sprites';
+import { installFonts } from './game/fonts';
 
 const params = new URLSearchParams(window.location.search);
 const mapName = params.get('map') ?? 'map1';
@@ -21,6 +22,7 @@ function getNextMap(current: string): string | null {
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('App container missing');
 const container = app;
+installFonts();
 
 async function main() {
   const manifest = await loadAssetManifest();

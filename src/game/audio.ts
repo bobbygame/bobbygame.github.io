@@ -1,3 +1,5 @@
+import { assetUrl } from './paths';
+
 export type SoundEffect = 'move' | 'collect' | 'button' | 'die' | 'win' | 'unlock';
 
 class AudioManager {
@@ -11,12 +13,12 @@ class AudioManager {
 
   private preload() {
     const soundMap: Record<SoundEffect, string> = {
-      move: '/assets/audio/go.webm',
-      collect: '/assets/audio/go.webm',
-      button: '/assets/audio/lock2.mp3',
-      die: '/assets/audio/dead.mp3',
-      win: '/assets/audio/success.mp3',
-      unlock: '/assets/audio/lock2.mp3',
+      move: assetUrl('assets/audio/go.webm'),
+      collect: assetUrl('assets/audio/go.webm'),
+      button: assetUrl('assets/audio/lock2.mp3'),
+      die: assetUrl('assets/audio/dead.mp3'),
+      win: assetUrl('assets/audio/success.mp3'),
+      unlock: assetUrl('assets/audio/lock2.mp3'),
     };
 
     for (const [key, path] of Object.entries(soundMap)) {
@@ -26,7 +28,7 @@ class AudioManager {
       this.sounds.set(key as SoundEffect, audio);
     }
 
-    this.bgMusic = new Audio('/assets/audio/main.mp3');
+    this.bgMusic = new Audio(assetUrl('assets/audio/main.mp3'));
     this.bgMusic.loop = true;
     this.bgMusic.volume = 0.3;
     this.bgMusic.preload = 'auto';
