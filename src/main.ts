@@ -1,6 +1,7 @@
 import { installFonts } from './game/fonts';
 import { BrowserGameRuntime } from './game/runtime';
 import { FIRST_LEVEL } from './game/levelProgression';
+import { currentRoutePath } from './game/paths';
 
 const params = new URLSearchParams(window.location.search);
 const mapName = params.get('map') ?? FIRST_LEVEL;
@@ -12,7 +13,8 @@ const container = app;
 installFonts();
 
 async function main() {
-  if (window.location.pathname.startsWith('/editor')) {
+  const routePath = currentRoutePath();
+  if (routePath === '/editor' || routePath.startsWith('/editor/')) {
     const { mountEditor } = await import('./editor/app');
     await mountEditor(container);
     return;

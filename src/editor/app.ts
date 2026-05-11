@@ -14,6 +14,7 @@ import { gameStateFromLevelDefinition } from '../game/levelAdapter';
 import type { LevelEntityDefinition } from '../game/levelDefinition';
 import { loadLevelDefinition } from '../game/loader';
 import { validateLevelDefinition } from '../game/levelValidation';
+import { appUrl } from '../game/paths';
 import { Renderer } from '../game/render';
 import { GameSimulation } from '../game/simulation';
 import { SpriteLoader } from '../game/sprites';
@@ -188,7 +189,7 @@ class LevelEditor {
           <button type="button" data-action="import">Import</button>
           <button type="button" data-action="export">Export</button>
           <button type="button" data-action="playtest" class="editor-primary">Playtest</button>
-          <a href="/" class="editor-link">Game</a>
+          <a href="${appUrl()}" class="editor-link">Game</a>
           <input data-import-file type="file" accept="application/json,.json,.bobby-level.json" hidden />
         </div>
       </header>
@@ -357,7 +358,7 @@ class LevelEditor {
     }
     if (action === 'open-game') {
       this.saveCurrentToLibrary();
-      window.location.href = `/?community=${encodeURIComponent(this.document.id)}`;
+      window.location.href = appUrl(`?community=${encodeURIComponent(this.document.id)}`);
       return;
     }
     if (action === 'undo') {
