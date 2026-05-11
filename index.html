@@ -196,6 +196,7 @@
     .editor-link,
     .editor-fieldset input,
     .editor-fieldset select,
+    .editor-fieldset button,
     .editor-playtest button {
       min-height: 34px;
       border-radius: 6px;
@@ -209,6 +210,7 @@
     .editor-chip,
     .editor-actions button,
     .editor-link,
+    .editor-fieldset button,
     .editor-playtest button {
       cursor: pointer;
       padding: 0 10px;
@@ -312,6 +314,50 @@
       width: 100%;
       box-sizing: border-box;
       padding: 0 9px;
+    }
+
+    .editor-asset-preview {
+      display: grid;
+      place-items: center;
+      min-height: 144px;
+      margin: 8px 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #11130d;
+    }
+
+    .editor-asset-preview canvas,
+    .editor-frame-button canvas {
+      image-rendering: pixelated;
+    }
+
+    .editor-frame-strip {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding: 2px 0 10px;
+      margin-bottom: 8px;
+    }
+
+    .editor-frame-button {
+      flex: 0 0 54px;
+      display: grid;
+      place-items: center;
+      gap: 3px;
+      min-height: 64px;
+      padding: 5px;
+      font-size: 11px;
+    }
+
+    .editor-frame-button.is-active {
+      border-color: var(--accent);
+      background: #3d3717;
+      color: #fff7c7;
+    }
+
+    .editor-export-button {
+      width: 100%;
+      margin-top: 6px;
     }
 
     .editor-field-row {

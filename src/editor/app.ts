@@ -1,6 +1,6 @@
 import { levelNames } from '../content';
 import { actionFromKeyboardKey } from '../game/actions';
-import { loadAssetManifest, type SpriteFrame } from '../game/assets';
+import { loadAssetManifest, type AssetManifest, type ObjectAsset, type SpriteAnimation, type SpriteFrame } from '../game/assets';
 import {
   createCommunityLevel,
   deleteCommunityLevel,
@@ -95,9 +95,21 @@ class LevelEditor {
   private librarySelect!: HTMLSelectElement;
   private libraryStatus!: HTMLElement;
   private fileInput!: HTMLInputElement;
+  private assetObjectSelect!: HTMLSelectElement;
+  private assetAnimationSelect!: HTMLSelectElement;
+  private assetPreview!: HTMLCanvasElement;
+  private assetPreviewCtx!: CanvasRenderingContext2D;
+  private assetFrames!: HTMLElement;
+  private assetFrameEditor!: HTMLElement;
+  private assetMeta!: HTMLElement;
   private pointerPainting = false;
   private pointerHistoryCaptured = false;
   private draggingEntityId: number | null = null;
+  private assetManifest?: AssetManifest;
+  private selectedAssetName = 'bobby';
+  private selectedAssetAnimation = 'downStop';
+  private selectedAssetFrameIndex = 0;
+  private assetPreviewRaf = 0;
   private sprites?: SpriteLoader;
   private playtest?: {
     overlay: HTMLDivElement;
@@ -127,20 +139,32 @@ class LevelEditor {
     this.librarySelect = q<HTMLSelectElement>(this.root, '[data-local-level]');
     this.libraryStatus = q(this.root, '[data-library-status]');
     this.fileInput = q<HTMLInputElement>(this.root, '[data-import-file]');
+    this.assetObjectSelect = q<HTMLSelectElement>(this.root, '[data-asset-object]');
+    this.assetAnimationSelect = q<HTMLSelectElement>(this.root, '[data-asset-animation]');
+    this.assetPreview = q<HTMLCanvasElement>(this.root, '[data-asset-preview]');
+    const assetPreviewCtx = this.assetPreview.getContext('2d');
+    if (!assetPreviewCtx) throw new Error('Canvas not supported');
+    this.assetPreviewCtx = assetPreviewCtx;
+    this.assetFrames = q(this.root, '[data-asset-frames]');
+    this.assetFrameEditor = q(this.root, '[data-asset-frame-editor]');
+    this.assetMeta = q(this.root, '[data-asset-meta]');
 
     await this.preloadSprites();
     this.bindEvents();
     this.fillDocumentFields();
     this.renderLibraryOptions();
     this.renderAll();
+    this.startAssetPreviewLoop();
   }
 
   private async preloadSprites() {
     try {
-      this.sprites = new SpriteLoader(await loadAssetManifest());
+      this.assetManifest = structuredClone(await loadAssetManifest());
+      this.sprites = new SpriteLoader(this.assetManifest);
       await this.sprites.preloadAll();
     } catch (error) {
       console.warn('Editor sprite preload failed; falling back to symbolic rendering.', error);
+      this.assetManifest = undefined;
       this.sprites = undefined;
     }
   }
@@ -233,6 +257,27 @@ class LevelEditor {
             </div>
             <label>Required carrots<input data-level-field="requiredCarrots" type="number" min="0" /></label>
           </section>
+          <section class="editor-fieldset">
+            <h2>Asset Animation</h2>
+            <label>Object<select data-asset-field="object" data-asset-object></select></label>
+            <label>Animation<select data-asset-field="animation" data-asset-animation></select></label>
+            <div class="editor-asset-preview">
+              <canvas data-asset-preview width="128" height="128"></canvas>
+            </div>
+            <p data-asset-meta class="editor-muted"></p>
+            <div data-asset-frames class="editor-frame-strip"></div>
+            <div class="editor-field-row">
+              <label>Speed<input data-asset-field="speed" type="number" min="0" step="1" /></label>
+              <label>Loop
+                <select data-asset-field="looping">
+                  <option value="true">loop</option>
+                  <option value="false">once</option>
+                </select>
+              </label>
+            </div>
+            <div data-asset-frame-editor></div>
+            <button type="button" data-action="export-assets" class="editor-export-button">Export Asset JSON</button>
+          </section>
           <section data-inspector class="editor-fieldset"></section>
           <section class="editor-fieldset">
             <h2>Diagnostics</h2>
@@ -246,6 +291,13 @@ class LevelEditor {
   private bindEvents() {
     this.root.addEventListener('click', (event) => {
       const target = event.target instanceof Element ? event.target : null;
+      const frameButton = target?.closest<HTMLButtonElement>('[data-asset-frame]');
+      if (frameButton) {
+        this.selectedAssetFrameIndex = Number(frameButton.dataset.assetFrame ?? 0);
+        this.renderAssetPanel();
+        return;
+      }
+
       const button = target?.closest<HTMLButtonElement | HTMLAnchorElement>('[data-action], [data-tool]');
       if (!button || button instanceof HTMLAnchorElement) return;
 
@@ -262,6 +314,10 @@ class LevelEditor {
     this.root.addEventListener('input', (event) => {
       const target = event.target;
       if (!(target instanceof HTMLInputElement || target instanceof HTMLSelectElement)) return;
+      if (target.dataset.assetField || target.dataset.assetFrameField) {
+        this.handleAssetFieldInput(target);
+        return;
+      }
       this.handleFieldInput(target);
     });
 
@@ -375,6 +431,10 @@ class LevelEditor {
     }
     if (action === 'export') {
       this.exportCurrentLevel();
+      return;
+    }
+    if (action === 'export-assets') {
+      this.exportAssetManifest();
       return;
     }
     if (action === 'playtest') {
@@ -577,6 +637,7 @@ class LevelEditor {
   private renderAll() {
     this.renderToolState();
     this.renderToolPreviews();
+    this.renderAssetPanel();
     this.renderCanvas();
     this.renderInspector();
     this.renderDiagnostics();
@@ -604,6 +665,223 @@ class LevelEditor {
     const level = this.document.level;
     const carrotCount = level.entities.filter((entity) => entity.kind === 'carrot').length;
     this.stats.textContent = `${level.tilemap.cols}x${level.tilemap.rows} / ${level.entities.length} entities / ${carrotCount} carrots`;
+  }
+
+  private assetObjects(): Array<[string, ObjectAsset]> {
+    if (!this.assetManifest) return [];
+    return Object.entries(this.assetManifest.objects)
+      .filter(([key, object]) => key === object.name && (Boolean(object.frame) || Object.keys(object.animations).length > 0))
+      .sort(([a], [b]) => a.localeCompare(b));
+  }
+
+  private ensureAssetSelection() {
+    if (!this.assetManifest) return;
+    const objects = this.assetObjects();
+    if (objects.length === 0) return;
+
+    if (!this.assetManifest.objects[this.selectedAssetName]) {
+      this.selectedAssetName = objects.find(([name]) => name === 'bobby')?.[0] ?? objects[0][0];
+    }
+
+    const object = this.assetManifest.objects[this.selectedAssetName];
+    const animationNames = this.animationNamesForObject(object);
+    if (!animationNames.includes(this.selectedAssetAnimation)) {
+      this.selectedAssetAnimation = animationNames.includes('downStop') ? 'downStop' : (animationNames[0] ?? '__frame');
+    }
+
+    const animation = this.selectedAssetAnimationEntry();
+    const maxFrameIndex = Math.max(0, (animation?.frames.length ?? 1) - 1);
+    this.selectedAssetFrameIndex = clamp(this.selectedAssetFrameIndex, 0, maxFrameIndex);
+  }
+
+  private animationNamesForObject(object: ObjectAsset): string[] {
+    const names = Object.keys(object.animations);
+    if (object.frame) names.unshift('__frame');
+    return names;
+  }
+
+  private selectedAssetAnimationEntry(): {
+    object: ObjectAsset;
+    name: string;
+    animation?: SpriteAnimation;
+    frames: SpriteFrame[];
+    staticFrame: boolean;
+  } | null {
+    const object = this.assetManifest?.objects[this.selectedAssetName];
+    if (!object) return null;
+
+    if (this.selectedAssetAnimation === '__frame') {
+      return object.frame
+        ? { object, name: '__frame', frames: [object.frame], staticFrame: true }
+        : null;
+    }
+
+    const animation = object.animations[this.selectedAssetAnimation];
+    if (!animation) return null;
+    return { object, name: this.selectedAssetAnimation, animation, frames: animation.frames, staticFrame: false };
+  }
+
+  private renderAssetPanel() {
+    if (!this.assetManifest) {
+      this.assetMeta.textContent = 'Assets could not be loaded.';
+      return;
+    }
+
+    this.ensureAssetSelection();
+    const objects = this.assetObjects();
+    this.assetObjectSelect.innerHTML = objects.map(([name, object]) => (
+      `<option value="${escapeHtml(name)}" ${name === this.selectedAssetName ? 'selected' : ''}>${escapeHtml(object.name)}</option>`
+    )).join('');
+
+    const object = this.assetManifest.objects[this.selectedAssetName];
+    const animationNames = object ? this.animationNamesForObject(object) : [];
+    this.assetAnimationSelect.innerHTML = animationNames.map((name) => (
+      `<option value="${escapeHtml(name)}" ${name === this.selectedAssetAnimation ? 'selected' : ''}>${name === '__frame' ? 'Static frame' : escapeHtml(name)}</option>`
+    )).join('');
+
+    const selected = this.selectedAssetAnimationEntry();
+    const speedInput = q<HTMLInputElement>(this.root, '[data-asset-field="speed"]');
+    const loopingSelect = q<HTMLSelectElement>(this.root, '[data-asset-field="looping"]');
+
+    speedInput.disabled = !selected?.animation;
+    loopingSelect.disabled = !selected?.animation;
+    speedInput.value = String(selected?.animation?.speed ?? 0);
+    loopingSelect.value = String(selected?.animation?.looping ?? false);
+
+    const frames = selected?.frames ?? [];
+    this.assetMeta.textContent = selected
+      ? `${selected.object.name} / ${selected.name === '__frame' ? 'static' : selected.name} / ${frames.length} frame${frames.length === 1 ? '' : 's'}`
+      : 'No animation selected.';
+
+    this.assetFrames.innerHTML = frames.map((_, index) => `
+      <button type="button" class="editor-frame-button ${index === this.selectedAssetFrameIndex ? 'is-active' : ''}" data-asset-frame="${index}">
+        <canvas width="42" height="42" data-asset-frame-canvas="${index}" aria-hidden="true"></canvas>
+        <span>${index + 1}</span>
+      </button>
+    `).join('');
+
+    const frame = frames[this.selectedAssetFrameIndex];
+    this.assetFrameEditor.innerHTML = frame ? `
+      <label>Sheet<input data-asset-frame-field="sheet" value="${escapeHtml(frame.sheet)}" /></label>
+      <div class="editor-field-row">
+        <label>X<input data-asset-frame-field="x" type="number" min="0" value="${frame.x}" /></label>
+        <label>Y<input data-asset-frame-field="y" type="number" min="0" value="${frame.y}" /></label>
+      </div>
+      <div class="editor-field-row">
+        <label>W<input data-asset-frame-field="w" type="number" min="1" value="${frame.w}" /></label>
+        <label>H<input data-asset-frame-field="h" type="number" min="1" value="${frame.h}" /></label>
+      </div>
+    ` : '<p class="editor-muted">No frame selected.</p>';
+
+    this.drawAssetFrameStrip();
+    this.drawAssetPreview();
+  }
+
+  private handleAssetFieldInput(target: HTMLInputElement | HTMLSelectElement) {
+    const assetField = target.dataset.assetField;
+    if (assetField === 'object') {
+      this.selectedAssetName = target.value;
+      this.selectedAssetAnimation = '';
+      this.selectedAssetFrameIndex = 0;
+      this.renderAssetPanel();
+      return;
+    }
+    if (assetField === 'animation') {
+      this.selectedAssetAnimation = target.value;
+      this.selectedAssetFrameIndex = 0;
+      this.renderAssetPanel();
+      return;
+    }
+
+    const selected = this.selectedAssetAnimationEntry();
+    if (!selected) return;
+
+    if (assetField === 'speed' && selected.animation) {
+      selected.animation.speed = Math.max(0, Number(target.value || 0));
+      this.drawAssetPreview();
+      return;
+    }
+    if (assetField === 'looping' && selected.animation) {
+      selected.animation.looping = target.value === 'true';
+      this.drawAssetPreview();
+      return;
+    }
+
+    const frameField = target.dataset.assetFrameField;
+    const frame = selected.frames[this.selectedAssetFrameIndex];
+    if (!frame || !frameField) return;
+
+    if (frameField === 'sheet') {
+      frame.sheet = target.value;
+    } else if (frameField === 'x' || frameField === 'y') {
+      frame[frameField] = Math.max(0, Math.round(Number(target.value || 0)));
+    } else if (frameField === 'w' || frameField === 'h') {
+      frame[frameField] = Math.max(1, Math.round(Number(target.value || 1)));
+    }
+    this.drawAssetFrameStrip();
+    this.drawAssetPreview();
+  }
+
+  private startAssetPreviewLoop() {
+    if (this.assetPreviewRaf) cancelAnimationFrame(this.assetPreviewRaf);
+    const tick = () => {
+      this.drawAssetPreview();
+      this.assetPreviewRaf = requestAnimationFrame(tick);
+    };
+    this.assetPreviewRaf = requestAnimationFrame(tick);
+  }
+
+  private drawAssetPreview() {
+    const selected = this.selectedAssetAnimationEntry();
+    const { assetPreviewCtx: ctx, assetPreview: canvas } = this;
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f120b';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const frame = this.assetPreviewFrame(selected);
+    if (!frame || !this.sprites) return;
+    this.drawFrameFitted(ctx, frame, canvas.width, canvas.height, 12);
+  }
+
+  private assetPreviewFrame(selected = this.selectedAssetAnimationEntry()): SpriteFrame | undefined {
+    if (!selected || selected.frames.length === 0) return undefined;
+    if (!selected.animation || selected.animation.speed === 0) return selected.frames[this.selectedAssetFrameIndex] ?? selected.frames[0];
+
+    const elapsed = performance.now() / 1000;
+    const frameIndex = selected.animation.looping
+      ? Math.floor(elapsed * selected.animation.speed) % selected.frames.length
+      : Math.min(selected.frames.length - 1, Math.floor(elapsed * selected.animation.speed));
+    return selected.frames[frameIndex];
+  }
+
+  private drawAssetFrameStrip() {
+    const selected = this.selectedAssetAnimationEntry();
+    if (!selected || !this.sprites) return;
+
+    for (const canvas of this.assetFrames.querySelectorAll<HTMLCanvasElement>('[data-asset-frame-canvas]')) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) continue;
+      const frameIndex = Number(canvas.dataset.assetFrameCanvas ?? 0);
+      const frame = selected.frames[frameIndex];
+      ctx.imageSmoothingEnabled = false;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#0f120b';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (frame) this.drawFrameFitted(ctx, frame, canvas.width, canvas.height, 3);
+    }
+  }
+
+  private drawFrameFitted(ctx: CanvasRenderingContext2D, frame: SpriteFrame, width: number, height: number, padding: number) {
+    if (!this.sprites) return;
+    const maxWidth = Math.max(1, width - padding * 2);
+    const maxHeight = Math.max(1, height - padding * 2);
+    const scale = Math.min(maxWidth / frame.w, maxHeight / frame.h);
+    const drawWidth = Math.max(1, Math.round(frame.w * scale));
+    const drawHeight = Math.max(1, Math.round(frame.h * scale));
+    const x = Math.round((width - drawWidth) / 2);
+    const y = Math.round((height - drawHeight) / 2);
+    this.sprites.drawSprite(ctx, frame, x, y, drawWidth, drawHeight);
   }
 
   private renderCanvas() {
@@ -855,6 +1133,16 @@ class LevelEditor {
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${sanitizeFileName(this.document.title)}.bobby-level.json`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
+
+  private exportAssetManifest() {
+    if (!this.assetManifest) return;
+    const blob = new Blob([`${JSON.stringify(this.assetManifest, null, 2)}\n`], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'bobby-asset-manifest.json';
     link.click();
     URL.revokeObjectURL(link.href);
   }
