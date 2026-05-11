@@ -13,6 +13,7 @@
       background: #000;
       color: #fff;
       touch-action: none;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     #app {
@@ -85,6 +86,312 @@
     @media (hover: none), (pointer: coarse) {
       .touch-joystick {
         display: grid;
+      }
+    }
+
+    .editor-host {
+      place-items: stretch !important;
+      background: #151610 !important;
+      color: #f5f0df;
+      touch-action: auto;
+    }
+
+    .level-editor {
+      --panel: #23251b;
+      --panel-2: #191b14;
+      --line: #4c513c;
+      --text: #f5f0df;
+      --muted: #b8b297;
+      --accent: #f0c84b;
+      --accent-2: #57c785;
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      grid-template-rows: 56px 1fr;
+      background: #151610;
+      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .editor-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--line);
+      background: #202218;
+      min-width: 0;
+    }
+
+    .editor-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .editor-brand strong {
+      font-size: 18px;
+    }
+
+    .editor-brand span,
+    .editor-muted {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .editor-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .editor-shell {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 236px minmax(360px, 1fr) 320px;
+    }
+
+    .editor-panel {
+      min-height: 0;
+      overflow: auto;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 16px;
+    }
+
+    .editor-inspector {
+      border-right: 0;
+      border-left: 1px solid var(--line);
+    }
+
+    .editor-panel section + section,
+    .editor-fieldset + .editor-fieldset {
+      margin-top: 18px;
+    }
+
+    .editor-panel h2,
+    .editor-fieldset h2 {
+      margin: 0 0 10px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #d9d1ac;
+    }
+
+    .editor-chip-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .editor-chip,
+    .editor-actions button,
+    .editor-actions select,
+    .editor-link,
+    .editor-fieldset input,
+    .editor-fieldset select,
+    .editor-playtest button {
+      min-height: 34px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #171910;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .editor-chip,
+    .editor-actions button,
+    .editor-link,
+    .editor-playtest button {
+      cursor: pointer;
+      padding: 0 10px;
+    }
+
+    .editor-chip {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      line-height: 1.1;
+      min-width: 0;
+    }
+
+    .editor-chip--tile {
+      justify-content: flex-start;
+    }
+
+    .editor-chip span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .editor-chip.is-active,
+    .editor-primary {
+      border-color: var(--accent);
+      background: #3d3717;
+      color: #fff7c7;
+    }
+
+    .editor-actions button:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .editor-swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      flex: 0 0 auto;
+    }
+
+    .editor-tool-preview {
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      image-rendering: pixelated;
+      border-radius: 3px;
+      background: #0f120b;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .editor-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .editor-workspace {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.04) 1px, transparent 1px),
+        #11130d;
+      background-size: 24px 24px;
+    }
+
+    .editor-canvas-frame {
+      padding: 10px;
+      border: 1px solid #555b45;
+      background: #25281c;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.32);
+    }
+
+    [data-editor-canvas] {
+      max-width: min(80vw, 920px);
+      max-height: calc(100vh - 130px);
+      background: #1fa33a;
+      cursor: crosshair;
+    }
+
+    .editor-fieldset label {
+      display: grid;
+      gap: 6px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .editor-fieldset input,
+    .editor-fieldset select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 9px;
+    }
+
+    .editor-field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .editor-diagnostics {
+      display: grid;
+      gap: 8px;
+    }
+
+    .editor-diagnostic,
+    .editor-ok {
+      margin: 0;
+      padding: 9px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.35;
+      background: #171910;
+      border: 1px solid var(--line);
+    }
+
+    .editor-ok {
+      color: #b7f7c4;
+      border-color: #315c3d;
+    }
+
+    .editor-diagnostic--error {
+      color: #ffd0d0;
+      border-color: #7f1d1d;
+      background: #341919;
+    }
+
+    .editor-diagnostic--warning {
+      color: #fff2b8;
+      border-color: #7c5d12;
+      background: #332811;
+    }
+
+    .editor-playtest {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      grid-template-rows: 52px 1fr;
+      background: #050505;
+    }
+
+    .editor-playtest__bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: flex-end;
+      padding: 0 14px;
+      border-bottom: 1px solid #333;
+      background: #151610;
+    }
+
+    .editor-playtest__bar strong {
+      margin-right: auto;
+    }
+
+    .editor-playtest__stage {
+      display: grid;
+      place-items: center;
+      min-height: 0;
+    }
+
+    @media (max-width: 980px) {
+      .editor-shell {
+        grid-template-columns: 180px minmax(280px, 1fr);
+      }
+
+      .editor-inspector {
+        grid-column: 1 / -1;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        max-height: 34vh;
       }
     }
   </style>

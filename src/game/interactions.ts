@@ -1,5 +1,4 @@
 import type { GameState, Entity } from './types';
-import { audio } from './audio';
 
 function sameGridCell(a: Entity, b: Entity, tileSize: number): boolean {
   return Math.round(a.pos.x / tileSize) === Math.round(b.pos.x / tileSize)
@@ -75,14 +74,12 @@ export function handleArrival(state: GameState) {
       e.dead = true;
       state.inventory.carrots += 1;
       state.events.push('Carrot +1');
-      audio.play('collect');
     }
     if (e.kind === 'key') {
       e.dead = true;
       const color = String(e.data.sign ?? '0');
       state.inventory.keys[color] = true;
       state.events.push(`Key ${color}`);
-      audio.play('collect');
     }
     if (e.kind === 'lock') {
       const color = String(e.data.sign ?? '0');
@@ -90,7 +87,6 @@ export function handleArrival(state: GameState) {
         e.dead = true;
         delete state.inventory.keys[color];
         state.events.push(`Unlock ${color}`);
-        audio.play('unlock');
       }
     }
     if (e.kind === 'trap') {
@@ -99,7 +95,6 @@ export function handleArrival(state: GameState) {
         state.events.push('Hit trap');
         state.player.dead = true;
         state.animation.state = 'dead';
-        audio.play('die');
       } else {
         // First press: mark to arm after leaving this tile
         state.lastTrapSteppedId = e.id;
@@ -115,12 +110,10 @@ export function handleArrival(state: GameState) {
     if (e.kind === 'goal') {
       state.won = true;
       state.events.push('Goal reached');
-      audio.play('win');
     }
     if (e.kind === 'channel' && state.channelOpen) {
       state.won = true;
       state.events.push('Level complete!');
-      audio.play('win');
     }
   }
 }

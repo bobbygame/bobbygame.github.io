@@ -45,6 +45,13 @@ export class Renderer {
     window.addEventListener('resize', () => this.resize());
   }
 
+  setState(state: GameState) {
+    this.state = state;
+    this.canvas.width = state.tilemap.width || 650;
+    this.canvas.height = state.tilemap.height || 800;
+    this.resize();
+  }
+
   resize() {
     const scale = Math.min(window.innerWidth / this.canvas.width, window.innerHeight / this.canvas.height);
     const width = Math.floor(this.canvas.width * scale);

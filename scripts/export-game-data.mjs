@@ -260,7 +260,14 @@ export default ${constName};
 
 function writeIndex(levelNames) {
   const loaders = levelNames.map((name) => `  ${JSON.stringify(name)}: () => import('./levels/${name}'),`).join('\n');
+  const names = levelNames.map((name) => `  ${JSON.stringify(name)}`).join(',\n');
   const source = `import type { Layout } from '../game/layout';
+
+export const levelNames = [
+${names}
+] as const;
+
+export type LevelName = typeof levelNames[number];
 
 const levelLoaders: Record<string, () => Promise<{ default: Layout }>> = {
 ${loaders}

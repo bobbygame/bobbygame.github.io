@@ -72,6 +72,7 @@ export interface LayoutFile {
   layers: Array<{
     instances: Array<{
       type: string;
+      uid: number;
       world: { x: number; y: number; width: number; height: number; angle?: number };
       properties?: Record<string, unknown>;
       instanceVariables?: Record<string, unknown>;

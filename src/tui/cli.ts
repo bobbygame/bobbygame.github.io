@@ -1,7 +1,7 @@
 import { loadGame } from '../game/loader';
-import { MovementSystem, type Direction } from '../game/movement';
-import { ButtonSystem } from '../game/buttons';
-import { armTrapIfLeft, handleArrival } from '../game/interactions';
+import { nextMapName } from '../game/levelProgression';
+import { GameSimulation } from '../game/simulation';
+import type { Direction } from '../game/movement';
 import type { Entity, GameState } from '../game/types';
 
 declare const process: {
@@ -72,13 +72,6 @@ function parseMapName(): string {
 
 function parseRenderMode(): RenderMode {
   return process.argv.includes('--ascii') ? 'ascii' : 'emoji';
-}
-
-function nextMapName(current: string): string | null {
-  const match = current.match(/^map(\d+)$/);
-  if (!match) return null;
-  const num = Number(match[1]);
-  return num >= 30 ? null : `map${num + 1}`;
 }
 
 function cell(entity: Entity, tileSize: number) {
@@ -171,8 +164,7 @@ function visibleEntityAt(state: GameState, x: number, y: number): Entity | null 
 
 class TuiGame {
   private state!: GameState;
-  private movement!: MovementSystem;
-  private buttons!: ButtonSystem;
+  private simulation!: GameSimulation;
   private tickTimer: ReturnType<typeof setTimeout> | null = null;
   private queuedDirection: Direction = null;
 
@@ -188,8 +180,7 @@ class TuiGame {
   private async load(mapName: string) {
     this.mapName = mapName;
     this.state = await loadGame(mapName);
-    this.movement = new MovementSystem(this.state);
-    this.buttons = new ButtonSystem(this.state);
+    this.simulation = new GameSimulation(this.state);
   }
 
   private installInput() {
@@ -227,22 +218,17 @@ class TuiGame {
   private tick() {
     let changed = false;
 
-    if (!this.state.player.dead && !this.state.won && (this.queuedDirection || this.movement.isMoving())) {
+    if (!this.state.player.dead && !this.state.won && (this.queuedDirection || this.simulation.isMoving())) {
       if (this.queuedDirection) {
-        this.movement.setIntent(this.queuedDirection);
+        this.simulation.dispatch({ type: 'move', direction: this.queuedDirection });
         this.queuedDirection = null;
       }
-      this.movement.update(TICK_MS / 1000);
-      this.buttons.update();
+      this.simulation.update(TICK_MS / 1000);
       changed = true;
-      if (!this.movement.isMoving()) {
-        armTrapIfLeft(this.state);
-        handleArrival(this.state);
-      }
     }
 
     if (changed) this.render();
-    if (!this.state.player.dead && !this.state.won && (this.queuedDirection || this.movement.isMoving())) {
+    if (!this.state.player.dead && !this.state.won && (this.queuedDirection || this.simulation.isMoving())) {
       this.requestTick();
     }
   }

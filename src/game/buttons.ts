@@ -1,5 +1,4 @@
 import type { GameState } from './types';
-import { audio } from './audio';
 
 function entitiesAt(state: GameState, x: number, y: number) {
   const gridX = Math.round(x / state.tileSize);
@@ -43,7 +42,6 @@ export class ButtonSystem {
           }
         }
         this.state.events.push('Conveyor button toggled');
-        audio.play('button');
       }
       this.lastButtonState.set(btn.id, isOn);
     }
@@ -78,7 +76,6 @@ export class ButtonSystem {
           }
         }
         this.state.events.push('Stone button toggled');
-        audio.play('button');
       }
       this.lastButtonState.set(btn.id, isOn);
     }

@@ -1,5 +1,40 @@
 import type { Layout } from '../game/layout';
 
+export const levelNames = [
+  "map1",
+  "map2",
+  "map3",
+  "map4",
+  "map5",
+  "map6",
+  "map7",
+  "map8",
+  "map9",
+  "map10",
+  "map11",
+  "map12",
+  "map13",
+  "map14",
+  "map15",
+  "map16",
+  "map17",
+  "map18",
+  "map19",
+  "map20",
+  "map21",
+  "map22",
+  "map23",
+  "map24",
+  "map25",
+  "map26",
+  "map27",
+  "map28",
+  "map29",
+  "map30"
+] as const;
+
+export type LevelName = typeof levelNames[number];
+
 const levelLoaders: Record<string, () => Promise<{ default: Layout }>> = {
   "map1": () => import('./levels/map1'),
   "map2": () => import('./levels/map2'),

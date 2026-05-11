@@ -30,6 +30,32 @@ Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家
 
 关卡设计鼓励“先观察，再行动”：很多路线不是靠连续移动完成，而是通过改变机关状态、规划踩踏顺序和利用单向移动完成。
 
+## 社区关卡编辑器
+
+`/editor` 提供一个网页关卡编辑器，面向社区共建关卡的本地创作流程：
+
+- 从空白关卡开始，或加载内置 `map1` 到 `map30` 作为参考。
+- 使用真实素材预览的 tile 和 entity 工具在 50px 网格上摆放地形、胡萝卜、机关、出口和玩家。
+- 实体工具覆盖素材图集里的主要关卡对象：栅栏/墙体、陷阱状态、方向石、传送带方向、按钮状态、三色钥匙锁和装饰素材。
+- 通过右侧属性面板编辑方向石、传送带、钥匙锁、按钮和陷阱状态。
+- 实时复用运行时关卡校验，提示缺玩家、缺出口、目标胡萝卜数量不合理、实体出界等问题。
+- 使用 Playtest 在当前浏览器页内直接试玩正在编辑的关卡。
+- 导出 `.bobby-level.json`，里面包含标题、作者、难度、标签和 `LevelDefinition`。
+- 使用 Save Local 保存到浏览器本地关卡库，再用 Open Game 直接以游戏模式打开。
+- 支持 Undo / Redo，选择工具下可以拖拽移动实体。
+
+第一版编辑器是本地文件流，不依赖账号或服务器。社区投稿可以先以 `.bobby-level.json` 附件、issue 或 PR 的方式提交；正式收录前应运行：
+
+```sh
+npm run validate:levels
+```
+
+保存到本地关卡库后，也可以用 URL 直接试玩：
+
+```txt
+http://localhost:5173/?community=<local-level-id>
+```
+
 ## 本地开发
 
 ```sh
@@ -45,10 +71,17 @@ npm run dev
 http://localhost:5173/?map=map20
 ```
 
+社区关卡编辑器：
+
+```txt
+http://localhost:5173/editor
+```
+
 构建：
 
 ```sh
 npm run typecheck
+npm run validate:levels
 npm run build
 ```
 
@@ -94,13 +127,17 @@ bobby-carrot
 ## 项目结构
 
 ```txt
-src/main.ts                 游戏入口和主循环
-src/game/                   运行时系统
+src/main.ts                 浏览器启动入口
+src/game/runtime.ts         浏览器运行时生命周期、输入、渲染调度
+src/game/simulation.ts      纯游戏状态更新入口
+src/game/levelAdapter.ts    Construct 导出布局到内部关卡定义的适配层
+src/game/levelValidation.ts 关卡结构和数据质量校验
 src/game/movement.ts        网格移动、碰撞、锁、传送带移动
 src/game/interactions.ts    胡萝卜、钥匙、陷阱、出口等到达格处理
 src/game/buttons.ts         红色/黄色按钮和机关联动
 src/game/render.ts          Canvas 渲染、HUD、胜利/失败提示
 src/game/touchControls.ts   移动端方向舵
+src/tools/validate-levels.ts 关卡校验 CLI
 src/tui/cli.ts              终端版本入口和字符渲染
 src/content/levels/         关卡数据，每关一个文件
 src/content/assets.ts       精灵图坐标和动画配置
@@ -122,7 +159,7 @@ public/assets/              图片、音频、字体素材
 1. 一个 PR 聚焦一个主题，例如“修复第 4 关传送带方向”或“新增第 31 关”。
 2. 关卡改动请说明变更前后的可通关路径。
 3. 机制改动请说明影响到哪些实体类型，并尽量附带测试关卡或截图。
-4. 提交前运行 `npm run typecheck` 和 `npm run build`。
+4. 提交前运行 `npm run typecheck`、`npm run validate:levels` 和 `npm run build`。
 
 ## 技术说明
 

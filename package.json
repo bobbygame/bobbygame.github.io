@@ -13,9 +13,11 @@
     "dev": "vite",
     "build": "vite build",
     "build:tui": "vite build --config vite.tui.config.js",
+    "build:tools": "vite build --config vite.tools.config.js",
     "prepare": "npm run build:tui",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:levels": "npm run build:tools && node dist-tools/validate-levels.js"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

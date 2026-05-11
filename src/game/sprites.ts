@@ -97,6 +97,9 @@ export class SpriteLoader {
   }
 
   frameForEntity(entity: Entity, state: GameState): SpriteFrame | undefined {
+    const sprite = typeof entity.data.sprite === 'string' ? entity.data.sprite : undefined;
+    if (sprite) return this.getFrame(entity.typeName, sprite, state.stats.timeElapsed) ?? this.getFrame(entity.typeName);
+
     if (entity.kind === 'player') {
       const direction = state.animation.direction;
       if (state.animation.state === 'moving') return this.getFrame(entity.typeName, `${direction}Go`, state.stats.timeElapsed);

@@ -3,4 +3,7 @@ node_modules
 .vscode/
 dist
 dist-tui
+dist-tools
 .vite
+*.log
+*.tgz
