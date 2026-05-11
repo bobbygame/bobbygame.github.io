@@ -108,7 +108,9 @@ export class BrowserGameRuntime {
         this.renderer.setState(state);
       } else {
         if (!this.sprites) throw new Error('Sprites must be loaded before the renderer starts');
-        this.renderer = new Renderer(state, this.options.container, this.sprites);
+        this.renderer = new Renderer(state, this.options.container, this.sprites, () => {
+          void this.dispatch({ type: 'advance' });
+        });
       }
       this.renderer.draw();
     } finally {
@@ -140,7 +142,9 @@ export class BrowserGameRuntime {
         this.renderer.setState(state);
       } else {
         if (!this.sprites) throw new Error('Sprites must be loaded before the renderer starts');
-        this.renderer = new Renderer(state, this.options.container, this.sprites);
+        this.renderer = new Renderer(state, this.options.container, this.sprites, () => {
+          void this.dispatch({ type: 'advance' });
+        });
       }
       this.renderer.draw();
     } finally {

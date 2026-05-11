@@ -30,61 +30,383 @@
       touch-action: none;
     }
 
-    .touch-joystick {
-      --joystick-size: clamp(104px, 24vw, 136px);
-      --joystick-ring: rgba(255, 255, 255, 0.18);
-      --joystick-edge: rgba(255, 255, 255, 0.45);
-      --joystick-knob: rgba(255, 232, 88, 0.92);
-      --joystick-shadow: rgba(0, 0, 0, 0.35);
-      position: fixed;
-      left: 50%;
-      bottom: max(18px, env(safe-area-inset-bottom));
-      width: var(--joystick-size);
-      height: var(--joystick-size);
-      display: none;
+    .game-stage {
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .game-stage > canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    .game-hud {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: start;
+      gap: clamp(6px, 1.6vw, 14px);
+      padding: clamp(7px, 1.8vw, 14px);
+      box-sizing: border-box;
+      pointer-events: none;
+      z-index: 2;
+      font-family: comic, ui-rounded, system-ui, sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-hud__pill {
+      --glass-border: rgba(255, 255, 255, 0.52);
+      --glass-fill: rgba(9, 38, 28, 0.36);
+      --glass-shine: rgba(255, 255, 255, 0.34);
+      position: relative;
+      min-width: clamp(82px, 16vw, 142px);
+      min-height: clamp(38px, 6.8vw, 54px);
+      display: grid;
+      grid-template-columns: auto auto;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(5px, 1.1vw, 10px);
+      padding: clamp(6px, 1.1vw, 9px) clamp(9px, 2vw, 16px);
+      box-sizing: border-box;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+      border-radius: clamp(14px, 2.6vw, 22px);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.30), rgba(255, 255, 255, 0.07) 47%, rgba(255, 255, 255, 0.20)),
+        var(--glass-fill);
+      box-shadow:
+        0 9px 20px rgba(0, 0, 0, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -10px 24px rgba(4, 20, 15, 0.22);
+      backdrop-filter: blur(13px) saturate(1.45);
+      -webkit-backdrop-filter: blur(13px) saturate(1.45);
+      color: #fff;
+      text-shadow:
+        0 2px 3px rgba(0, 0, 0, 0.62),
+        0 0 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .game-hud__pill::before {
+      content: "";
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      top: 5px;
+      height: 34%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--glass-shine), rgba(255, 255, 255, 0));
+      opacity: 0.74;
+    }
+
+    .game-hud__label,
+    .game-hud__value {
+      position: relative;
+      z-index: 1;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .game-hud__label {
+      color: rgba(240, 255, 235, 0.82);
+      font-size: clamp(10px, 1.7vw, 14px);
+      font-weight: 700;
+    }
+
+    .game-hud__value {
+      color: #fff;
+      font-size: clamp(22px, 4vw, 32px);
+      font-weight: 900;
+    }
+
+    .game-hud__pill--time {
+      justify-self: start;
+    }
+
+    .game-hud__pill--level {
+      justify-self: center;
+      min-width: clamp(76px, 13vw, 118px);
+    }
+
+    .game-hud__pill--remain {
+      justify-self: end;
+    }
+
+    .game-win {
+      position: absolute;
+      inset: 0;
+      display: grid;
       place-items: center;
-      transform: translateX(-50%);
+      padding: clamp(78px, 14vw, 112px) clamp(14px, 4vw, 34px) clamp(22px, 5vw, 44px);
+      box-sizing: border-box;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+      z-index: 3;
+    }
+
+    .game-stage--won .game-win {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .game-win__panel {
+      width: min(430px, 82%);
+      display: grid;
+      gap: clamp(14px, 2.8vw, 22px);
+      justify-items: stretch;
+      padding: clamp(18px, 4.2vw, 30px);
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.52);
+      border-radius: clamp(18px, 3vw, 24px);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.08) 46%, rgba(255, 255, 255, 0.20)),
+        rgba(6, 30, 22, 0.58);
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -18px 38px rgba(0, 0, 0, 0.24);
+      backdrop-filter: blur(16px) saturate(1.45);
+      -webkit-backdrop-filter: blur(16px) saturate(1.45);
+      color: #fff;
+      font-family: comic, ui-rounded, system-ui, sans-serif;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .game-win__title {
+      color: #fff45a;
+      font-size: clamp(40px, 8.2vw, 64px);
+      line-height: 0.95;
+      text-shadow:
+        0 4px 0 rgba(24, 92, 20, 0.9),
+        0 9px 18px rgba(0, 0, 0, 0.42);
+      letter-spacing: 0;
+    }
+
+    .game-win__stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .game-win__stat {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 10px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      text-align: left;
+    }
+
+    .game-win__stat span {
+      color: rgba(237, 255, 230, 0.82);
+      font-size: clamp(16px, 3.2vw, 22px);
+      line-height: 1;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.54);
+    }
+
+    .game-win__stat strong {
+      min-width: 2ch;
+      color: #fff;
+      font-size: clamp(28px, 5.8vw, 42px);
+      line-height: 1;
+      text-align: right;
+      text-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .game-win__continue {
+      min-height: clamp(48px, 8vw, 58px);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      border-radius: 16px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 42%, rgba(0, 0, 0, 0.12)),
+        linear-gradient(180deg, #ffed4a, #ffb703);
+      box-shadow:
+        0 10px 20px rgba(0, 0, 0, 0.30),
+        inset 0 2px 0 rgba(255, 255, 255, 0.72),
+        inset 0 -6px 0 rgba(142, 86, 0, 0.22);
+      color: #12350d;
+      cursor: pointer;
+      font: 900 clamp(22px, 4.4vw, 32px) comic, ui-rounded, system-ui, sans-serif;
+      letter-spacing: 0;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.46);
+      touch-action: manipulation;
+      pointer-events: auto;
+    }
+
+    .game-win__continue:disabled {
+      pointer-events: none;
+    }
+
+    .game-win__continue:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.86);
+      outline-offset: 3px;
+    }
+
+    .game-win__continue:active {
+      transform: translateY(1px);
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.28),
+        inset 0 2px 0 rgba(255, 255, 255, 0.58),
+        inset 0 -3px 0 rgba(142, 86, 0, 0.22);
+    }
+
+    @media (max-width: 460px) {
+      .game-hud {
+        gap: 5px;
+        padding: 6px;
+      }
+
+      .game-hud__pill {
+        min-width: 0;
+        padding-inline: 8px;
+      }
+
+      .game-hud__label {
+        font-size: 9px;
+      }
+
+      .game-hud__value {
+        font-size: 20px;
+      }
+
+      .game-win {
+        padding-top: 72px;
+      }
+
+      .game-win__panel {
+        width: min(360px, 90%);
+        gap: 12px;
+        padding: 16px;
+      }
+
+      .game-win__stat {
+        min-height: 48px;
+        padding: 8px 12px;
+      }
+    }
+
+    .touch-dpad {
+      --dpad-size: clamp(142px, 34vw, 176px);
+      --dpad-button: clamp(46px, 11vw, 58px);
+      --dpad-glass: rgba(10, 38, 28, 0.46);
+      --dpad-edge: rgba(255, 255, 255, 0.46);
+      --dpad-accent: #ffdd37;
+      position: fixed;
+      left: max(14px, env(safe-area-inset-left));
+      bottom: max(14px, env(safe-area-inset-bottom));
+      width: var(--dpad-size);
+      height: var(--dpad-size);
+      display: none;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      place-items: center;
       z-index: 10;
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
     }
 
-    .touch-joystick__ring,
-    .touch-joystick__knob {
+    .touch-dpad__button {
+      position: relative;
+      width: var(--dpad-button);
+      height: var(--dpad-button);
+      margin: 0;
+      padding: 0;
+      border: 1px solid var(--dpad-edge);
+      border-radius: 14px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.08) 48%, rgba(255, 255, 255, 0.18)),
+        var(--dpad-glass);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.62),
+        inset 0 -8px 18px rgba(0, 0, 0, 0.22);
+      backdrop-filter: blur(10px) saturate(1.35);
+      -webkit-backdrop-filter: blur(10px) saturate(1.35);
+      cursor: pointer;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .touch-dpad__button::before {
+      content: "";
       position: absolute;
       left: 50%;
       top: 50%;
-      border-radius: 999px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 16px solid var(--dpad-accent);
+      filter: drop-shadow(0 2px 1px rgba(0, 0, 0, 0.45));
+      transform: translate(-50%, -58%);
     }
 
-    .touch-joystick__ring {
-      width: 100%;
-      height: 100%;
+    .touch-dpad__button--up {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .touch-dpad__button--left {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .touch-dpad__button--right {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    .touch-dpad__button--down {
+      grid-column: 2;
+      grid-row: 3;
+    }
+
+    .touch-dpad__button--left::before {
+      transform: translate(-62%, -50%) rotate(-90deg);
+    }
+
+    .touch-dpad__button--right::before {
+      transform: translate(-38%, -50%) rotate(90deg);
+    }
+
+    .touch-dpad__button--down::before {
+      transform: translate(-50%, -42%) rotate(180deg);
+    }
+
+    .touch-dpad__button--active,
+    .touch-dpad__button:active {
+      transform: translateY(1px);
       background:
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0 29%, transparent 30%),
-        var(--joystick-ring);
-      border: 2px solid var(--joystick-edge);
-      box-shadow: 0 8px 22px var(--joystick-shadow), inset 0 0 0 8px rgba(0, 0, 0, 0.16);
+        linear-gradient(145deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.06) 48%, rgba(255, 255, 255, 0.12)),
+        rgba(24, 92, 36, 0.58);
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.44),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.24);
     }
 
-    .touch-joystick__knob {
-      width: 44%;
-      height: 44%;
-      background: var(--joystick-knob);
-      border: 2px solid rgba(255, 255, 255, 0.72);
-      box-shadow: 0 6px 16px var(--joystick-shadow), inset 0 -6px 0 rgba(0, 0, 0, 0.16);
-      transition: transform 120ms ease;
-    }
-
-    .touch-joystick--active .touch-joystick__knob {
-      transition: none;
+    .touch-dpad__button:focus-visible {
+      outline: 3px solid rgba(255, 255, 255, 0.82);
+      outline-offset: 2px;
     }
 
     @media (hover: none), (pointer: coarse) {
-      .touch-joystick {
+      .touch-dpad {
+        display: grid;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .touch-dpad {
         display: grid;
       }
     }

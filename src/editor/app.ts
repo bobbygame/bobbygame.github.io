@@ -1169,7 +1169,7 @@ class LevelEditor {
     let state = gameStateFromLevelDefinition(this.document.level);
     let simulation = new GameSimulation(state);
     const stage = q<HTMLElement>(overlay, '.editor-playtest__stage');
-    const renderer = new Renderer(state, stage, this.sprites);
+    const renderer = new Renderer(state, stage, this.sprites, () => this.stopPlaytest());
     let last = performance.now();
 
     const keyHandler = (event: KeyboardEvent) => {

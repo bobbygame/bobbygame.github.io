@@ -1,9 +1,6 @@
 import type { GameState, Entity } from './types';
 import { SpriteLoader } from './sprites';
 
-const HUD_FONT = 'bold 26px comic, system-ui, sans-serif';
-const SMALL_FONT = 'bold 24px comic, system-ui, sans-serif';
-
 function fallbackColor(kind: string): string {
   switch (kind) {
     case 'player': return '#7dd3fc';
@@ -21,18 +18,48 @@ function keyAnimationName(sign: string): string {
 }
 
 export class Renderer {
+  private readonly stage: HTMLDivElement;
+  private readonly hudTime: HTMLElement;
+  private readonly hudLevel: HTMLElement;
+  private readonly hudRemain: HTMLElement;
+  private readonly winTitle: HTMLElement;
+  private readonly winTime: HTMLElement;
+  private readonly winSteps: HTMLElement;
+  private readonly winButton: HTMLButtonElement;
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
 
   constructor(
     private state: GameState,
     container: HTMLElement,
-    private sprites: SpriteLoader
+    private sprites: SpriteLoader,
+    private readonly onAdvance: () => void
   ) {
+    this.stage = document.createElement('div');
+    this.stage.className = 'game-stage';
+
     this.canvas = document.createElement('canvas');
     this.canvas.width = state.tilemap.width || 650;
     this.canvas.height = state.tilemap.height || 800;
     this.canvas.setAttribute('aria-label', 'Bobby Carrot game canvas');
+
+    const hud = document.createElement('div');
+    hud.className = 'game-hud';
+    hud.setAttribute('aria-label', 'Game status');
+
+    const timePill = this.createHudPill('Time', 'time');
+    const levelPill = this.createHudPill('Level', 'level');
+    const remainPill = this.createHudPill('Remain', 'remain');
+    this.hudTime = timePill.value;
+    this.hudLevel = levelPill.value;
+    this.hudRemain = remainPill.value;
+    hud.append(timePill.root, levelPill.root, remainPill.root);
+
+    const winOverlay = this.createWinOverlay();
+    this.winTitle = winOverlay.title;
+    this.winTime = winOverlay.time;
+    this.winSteps = winOverlay.steps;
+    this.winButton = winOverlay.button;
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) throw new Error('Canvas not supported');
@@ -40,7 +67,8 @@ export class Renderer {
     this.ctx.imageSmoothingEnabled = false;
     this.canvas.style.imageRendering = 'pixelated';
 
-    container.replaceChildren(this.canvas);
+    this.stage.append(this.canvas, hud, winOverlay.root);
+    container.replaceChildren(this.stage);
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -56,6 +84,8 @@ export class Renderer {
     const scale = Math.min(window.innerWidth / this.canvas.width, window.innerHeight / this.canvas.height);
     const width = Math.floor(this.canvas.width * scale);
     const height = Math.floor(this.canvas.height * scale);
+    this.stage.style.width = `${width}px`;
+    this.stage.style.height = `${height}px`;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
   }
@@ -139,26 +169,35 @@ export class Renderer {
   }
 
   private drawHud() {
-    const { ctx, state } = this;
+    const { state } = this;
     const remain = Math.max(0, state.requiredCarrots - state.inventory.carrots);
     const time = Math.floor(state.stats.timeElapsed);
     const level = state.mapName.replace('map', '');
 
-    ctx.save();
-    ctx.font = HUD_FONT;
-    ctx.fillStyle = '#fff';
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
-    ctx.textBaseline = 'top';
-
-    this.strokeFillText(`Time: ${time}`, 16, 12);
-    this.strokeFillText(`Level ${level}`, 260, 12);
-    this.strokeFillText(`Remain: ${remain}`, 455, 12);
-
-    const carrotFrame = this.sprites.getFrame('carrot1');
-    if (carrotFrame) this.sprites.drawSprite(ctx, carrotFrame, 600, 8, 46, 46, -0.25);
+    this.updateHudText(this.hudTime, String(time));
+    this.updateHudText(this.hudLevel, String(level));
+    this.updateHudText(this.hudRemain, String(remain));
     this.drawInventoryKeys();
-    ctx.restore();
+  }
+
+  private createHudPill(label: string, modifier: string) {
+    const root = document.createElement('div');
+    root.className = `game-hud__pill game-hud__pill--${modifier}`;
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'game-hud__label';
+    labelEl.textContent = label;
+
+    const value = document.createElement('strong');
+    value.className = 'game-hud__value';
+    value.textContent = '0';
+
+    root.append(labelEl, value);
+    return { root, value };
+  }
+
+  private updateHudText(target: HTMLElement, value: string) {
+    if (target.textContent !== value) target.textContent = value;
   }
 
   private drawInventoryKeys() {
@@ -183,17 +222,14 @@ export class Renderer {
     const { ctx, state } = this;
 
     if (state.won) {
-      ctx.save();
-      ctx.font = 'bold 48px comic, system-ui, sans-serif';
-      ctx.fillStyle = '#fff200';
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
-      ctx.lineWidth = 5;
-      this.strokeFillText('SUCCESS!', 215, 120);
-      ctx.font = SMALL_FONT;
-      this.strokeFillText(`Time Use: ${Math.floor(state.stats.timeElapsed)}`, 205, 330);
-      this.strokeFillText(`Steps: ${state.stats.steps}`, 245, 385);
-      this.strokeFillText('Continue', 25, 720);
-      ctx.restore();
+      this.stage.classList.add('game-stage--won');
+      this.winButton.disabled = false;
+      this.updateHudText(this.winTitle, 'SUCCESS!');
+      this.updateHudText(this.winTime, String(Math.floor(state.stats.timeElapsed)));
+      this.updateHudText(this.winSteps, String(state.stats.steps));
+    } else {
+      this.stage.classList.remove('game-stage--won');
+      this.winButton.disabled = true;
     }
 
     if (state.player.dead) {
@@ -205,6 +241,50 @@ export class Renderer {
       this.strokeFillText('TRY AGAIN', 205, 350);
       ctx.restore();
     }
+  }
+
+  private createWinOverlay() {
+    const root = document.createElement('div');
+    root.className = 'game-win';
+    root.setAttribute('aria-live', 'polite');
+
+    const panel = document.createElement('div');
+    panel.className = 'game-win__panel';
+
+    const title = document.createElement('strong');
+    title.className = 'game-win__title';
+
+    const stats = document.createElement('div');
+    stats.className = 'game-win__stats';
+    const time = this.createWinStat('Time Used');
+    const steps = this.createWinStat('Steps');
+    stats.append(time.root, steps.root);
+
+    const button = document.createElement('button');
+    button.className = 'game-win__continue';
+    button.type = 'button';
+    button.textContent = 'Continue';
+    button.disabled = true;
+    button.addEventListener('click', () => this.onAdvance());
+
+    panel.append(title, stats, button);
+    root.append(panel);
+
+    return { root, title, time: time.value, steps: steps.value, button };
+  }
+
+  private createWinStat(label: string) {
+    const root = document.createElement('div');
+    root.className = 'game-win__stat';
+
+    const labelEl = document.createElement('span');
+    labelEl.textContent = label;
+
+    const value = document.createElement('strong');
+    value.textContent = '0';
+
+    root.append(labelEl, value);
+    return { root, value };
   }
 
   private strokeFillText(text: string, x: number, y: number) {
