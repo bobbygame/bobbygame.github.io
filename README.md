@@ -127,6 +127,8 @@ bobby-carrot
 
 ## 项目结构
 
+完整架构说明见 [`docs/architecture.md`](docs/architecture.md)。
+
 ```txt
 src/main.ts                 浏览器启动入口
 src/game/runtime.ts         浏览器运行时生命周期、输入、渲染调度
