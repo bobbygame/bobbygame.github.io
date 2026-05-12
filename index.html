@@ -300,7 +300,7 @@
       --dpad-edge: rgba(255, 255, 255, 0.46);
       --dpad-accent: #ffdd37;
       position: fixed;
-      left: max(14px, env(safe-area-inset-left));
+      left: 50%;
       bottom: max(14px, env(safe-area-inset-bottom));
       width: var(--dpad-size);
       height: var(--dpad-size);
@@ -308,6 +308,7 @@
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
       place-items: center;
+      transform: translateX(-50%);
       z-index: 10;
       touch-action: none;
       user-select: none;
