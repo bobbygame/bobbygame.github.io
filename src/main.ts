@@ -20,6 +20,7 @@ async function main() {
     return;
   }
 
+  container.className = 'game-app';
   const runtime = new BrowserGameRuntime({
     container,
     initialMap: mapName,

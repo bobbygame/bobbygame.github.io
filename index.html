@@ -17,11 +17,415 @@
     }
 
     #app {
+      position: relative;
       width: 100vw;
       height: 100vh;
       display: grid;
       place-items: center;
       background: #000;
+      isolation: isolate;
+    }
+
+    #app.game-app {
+      --scene-pad-x: clamp(22px, 5vw, 104px);
+      --scene-pad-y: clamp(18px, 5vh, 78px);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% -12%, rgba(236, 255, 179, 0.62), transparent 36%),
+        radial-gradient(circle at 18% 28%, rgba(104, 181, 83, 0.30), transparent 34%),
+        radial-gradient(circle at 82% 24%, rgba(66, 148, 112, 0.28), transparent 32%),
+        linear-gradient(180deg, #d1e9a5 0%, #89b969 34%, #335f3a 66%, #13271d 100%);
+    }
+
+    #app.game-app::before,
+    #app.game-app::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+    }
+
+    #app.game-app::before {
+      inset: -28%;
+      z-index: 0;
+      opacity: 0.72;
+      background:
+        conic-gradient(from 210deg at 50% 36%, rgba(235, 255, 179, 0.84), rgba(97, 158, 82, 0.32), rgba(184, 224, 122, 0.58), rgba(23, 82, 58, 0.40), rgba(235, 255, 179, 0.84));
+      filter: blur(42px);
+    }
+
+    #app.game-app::after {
+      left: -6vw;
+      right: -6vw;
+      bottom: -18vh;
+      height: 42vh;
+      z-index: 0;
+      background:
+        linear-gradient(180deg, rgba(203, 232, 127, 0.52), rgba(79, 123, 69, 0.46) 36%, rgba(14, 35, 26, 0.68) 100%),
+        linear-gradient(90deg, rgba(202, 235, 142, 0.28), rgba(36, 87, 58, 0.36), rgba(183, 219, 118, 0.24));
+      border-radius: 50% 50% 0 0 / 34% 34% 0 0;
+      box-shadow:
+        0 -48px 110px rgba(12, 35, 25, 0.32),
+        inset 0 1px 0 rgba(235, 255, 189, 0.34);
+    }
+
+    .game-device-scene {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      box-sizing: border-box;
+      padding: var(--scene-pad-y) var(--scene-pad-x);
+      perspective: 1500px;
+    }
+
+    .game-device-scene::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: max(6vh, 54px);
+      width: min(54vw, 650px);
+      height: clamp(34px, 6vh, 78px);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: rgba(5, 24, 16, 0.34);
+      filter: blur(28px);
+      pointer-events: none;
+    }
+
+    .game-device-scene::after {
+      content: "";
+      position: absolute;
+      left: 15vw;
+      right: 15vw;
+      bottom: max(3.5vh, 28px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(220, 255, 171, 0.18), transparent);
+      pointer-events: none;
+    }
+
+    .game-scene-actions {
+      position: absolute;
+      top: max(18px, var(--scene-pad-y));
+      right: max(18px, var(--scene-pad-x));
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      pointer-events: auto;
+    }
+
+    .game-scene-link {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px 0 14px;
+      border: 1px solid rgba(255, 255, 255, 0.62);
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg, rgba(235, 255, 210, 0.74), rgba(196, 231, 164, 0.38)),
+        rgba(30, 78, 48, 0.34);
+      box-shadow:
+        0 18px 42px rgba(7, 28, 18, 0.18),
+        0 3px 8px rgba(7, 28, 18, 0.10),
+        inset 0 1px 0 rgba(242, 255, 218, 0.78);
+      color: #102316;
+      font: 700 15px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+      text-decoration: none;
+      backdrop-filter: blur(22px) saturate(1.18);
+      -webkit-backdrop-filter: blur(22px) saturate(1.18);
+    }
+
+    .game-scene-link::before {
+      content: "";
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      border: 1px solid rgba(32, 38, 45, 0.34);
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, transparent 46%, rgba(17, 44, 24, 0.70) 46% 54%, transparent 54%),
+        linear-gradient(0deg, transparent 46%, rgba(17, 44, 24, 0.70) 46% 54%, transparent 54%),
+        rgba(228, 255, 194, 0.58);
+      box-shadow:
+        inset 0 1px 0 rgba(245, 255, 225, 0.80),
+        0 1px 2px rgba(8, 30, 18, 0.16);
+    }
+
+    .game-scene-link:hover {
+      box-shadow:
+        0 22px 48px rgba(7, 28, 18, 0.22),
+        0 4px 10px rgba(7, 28, 18, 0.12),
+        inset 0 1px 0 rgba(242, 255, 218, 0.86);
+    }
+
+    .game-scene-link:focus-visible {
+      outline: 3px solid rgba(0, 113, 227, 0.36);
+      outline-offset: 3px;
+    }
+
+    .game-save-panel {
+      position: absolute;
+      left: max(22px, var(--scene-pad-x));
+      top: 50%;
+      z-index: 4;
+      width: clamp(238px, 18vw, 318px);
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      box-sizing: border-box;
+      border: 1px solid rgba(225, 255, 199, 0.36);
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(229, 255, 198, 0.22), rgba(39, 94, 50, 0.18)),
+        rgba(11, 46, 27, 0.52);
+      box-shadow:
+        0 26px 60px rgba(5, 24, 15, 0.26),
+        0 6px 16px rgba(5, 24, 15, 0.16),
+        inset 0 1px 0 rgba(244, 255, 226, 0.42);
+      color: #f4ffe4;
+      transform: translateY(-50%);
+      backdrop-filter: blur(24px) saturate(1.28);
+      -webkit-backdrop-filter: blur(24px) saturate(1.28);
+    }
+
+    .game-save-panel__eyebrow {
+      color: rgba(230, 255, 198, 0.66);
+      font: 800 11px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .game-save-panel__title {
+      display: block;
+      color: #fbffe9;
+      font: 800 24px/1.05 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-save-panel__section {
+      display: grid;
+      gap: 5px;
+      padding: 12px;
+      border: 1px solid rgba(228, 255, 197, 0.18);
+      border-radius: 16px;
+      background: rgba(6, 33, 20, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    }
+
+    .game-save-panel__section--slot {
+      background: rgba(13, 52, 30, 0.34);
+    }
+
+    .game-save-panel__label {
+      color: rgba(229, 255, 198, 0.62);
+      font: 700 12px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-save-panel__value {
+      min-height: 24px;
+      color: #ffffff;
+      font: 800 20px/1.15 -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-save-panel__meta {
+      color: rgba(241, 255, 220, 0.76);
+      font: 650 13px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-save-panel__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .game-save-panel__button {
+      min-height: 40px;
+      padding: 0 12px;
+      border: 1px solid rgba(234, 255, 208, 0.36);
+      border-radius: 14px;
+      background:
+        linear-gradient(180deg, rgba(235, 255, 202, 0.34), rgba(117, 176, 86, 0.20)),
+        rgba(31, 92, 43, 0.52);
+      box-shadow:
+        0 10px 22px rgba(4, 24, 14, 0.18),
+        inset 0 1px 0 rgba(250, 255, 229, 0.42);
+      color: #faffea;
+      cursor: pointer;
+      font: 800 13px/1 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+      touch-action: manipulation;
+    }
+
+    .game-save-panel__button--ghost {
+      background: rgba(5, 29, 18, 0.24);
+      color: rgba(245, 255, 228, 0.82);
+    }
+
+    .game-save-panel__button:disabled {
+      cursor: default;
+      opacity: 0.44;
+    }
+
+    .game-save-panel__button:not(:disabled):active {
+      box-shadow:
+        0 5px 14px rgba(4, 24, 14, 0.16),
+        inset 0 1px 0 rgba(250, 255, 229, 0.30);
+    }
+
+    .game-save-panel__button:focus-visible {
+      outline: 3px solid rgba(225, 255, 154, 0.52);
+      outline-offset: 2px;
+    }
+
+    .game-save-panel__message {
+      min-height: 18px;
+      margin: 0;
+      color: rgba(247, 255, 226, 0.78);
+      font: 700 12px/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .game-device {
+      --device-bezel: clamp(13px, 1.26vw, 23px);
+      --rope-length: clamp(92px, 15vh, 176px);
+      position: relative;
+      display: inline-grid;
+      padding: var(--device-bezel);
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      border-radius: calc(var(--device-bezel) * 1.34 + 26px);
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0.16) 4%, rgba(76, 83, 88, 0.36) 13%, rgba(21, 24, 26, 0.98) 47%, rgba(3, 4, 5, 1) 100%),
+        linear-gradient(90deg, #d7d9d2 0%, #44494a 5%, #111415 16%, #0b0d0e 84%, #303536 96%, #050607 100%);
+      box-shadow:
+        0 58px 118px rgba(39, 49, 62, 0.24),
+        0 24px 48px rgba(39, 49, 62, 0.18),
+        0 1px 0 rgba(255, 255, 255, 0.88),
+        inset 0 1px 0 rgba(255, 255, 255, 0.78),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.92);
+    }
+
+    .game-hanger-rope {
+      position: absolute;
+      top: calc(-1 * var(--rope-length));
+      width: clamp(5px, 0.46vw, 8px);
+      height: calc(var(--rope-length) + var(--device-bezel) + 8px);
+      border-radius: 999px;
+      background:
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.34) 0 2px, transparent 2px 7px),
+        linear-gradient(90deg, #5c4529, #d1ab70 28%, #6f512c 58%, #2f2113 100%);
+      box-shadow:
+        0 16px 28px rgba(4, 20, 12, 0.16),
+        inset 1px 0 0 rgba(255, 235, 183, 0.52),
+        inset -1px 0 0 rgba(24, 13, 7, 0.42);
+      transform-origin: bottom center;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .game-hanger-rope::before,
+    .game-hanger-rope::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .game-hanger-rope::before {
+      top: -8px;
+      width: clamp(22px, 2.2vw, 34px);
+      height: clamp(8px, 0.8vw, 12px);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0)),
+        linear-gradient(90deg, #182219, #7d9163 48%, #1a2419);
+      box-shadow:
+        0 8px 18px rgba(6, 24, 14, 0.20),
+        inset 0 1px 0 rgba(237, 255, 199, 0.42);
+    }
+
+    .game-hanger-rope::after {
+      bottom: calc(var(--device-bezel) * 0.28);
+      width: clamp(16px, 1.4vw, 23px);
+      height: clamp(16px, 1.4vw, 23px);
+      border: 2px solid rgba(220, 228, 205, 0.78);
+      background: rgba(12, 16, 15, 0.48);
+      box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.26);
+    }
+
+    .game-hanger-rope--left {
+      left: 18%;
+      transform: rotate(-1.6deg);
+    }
+
+    .game-hanger-rope--right {
+      right: 18%;
+      transform: rotate(1.6deg);
+    }
+
+    .game-device::before,
+    .game-device::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .game-device::before {
+      inset: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: calc(var(--device-bezel) * 1.22 + 22px);
+      box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.72),
+        inset 0 18px 30px rgba(255, 255, 255, 0.08),
+        inset 0 -18px 30px rgba(0, 0, 0, 0.42);
+    }
+
+    .game-device::after {
+      top: calc(var(--device-bezel) * 0.34);
+      left: 50%;
+      width: clamp(4px, calc(var(--device-bezel) * 0.24), 7px);
+      height: clamp(4px, calc(var(--device-bezel) * 0.24), 7px);
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(circle at 58% 42%, rgba(145, 182, 190, 0.54) 0 16%, rgba(8, 10, 11, 0.96) 17% 100%);
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 0 0 3px rgba(0, 0, 0, 0.24);
+    }
+
+    .game-screen {
+      position: relative;
+      z-index: 3;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: clamp(13px, calc(var(--device-bezel) * 0.76), 22px);
+      background: #050607;
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.10),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.88),
+        inset 0 0 26px rgba(0, 0, 0, 0.72);
+    }
+
+    .game-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+      background:
+        linear-gradient(115deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.035) 17%, transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 18%, transparent 82%, rgba(0, 0, 0, 0.28));
+      opacity: 0.28;
     }
 
     canvas {
@@ -39,6 +443,63 @@
     .game-stage > canvas {
       width: 100%;
       height: 100%;
+    }
+
+    @media (max-width: 720px), (max-height: 680px) {
+      #app.game-app {
+        --scene-pad-x: clamp(12px, 3vw, 22px);
+        --scene-pad-y: clamp(12px, 3vh, 22px);
+      }
+
+      .game-scene-actions {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+      }
+
+      .game-scene-link {
+        min-height: 38px;
+        padding-inline: 11px 13px;
+        font-size: 13px;
+      }
+
+      .game-scene-link::before {
+        width: 15px;
+        height: 15px;
+      }
+
+      .game-save-panel {
+        left: max(10px, env(safe-area-inset-left));
+        top: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        width: min(292px, calc(100vw - 20px));
+        gap: 8px;
+        padding: 12px;
+        border-radius: 18px;
+        transform: none;
+      }
+
+      .game-save-panel__title {
+        font-size: 19px;
+      }
+
+      .game-save-panel__section {
+        padding: 9px;
+      }
+
+      .game-save-panel__value {
+        min-height: 20px;
+        font-size: 16px;
+      }
+
+      .game-save-panel__meta {
+        font-size: 12px;
+      }
+
+      .game-save-panel__button {
+        min-height: 34px;
+        border-radius: 12px;
+        font-size: 12px;
+      }
     }
 
     .game-hud {

@@ -5,13 +5,23 @@ import { getCommunityLevel } from './communityLevel';
 import { BrowserInputManager } from './input';
 import { loadLevelDefinition } from './loader';
 import { gameStateFromLevelDefinition } from './levelAdapter';
-import { nextOrFirstMapName } from './levelProgression';
+import { FIRST_LEVEL, nextOrFirstMapName } from './levelProgression';
 import { formatLevelDiagnostics, validateLevelDefinition } from './levelValidation';
 import { Renderer } from './render';
+import {
+  clearGameSave,
+  createGameSave,
+  loadGameSave,
+  restoreGameState,
+  storeGameSave,
+  type GameSaveSlot,
+  type SaveActionResult,
+} from './saveSystem';
 import { GameSimulation } from './simulation';
 import { SpriteLoader } from './sprites';
 import { VirtualJoystick } from './touchControls';
 import type { GameAction } from './actions';
+import type { GameState } from './types';
 
 export interface BrowserGameRuntimeOptions {
   container: HTMLElement;
@@ -32,6 +42,7 @@ export class BrowserGameRuntime {
   private currentCommunityId: string | null = null;
   private deathTimer = 0;
   private loadingLevel = false;
+  private saveSlot: GameSaveSlot | null = loadGameSave();
 
   constructor(private readonly options: BrowserGameRuntimeOptions) {
     this.currentMap = options.initialMap;
@@ -107,12 +118,9 @@ export class BrowserGameRuntime {
       if (this.renderer) {
         this.renderer.setState(state);
       } else {
-        if (!this.sprites) throw new Error('Sprites must be loaded before the renderer starts');
-        this.renderer = new Renderer(state, this.options.container, this.sprites, () => {
-          void this.dispatch({ type: 'advance' });
-        });
+        this.createRenderer(state);
       }
-      this.renderer.draw();
+      this.renderer?.draw();
     } finally {
       this.loadingLevel = false;
     }
@@ -141,12 +149,9 @@ export class BrowserGameRuntime {
       if (this.renderer) {
         this.renderer.setState(state);
       } else {
-        if (!this.sprites) throw new Error('Sprites must be loaded before the renderer starts');
-        this.renderer = new Renderer(state, this.options.container, this.sprites, () => {
-          void this.dispatch({ type: 'advance' });
-        });
+        this.createRenderer(state);
       }
-      this.renderer.draw();
+      this.renderer?.draw();
     } finally {
       this.loadingLevel = false;
     }
@@ -164,6 +169,84 @@ export class BrowserGameRuntime {
     url.searchParams.set('community', id);
     url.searchParams.delete('map');
     window.history.replaceState(null, '', url);
+  }
+
+  private createRenderer(state: GameState) {
+    if (!this.sprites) throw new Error('Sprites must be loaded before the renderer starts');
+    this.renderer = new Renderer(state, this.options.container, this.sprites, () => {
+      void this.dispatch({ type: 'advance' });
+    }, {
+      shell: 'device',
+      showEditorLink: true,
+      savePanel: {
+        initialSlot: this.saveSlot,
+        onSave: () => this.saveCurrentGame(),
+        onResume: () => this.resumeSavedGame(),
+        onNewGame: () => this.startNewGame(),
+        onDelete: () => this.deleteSavedGame(),
+      },
+    });
+  }
+
+  private saveCurrentGame(): SaveActionResult {
+    if (!this.simulation) return { ok: false, message: '还没有可保存的进度' };
+    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
+    if (this.simulation.isMoving()) return { ok: false, message: '角色停稳后再存档' };
+    if (this.simulation.status() === 'dead') return { ok: false, message: '失败状态不能存档' };
+    if (this.simulation.status() === 'won') return { ok: false, message: '进入下一关后再存档' };
+
+    try {
+      const slot = createGameSave(this.simulation.state, this.currentMap, this.currentCommunityId);
+      storeGameSave(slot);
+      this.saveSlot = slot;
+      this.renderer?.setSaveSlot(slot, '已保存当前进度');
+      return { ok: true, message: '已保存当前进度', slot };
+    } catch {
+      return { ok: false, message: '存档失败，浏览器拒绝写入' };
+    }
+  }
+
+  private resumeSavedGame(): SaveActionResult {
+    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
+    this.saveSlot = loadGameSave();
+    if (!this.saveSlot) return { ok: false, message: '没有可继续的存档', slot: null };
+
+    const state = restoreGameState(this.saveSlot);
+    if (!state) {
+      clearGameSave();
+      this.saveSlot = null;
+      this.renderer?.setSaveSlot(null, '存档损坏，已清除');
+      return { ok: false, message: '存档损坏，已清除', slot: null };
+    }
+
+    this.currentMap = this.saveSlot.currentMap;
+    this.currentCommunityId = this.saveSlot.currentCommunityId;
+    if (this.currentCommunityId) this.syncCommunityUrl(this.currentCommunityId);
+    else this.syncUrl(this.currentMap);
+    this.deathTimer = 0;
+    this.simulation = new GameSimulation(state);
+    if (this.renderer) this.renderer.setState(state);
+    else this.createRenderer(state);
+    this.renderer?.setSaveSlot(this.saveSlot, '已从存档继续');
+    this.renderer?.draw();
+    return { ok: true, message: '已从存档继续', slot: this.saveSlot };
+  }
+
+  private async startNewGame(): Promise<SaveActionResult> {
+    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
+    clearGameSave();
+    this.saveSlot = null;
+    this.renderer?.setSaveSlot(null, '已清除存档，开始新游戏');
+    await this.loadLevel(FIRST_LEVEL);
+    this.renderer?.setSaveSlot(null, '已开始新游戏');
+    return { ok: true, message: '已开始新游戏', slot: null };
+  }
+
+  private deleteSavedGame(): SaveActionResult {
+    clearGameSave();
+    this.saveSlot = null;
+    this.renderer?.setSaveSlot(null, '已删除存档');
+    return { ok: true, message: '已删除存档', slot: null };
   }
 
   private tick = (now: number) => {

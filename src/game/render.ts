@@ -1,5 +1,31 @@
 import type { GameState, Entity } from './types';
 import { SpriteLoader } from './sprites';
+import { appUrl } from './paths';
+import type { GameSaveSlot, SaveActionResult } from './saveSystem';
+
+type SaveActionHandler = () => SaveActionResult | Promise<SaveActionResult>;
+
+interface SavePanelControls {
+  initialSlot: GameSaveSlot | null;
+  onSave: SaveActionHandler;
+  onResume: SaveActionHandler;
+  onNewGame: SaveActionHandler;
+  onDelete: SaveActionHandler;
+}
+
+interface SavePanelElements {
+  root: HTMLElement;
+  currentMap: HTMLElement;
+  currentStats: HTMLElement;
+  slotTitle: HTMLElement;
+  slotMeta: HTMLElement;
+  slotStats: HTMLElement;
+  message: HTMLElement;
+  saveButton: HTMLButtonElement;
+  resumeButton: HTMLButtonElement;
+  newButton: HTMLButtonElement;
+  deleteButton: HTMLButtonElement;
+}
 
 function fallbackColor(kind: string): string {
   switch (kind) {
@@ -18,6 +44,14 @@ function keyAnimationName(sign: string): string {
 }
 
 export class Renderer {
+  private readonly root: HTMLElement;
+  private readonly scene?: HTMLDivElement;
+  private readonly device?: HTMLDivElement;
+  private readonly savePanelControls?: SavePanelControls;
+  private savePanel?: SavePanelElements;
+  private saveSlot: GameSaveSlot | null = null;
+  private savePanelBusy = false;
+  private savePanelMessage = '';
   private readonly stage: HTMLDivElement;
   private readonly hudTime: HTMLElement;
   private readonly hudLevel: HTMLElement;
@@ -33,8 +67,11 @@ export class Renderer {
     private state: GameState,
     container: HTMLElement,
     private sprites: SpriteLoader,
-    private readonly onAdvance: () => void
+    private readonly onAdvance: () => void,
+    options: { shell?: 'device' | 'bare'; showEditorLink?: boolean; savePanel?: SavePanelControls } = {}
   ) {
+    this.savePanelControls = options.savePanel;
+    this.saveSlot = options.savePanel?.initialSlot ?? null;
     this.stage = document.createElement('div');
     this.stage.className = 'game-stage';
 
@@ -68,7 +105,34 @@ export class Renderer {
     this.canvas.style.imageRendering = 'pixelated';
 
     this.stage.append(this.canvas, hud, winOverlay.root);
-    container.replaceChildren(this.stage);
+
+    if (options.shell === 'device') {
+      const scene = document.createElement('div');
+      scene.className = 'game-device-scene';
+      const device = document.createElement('div');
+      device.className = 'game-device';
+      const screen = document.createElement('div');
+      screen.className = 'game-screen';
+      const leftRope = document.createElement('div');
+      leftRope.className = 'game-hanger-rope game-hanger-rope--left';
+      leftRope.setAttribute('aria-hidden', 'true');
+      const rightRope = document.createElement('div');
+      rightRope.className = 'game-hanger-rope game-hanger-rope--right';
+      rightRope.setAttribute('aria-hidden', 'true');
+
+      if (options.showEditorLink !== false) scene.append(this.createEditorLink());
+      if (this.savePanelControls) scene.append(this.createSavePanel(this.savePanelControls));
+      screen.append(this.stage);
+      device.append(leftRope, rightRope, screen);
+      scene.append(device);
+      this.scene = scene;
+      this.device = device;
+      this.root = scene;
+    } else {
+      this.root = this.stage;
+    }
+
+    container.replaceChildren(this.root);
     this.resize();
     window.addEventListener('resize', () => this.resize());
   }
@@ -81,13 +145,202 @@ export class Renderer {
   }
 
   resize() {
-    const scale = Math.min(window.innerWidth / this.canvas.width, window.innerHeight / this.canvas.height);
+    const available = this.availableSize();
+    const scale = Math.min(available.width / this.canvas.width, available.height / this.canvas.height);
     const width = Math.floor(this.canvas.width * scale);
     const height = Math.floor(this.canvas.height * scale);
     this.stage.style.width = `${width}px`;
     this.stage.style.height = `${height}px`;
     this.canvas.style.width = `${width}px`;
     this.canvas.style.height = `${height}px`;
+  }
+
+  private availableSize() {
+    const target = this.scene ?? this.root.parentElement ?? document.documentElement;
+    const styles = getComputedStyle(target);
+    const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
+    const verticalPadding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
+    let width = (target.clientWidth || window.innerWidth) - horizontalPadding;
+    let height = (target.clientHeight || window.innerHeight) - verticalPadding;
+
+    if (this.device) {
+      const deviceStyles = getComputedStyle(this.device);
+      width -= parseFloat(deviceStyles.paddingLeft) + parseFloat(deviceStyles.paddingRight);
+      height -= parseFloat(deviceStyles.paddingTop) + parseFloat(deviceStyles.paddingBottom);
+      const floatingMargin = window.innerHeight < 720
+        ? Math.min(78, Math.max(36, window.innerHeight * 0.09))
+        : Math.min(190, Math.max(96, window.innerHeight * 0.14));
+      height -= floatingMargin;
+    }
+
+    return {
+      width: Math.max(1, width),
+      height: Math.max(1, height),
+    };
+  }
+
+  private createEditorLink() {
+    const actions = document.createElement('nav');
+    actions.className = 'game-scene-actions';
+    actions.setAttribute('aria-label', 'Game tools');
+
+    const link = document.createElement('a');
+    link.className = 'game-scene-link';
+    link.href = appUrl('editor');
+    link.textContent = '自定义地图';
+    link.setAttribute('aria-label', 'Open map editor');
+
+    actions.append(link);
+    return actions;
+  }
+
+  setSaveSlot(slot: GameSaveSlot | null, message = '') {
+    this.saveSlot = slot;
+    this.savePanelMessage = message;
+    this.updateSavePanel();
+  }
+
+  private createSavePanel(controls: SavePanelControls): HTMLElement {
+    const root = document.createElement('aside');
+    root.className = 'game-save-panel';
+    root.setAttribute('aria-label', 'Save management');
+    root.addEventListener('keydown', (event) => event.stopPropagation());
+
+    const eyebrow = document.createElement('span');
+    eyebrow.className = 'game-save-panel__eyebrow';
+    eyebrow.textContent = 'Save Slot';
+
+    const title = document.createElement('strong');
+    title.className = 'game-save-panel__title';
+    title.textContent = '游戏存档';
+
+    const current = document.createElement('section');
+    current.className = 'game-save-panel__section';
+    const currentLabel = document.createElement('span');
+    currentLabel.className = 'game-save-panel__label';
+    currentLabel.textContent = '当前进度';
+    const currentMap = document.createElement('strong');
+    currentMap.className = 'game-save-panel__value';
+    const currentStats = document.createElement('span');
+    currentStats.className = 'game-save-panel__meta';
+    current.append(currentLabel, currentMap, currentStats);
+
+    const slot = document.createElement('section');
+    slot.className = 'game-save-panel__section game-save-panel__section--slot';
+    const slotLabel = document.createElement('span');
+    slotLabel.className = 'game-save-panel__label';
+    slotLabel.textContent = '上次存档';
+    const slotTitle = document.createElement('strong');
+    slotTitle.className = 'game-save-panel__value';
+    const slotMeta = document.createElement('span');
+    slotMeta.className = 'game-save-panel__meta';
+    const slotStats = document.createElement('span');
+    slotStats.className = 'game-save-panel__meta';
+    slot.append(slotLabel, slotTitle, slotMeta, slotStats);
+
+    const actions = document.createElement('div');
+    actions.className = 'game-save-panel__actions';
+    const saveButton = this.createSaveButton('保存当前');
+    const resumeButton = this.createSaveButton('继续上次');
+    const newButton = this.createSaveButton('新开一局');
+    const deleteButton = this.createSaveButton('删除存档', 'ghost');
+    actions.append(saveButton, resumeButton, newButton, deleteButton);
+
+    const message = document.createElement('p');
+    message.className = 'game-save-panel__message';
+    message.setAttribute('aria-live', 'polite');
+
+    saveButton.addEventListener('click', () => this.runSavePanelAction(controls.onSave));
+    resumeButton.addEventListener('click', () => this.runSavePanelAction(controls.onResume));
+    newButton.addEventListener('click', () => this.runSavePanelAction(controls.onNewGame));
+    deleteButton.addEventListener('click', () => this.runSavePanelAction(controls.onDelete));
+
+    root.append(eyebrow, title, current, slot, actions, message);
+    this.savePanel = {
+      root,
+      currentMap,
+      currentStats,
+      slotTitle,
+      slotMeta,
+      slotStats,
+      message,
+      saveButton,
+      resumeButton,
+      newButton,
+      deleteButton,
+    };
+    this.updateSavePanel();
+    return root;
+  }
+
+  private createSaveButton(label: string, variant: 'primary' | 'ghost' = 'primary') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `game-save-panel__button game-save-panel__button--${variant}`;
+    button.textContent = label;
+    return button;
+  }
+
+  private runSavePanelAction(handler: SaveActionHandler) {
+    if (this.savePanelBusy) return;
+    this.savePanelBusy = true;
+    this.updateSavePanel();
+    Promise.resolve(handler())
+      .then((result) => {
+        if (Object.prototype.hasOwnProperty.call(result, 'slot')) this.saveSlot = result.slot ?? null;
+        this.savePanelMessage = result.message;
+      })
+      .catch(() => {
+        this.savePanelMessage = '操作失败，请稍后再试';
+      })
+      .finally(() => {
+        this.savePanelBusy = false;
+        this.updateSavePanel();
+      });
+  }
+
+  private updateSavePanel() {
+    if (!this.savePanel) return;
+
+    const remain = Math.max(0, this.state.requiredCarrots - this.state.inventory.carrots);
+    this.savePanel.currentMap.textContent = this.formatMapName(this.state.mapName);
+    this.savePanel.currentStats.textContent = `${Math.floor(this.state.stats.timeElapsed)} 秒 / ${this.state.stats.steps} 步 / 剩 ${remain}`;
+
+    if (this.saveSlot) {
+      const snapshot = this.saveSlot.state;
+      const savedRemain = Math.max(0, snapshot.requiredCarrots - snapshot.inventory.carrots);
+      const savedPlayer = snapshot.entities.find((entity) => entity.id === snapshot.playerId);
+      const col = savedPlayer ? Math.round(savedPlayer.pos.x / snapshot.tileSize) + 1 : null;
+      const row = savedPlayer ? Math.round(savedPlayer.pos.y / snapshot.tileSize) + 1 : null;
+      this.savePanel.slotTitle.textContent = this.formatMapName(snapshot.mapName);
+      this.savePanel.slotMeta.textContent = `保存于 ${this.formatSaveTime(this.saveSlot.savedAt)}`;
+      this.savePanel.slotStats.textContent = `${Math.floor(snapshot.stats.timeElapsed)} 秒 / ${snapshot.stats.steps} 步 / 剩 ${savedRemain}${col && row ? ` / ${col},${row}` : ''}`;
+    } else {
+      this.savePanel.slotTitle.textContent = '暂无存档';
+      this.savePanel.slotMeta.textContent = '保存当前进度后，可从这里继续';
+      this.savePanel.slotStats.textContent = '';
+    }
+
+    this.savePanel.message.textContent = this.savePanelMessage;
+    this.savePanel.saveButton.disabled = this.savePanelBusy;
+    this.savePanel.newButton.disabled = this.savePanelBusy;
+    this.savePanel.resumeButton.disabled = this.savePanelBusy || !this.saveSlot;
+    this.savePanel.deleteButton.disabled = this.savePanelBusy || !this.saveSlot;
+  }
+
+  private formatMapName(mapName: string) {
+    const level = mapName.match(/^map(\d+)$/)?.[1];
+    return level ? `第 ${level} 关` : mapName;
+  }
+
+  private formatSaveTime(timestamp: number) {
+    const date = new Date(timestamp);
+    return date.toLocaleString('zh-CN', {
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   draw() {
@@ -98,6 +351,7 @@ export class Renderer {
     this.drawEntities();
     this.drawHud();
     this.drawOverlay();
+    this.updateSavePanel();
   }
 
   private drawTilemap() {
