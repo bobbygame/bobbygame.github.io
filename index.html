@@ -9,6 +9,7 @@
     body {
       margin: 0;
       min-height: 100%;
+      min-height: 100dvh;
       overflow: hidden;
       background: #000;
       color: #fff;
@@ -20,6 +21,7 @@
       position: relative;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       display: grid;
       place-items: center;
       background: #000;
@@ -870,6 +872,255 @@
     @media (max-width: 820px) {
       .touch-dpad {
         display: grid;
+      }
+    }
+
+    @media (max-width: 900px), (max-height: 680px) {
+      :root {
+        --mobile-dpad-size: clamp(124px, 30vw, 160px);
+        --mobile-dpad-button: clamp(42px, 10vw, 54px);
+        --mobile-bottom-reserve: max(226px, 28vh);
+      }
+
+      .game-device-scene {
+        place-items: start center;
+        align-content: start;
+        padding:
+          max(56px, calc(env(safe-area-inset-top) + 44px))
+          max(10px, env(safe-area-inset-right))
+          calc(var(--mobile-bottom-reserve) + env(safe-area-inset-bottom))
+          max(10px, env(safe-area-inset-left));
+        perspective: none;
+      }
+
+      .game-device-scene::before {
+        bottom: calc(var(--mobile-bottom-reserve) + 16px);
+        width: min(76vw, 430px);
+        height: 42px;
+        filter: blur(20px);
+      }
+
+      .game-device-scene::after {
+        display: none;
+      }
+
+      .game-device {
+        --device-bezel: clamp(8px, 2.4vw, 14px);
+        --rope-length: clamp(36px, 8vh, 68px);
+      }
+
+      .game-hanger-rope {
+        opacity: 0.72;
+      }
+
+      .game-scene-actions {
+        top: max(10px, env(safe-area-inset-top));
+        right: max(10px, env(safe-area-inset-right));
+      }
+
+      .game-scene-link {
+        min-height: 36px;
+        padding: 0 12px 0 10px;
+        gap: 8px;
+        font-size: 13px;
+      }
+
+      .game-scene-link::before {
+        width: 15px;
+        height: 15px;
+      }
+
+      .game-save-panel {
+        position: fixed;
+        left: max(10px, env(safe-area-inset-left));
+        right: calc(max(10px, env(safe-area-inset-right)) + var(--mobile-dpad-size) + 12px);
+        top: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        width: auto;
+        min-width: 0;
+        max-height: min(236px, calc(100dvh - 78px));
+        gap: 7px;
+        overflow: auto;
+        padding: 10px;
+        border-radius: 16px;
+        transform: none;
+      }
+
+      .game-save-panel__eyebrow {
+        display: none;
+      }
+
+      .game-save-panel__title {
+        font-size: 16px;
+      }
+
+      .game-save-panel__section {
+        gap: 4px;
+        padding: 8px;
+        border-radius: 12px;
+      }
+
+      .game-save-panel__label {
+        font-size: 11px;
+      }
+
+      .game-save-panel__value {
+        min-height: 18px;
+        font-size: 15px;
+      }
+
+      .game-save-panel__meta {
+        font-size: 11px;
+        line-height: 1.25;
+      }
+
+      .game-save-panel__actions {
+        gap: 6px;
+      }
+
+      .game-save-panel__button {
+        min-height: 32px;
+        padding: 0 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        line-height: 1.1;
+      }
+
+      .game-save-panel__message {
+        min-height: 14px;
+        font-size: 11px;
+      }
+
+      .touch-dpad {
+        --dpad-size: var(--mobile-dpad-size);
+        --dpad-button: var(--mobile-dpad-button);
+        left: auto;
+        right: max(10px, env(safe-area-inset-right));
+        bottom: max(10px, env(safe-area-inset-bottom));
+        display: grid;
+        transform: none;
+      }
+    }
+
+    @media (max-width: 440px) {
+      :root {
+        --mobile-dpad-size: clamp(112px, 31vw, 128px);
+        --mobile-dpad-button: clamp(38px, 10vw, 44px);
+        --mobile-bottom-reserve: 218px;
+      }
+
+      .game-save-panel {
+        right: calc(max(8px, env(safe-area-inset-right)) + var(--mobile-dpad-size) + 8px);
+        left: max(8px, env(safe-area-inset-left));
+        max-height: 218px;
+        gap: 6px;
+        padding: 8px;
+      }
+
+      .game-save-panel__section {
+        padding: 7px;
+      }
+
+      .game-save-panel__button {
+        min-height: 30px;
+        padding: 0 6px;
+      }
+
+      .game-save-panel__message {
+        display: none;
+      }
+    }
+
+    @media (min-width: 560px) and (max-width: 900px) and (min-height: 521px) {
+      .game-save-panel {
+        grid-template-columns: 108px minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+          "title current slot"
+          "actions actions actions"
+          "message message message";
+        max-height: 188px;
+        align-items: stretch;
+      }
+
+      .game-save-panel__title {
+        grid-area: title;
+        align-self: center;
+      }
+
+      .game-save-panel__title + .game-save-panel__section {
+        grid-area: current;
+      }
+
+      .game-save-panel__section--slot {
+        grid-area: slot;
+      }
+
+      .game-save-panel__actions {
+        grid-area: actions;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .game-save-panel__message {
+        grid-area: message;
+      }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      :root {
+        --mobile-dpad-size: clamp(110px, 31vh, 132px);
+        --mobile-dpad-button: clamp(38px, 11vh, 44px);
+      }
+
+      .game-device-scene {
+        place-items: center;
+        padding:
+          max(44px, calc(env(safe-area-inset-top) + 8px))
+          calc(var(--mobile-dpad-size) + max(22px, env(safe-area-inset-right)))
+          max(12px, env(safe-area-inset-bottom))
+          calc(214px + env(safe-area-inset-left));
+      }
+
+      .game-device-scene::before {
+        bottom: 10px;
+      }
+
+      .game-save-panel {
+        top: max(48px, env(safe-area-inset-top));
+        right: auto;
+        bottom: auto;
+        width: 190px;
+        max-height: calc(100dvh - 60px);
+      }
+
+      .touch-dpad {
+        top: 50%;
+        bottom: auto;
+        transform: translateY(-50%);
+      }
+
+      .game-hud {
+        gap: 3px;
+        padding: 5px;
+      }
+
+      .game-hud__pill {
+        min-width: 0;
+        min-height: 30px;
+        gap: 3px;
+        padding: 4px 6px;
+        border-radius: 10px;
+      }
+
+      .game-hud__pill--level {
+        min-width: 0;
+      }
+
+      .game-hud__label {
+        font-size: 8px;
+      }
+
+      .game-hud__value {
+        font-size: 16px;
       }
     }
 

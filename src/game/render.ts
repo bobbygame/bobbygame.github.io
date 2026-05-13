@@ -52,6 +52,7 @@ export class Renderer {
   private saveSlot: GameSaveSlot | null = null;
   private savePanelBusy = false;
   private savePanelMessage = '';
+  private readonly handleResize = () => this.resize();
   private readonly stage: HTMLDivElement;
   private readonly hudTime: HTMLElement;
   private readonly hudLevel: HTMLElement;
@@ -134,7 +135,9 @@ export class Renderer {
 
     container.replaceChildren(this.root);
     this.resize();
-    window.addEventListener('resize', () => this.resize());
+    window.addEventListener('resize', this.handleResize);
+    window.visualViewport?.addEventListener('resize', this.handleResize);
+    window.visualViewport?.addEventListener('scroll', this.handleResize);
   }
 
   setState(state: GameState) {
@@ -160,16 +163,21 @@ export class Renderer {
     const styles = getComputedStyle(target);
     const horizontalPadding = parseFloat(styles.paddingLeft) + parseFloat(styles.paddingRight);
     const verticalPadding = parseFloat(styles.paddingTop) + parseFloat(styles.paddingBottom);
-    let width = (target.clientWidth || window.innerWidth) - horizontalPadding;
-    let height = (target.clientHeight || window.innerHeight) - verticalPadding;
+    const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const targetWidth = target.clientWidth || viewportWidth;
+    const targetHeight = target.clientHeight || viewportHeight;
+    let width = Math.min(targetWidth, viewportWidth) - horizontalPadding;
+    let height = Math.min(targetHeight, viewportHeight) - verticalPadding;
 
     if (this.device) {
       const deviceStyles = getComputedStyle(this.device);
       width -= parseFloat(deviceStyles.paddingLeft) + parseFloat(deviceStyles.paddingRight);
       height -= parseFloat(deviceStyles.paddingTop) + parseFloat(deviceStyles.paddingBottom);
-      const floatingMargin = window.innerHeight < 720
-        ? Math.min(78, Math.max(36, window.innerHeight * 0.09))
-        : Math.min(190, Math.max(96, window.innerHeight * 0.14));
+      const compactViewport = viewportWidth <= 900 || viewportHeight <= 680;
+      const floatingMargin = compactViewport ? 0 : viewportHeight < 720
+        ? Math.min(78, Math.max(36, viewportHeight * 0.09))
+        : Math.min(190, Math.max(96, viewportHeight * 0.14));
       height -= floatingMargin;
     }
 
