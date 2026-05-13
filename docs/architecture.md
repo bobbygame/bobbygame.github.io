@@ -217,7 +217,7 @@ TUI 与浏览器版本共享核心规则，但不共享 Canvas、音频、触摸
 
 部署配置在 `.github/workflows/static.yml`。GitHub Actions 使用 Node 22、`npm ci`、`npm run typecheck` 和 `npm run build`，再把 `dist` 发布到 GitHub Pages。
 
-Vite Web 构建在 `GITHUB_PAGES=true` 时设置 `base: /bobbygame/`，并把 `dist/index.html` 复制为 `dist/404.html` 和 `dist/editor/index.html`，用于静态托管下的前端路由兼容。
+Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/index.html` 复制为 `dist/404.html` 和 `dist/editor/index.html`，用于静态托管下的前端路由兼容。
 
 ## 12. 关键架构决策
 

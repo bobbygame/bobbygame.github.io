@@ -22,7 +22,7 @@ function githubPagesRoutes() {
 
 export default defineConfig({
   root: '.',
-  base: isGitHubPages ? '/bobbygame/' : '/',
+  base: '/',
   plugins: isGitHubPages ? [githubPagesRoutes()] : [],
   publicDir: 'public',
   server: {

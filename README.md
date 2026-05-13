@@ -2,7 +2,7 @@
 
 Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家控制兔子在 50px 网格地图中移动，收集每关要求的胡萝卜，理解机关规则，最终抵达出口。
 
-在线试玩：[https://bobbygame.github.io/bobbygame/](https://bobbygame.github.io/bobbygame/)
+在线试玩：[https://bobbygame.github.io/](https://bobbygame.github.io/)
 
 ## 游戏目标
 
@@ -91,7 +91,7 @@ npm run build
 项目同时提供一个 TUI 版本，可以在终端里直接玩同一套关卡数据：
 
 ```sh
-npm install -g github:bobbygame/bobbygame
+npm install -g github:bobbygame/bobbygame.github.io
 bobby-carrot
 ```
 
