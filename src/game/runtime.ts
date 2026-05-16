@@ -44,6 +44,12 @@ export class BrowserGameRuntime {
   private deathTimer = 0;
   private loadingLevel = false;
   private saveSlot: GameSaveSlot | null = loadGameSave();
+  private autoSaveSignature = '';
+  private autoSaveLastWrite = 0;
+  private readonly handlePageHide = () => this.autoSaveCurrentGame(true);
+  private readonly handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') this.autoSaveCurrentGame(true);
+  };
 
   constructor(private readonly options: BrowserGameRuntimeOptions) {
     this.currentMap = options.initialMap;
@@ -58,11 +64,16 @@ export class BrowserGameRuntime {
       void this.dispatch(action);
     });
     this.input.bindKeyboard();
-    if (this.options.initialCommunityId) {
+    const restored = this.restoreSavedGame();
+    if (restored.ok) {
+      this.renderer?.setSaveSlot(this.saveSlot, t('game.save.autorestored'));
+    } else if (this.options.initialCommunityId) {
       await this.loadCommunityLevel(this.options.initialCommunityId);
     } else {
       await this.loadLevel(this.currentMap);
     }
+    window.addEventListener('pagehide', this.handlePageHide);
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
     audio.playBgMusic();
     this.lastFrameTime = performance.now();
     this.animationFrame = requestAnimationFrame(this.tick);
@@ -72,6 +83,8 @@ export class BrowserGameRuntime {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
     this.input?.unbindKeyboard();
     this.joystick?.destroy();
+    window.removeEventListener('pagehide', this.handlePageHide);
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
   private async dispatch(action: GameAction) {
@@ -123,6 +136,7 @@ export class BrowserGameRuntime {
         this.createRenderer(state);
       }
       this.renderer?.draw();
+      this.autoSaveCurrentGame(true);
     } finally {
       this.loadingLevel = false;
     }
@@ -154,6 +168,7 @@ export class BrowserGameRuntime {
         this.createRenderer(state);
       }
       this.renderer?.draw();
+      this.autoSaveCurrentGame(true);
     } finally {
       this.loadingLevel = false;
     }
@@ -182,33 +197,50 @@ export class BrowserGameRuntime {
       showEditorLink: true,
       savePanel: {
         initialSlot: this.saveSlot,
-        onSave: () => this.saveCurrentGame(),
-        onResume: () => this.resumeSavedGame(),
-        onNewGame: () => this.startNewGame(),
-        onDelete: () => this.deleteSavedGame(),
+        onRestart: () => this.startNewGame(),
       },
     });
   }
 
-  private saveCurrentGame(): SaveActionResult {
-    if (!this.simulation) return { ok: false, message: t('game.save.noProgress') };
-    if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
-    if (this.simulation.isMoving()) return { ok: false, message: t('game.save.moving') };
-    if (this.simulation.status() === 'dead') return { ok: false, message: t('game.save.dead') };
-    if (this.simulation.status() === 'won') return { ok: false, message: t('game.save.won') };
+  private autoSaveCurrentGame(force = false): GameSaveSlot | null {
+    if (!this.simulation) return null;
+    if (this.simulation.isMoving()) return null;
+    if (this.simulation.status() === 'dead') return null;
+
+    const now = Date.now();
+    const signature = this.createAutoSaveSignature();
+    if (!force && signature === this.autoSaveSignature && now - this.autoSaveLastWrite < 2500) return null;
 
     try {
       const slot = createGameSave(this.simulation.state, this.currentMap, this.currentCommunityId);
       storeGameSave(slot);
       this.saveSlot = slot;
-      this.renderer?.setSaveSlot(slot, t('game.save.success'));
-      return { ok: true, message: t('game.save.success'), slot };
+      this.autoSaveSignature = signature;
+      this.autoSaveLastWrite = now;
+      this.renderer?.setSaveSlot(slot);
+      return slot;
     } catch {
-      return { ok: false, message: t('game.save.denied') };
+      this.renderer?.setSaveSlot(this.saveSlot, t('game.save.denied'));
+      return null;
     }
   }
 
-  private resumeSavedGame(): SaveActionResult {
+  private createAutoSaveSignature(): string {
+    if (!this.simulation) return '';
+    const { state } = this.simulation;
+    return [
+      this.currentCommunityId ?? this.currentMap,
+      this.simulation.status(),
+      state.stats.steps,
+      Math.floor(state.stats.timeElapsed / 2),
+      state.inventory.carrots,
+      state.player.pos.x,
+      state.player.pos.y,
+      state.won ? 1 : 0,
+    ].join(':');
+  }
+
+  private restoreSavedGame(): SaveActionResult {
     if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
     this.saveSlot = loadGameSave();
     if (!this.saveSlot) return { ok: false, message: t('game.save.none'), slot: null };
@@ -229,26 +261,23 @@ export class BrowserGameRuntime {
     this.simulation = new GameSimulation(state);
     if (this.renderer) this.renderer.setState(state);
     else this.createRenderer(state);
-    this.renderer?.setSaveSlot(this.saveSlot, t('game.save.resumed'));
+    this.autoSaveSignature = this.createAutoSaveSignature();
+    this.autoSaveLastWrite = Date.now();
+    this.renderer?.setSaveSlot(this.saveSlot, t('game.save.autorestored'));
     this.renderer?.draw();
-    return { ok: true, message: t('game.save.resumed'), slot: this.saveSlot };
+    return { ok: true, message: t('game.save.autorestored'), slot: this.saveSlot };
   }
 
   private async startNewGame(): Promise<SaveActionResult> {
     if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
     clearGameSave();
     this.saveSlot = null;
+    this.autoSaveSignature = '';
+    this.autoSaveLastWrite = 0;
     this.renderer?.setSaveSlot(null, t('game.save.clearedStarting'));
     await this.loadLevel(FIRST_LEVEL);
-    this.renderer?.setSaveSlot(null, t('game.save.newStarted'));
-    return { ok: true, message: t('game.save.newStarted'), slot: null };
-  }
-
-  private deleteSavedGame(): SaveActionResult {
-    clearGameSave();
-    this.saveSlot = null;
-    this.renderer?.setSaveSlot(null, t('game.save.deleted'));
-    return { ok: true, message: t('game.save.deleted'), slot: null };
+    this.renderer?.setSaveSlot(this.saveSlot, t('game.save.newStarted'));
+    return { ok: true, message: t('game.save.newStarted'), slot: this.saveSlot };
   }
 
   private tick = (now: number) => {
@@ -270,6 +299,7 @@ export class BrowserGameRuntime {
           const sound = soundForGameEvent(event);
           if (sound) audio.play(sound);
         }
+        this.autoSaveCurrentGame();
       }
 
       this.renderer?.draw();

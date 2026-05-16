@@ -2,34 +2,18 @@ import type { GameState, Entity } from './types';
 import { SpriteLoader } from './sprites';
 import { appUrl } from './paths';
 import type { GameSaveSlot, SaveActionResult } from './saveSystem';
-import { formatMapName, formatSaveTime, language, languageToggleLabel, languageToggleText, t, toggleLanguage } from './i18n';
+import { language, languageToggleLabel, languageToggleText, t, toggleLanguage } from './i18n';
 
 type SaveActionHandler = () => SaveActionResult | Promise<SaveActionResult>;
 
 interface SavePanelControls {
   initialSlot: GameSaveSlot | null;
-  onSave: SaveActionHandler;
-  onResume: SaveActionHandler;
-  onNewGame: SaveActionHandler;
-  onDelete: SaveActionHandler;
+  onRestart: SaveActionHandler;
 }
 
 interface SavePanelElements {
   root: HTMLElement;
-  eyebrow: HTMLElement;
-  title: HTMLElement;
-  currentLabel: HTMLElement;
-  currentMap: HTMLElement;
-  currentStats: HTMLElement;
-  slotLabel: HTMLElement;
-  slotTitle: HTMLElement;
-  slotMeta: HTMLElement;
-  slotStats: HTMLElement;
-  message: HTMLElement;
-  saveButton: HTMLButtonElement;
-  resumeButton: HTMLButtonElement;
-  newButton: HTMLButtonElement;
-  deleteButton: HTMLButtonElement;
+  restartButton: HTMLButtonElement;
 }
 
 function fallbackColor(kind: string): string {
@@ -56,7 +40,6 @@ export class Renderer {
   private savePanel?: SavePanelElements;
   private saveSlot: GameSaveSlot | null = null;
   private savePanelBusy = false;
-  private savePanelMessage = '';
   private readonly handleResize = () => this.resize();
   private readonly stage: HTMLDivElement;
   private readonly hudTimeLabel: HTMLElement;
@@ -255,7 +238,7 @@ export class Renderer {
 
   setSaveSlot(slot: GameSaveSlot | null, message = '') {
     this.saveSlot = slot;
-    this.savePanelMessage = message;
+    void message;
     this.updateSavePanel();
   }
 
@@ -265,72 +248,14 @@ export class Renderer {
     root.setAttribute('aria-label', t('game.save.aria'));
     root.addEventListener('keydown', (event) => event.stopPropagation());
 
-    const eyebrow = document.createElement('span');
-    eyebrow.className = 'game-save-panel__eyebrow';
-    eyebrow.textContent = t('game.save.eyebrow');
+    const restartButton = this.createSaveButton(t('game.save.restart'), 'ghost');
 
-    const title = document.createElement('strong');
-    title.className = 'game-save-panel__title';
-    title.textContent = t('game.save.title');
+    restartButton.addEventListener('click', () => this.runSavePanelAction(controls.onRestart));
 
-    const current = document.createElement('section');
-    current.className = 'game-save-panel__section';
-    const currentLabel = document.createElement('span');
-    currentLabel.className = 'game-save-panel__label';
-    currentLabel.textContent = t('game.save.current');
-    const currentMap = document.createElement('strong');
-    currentMap.className = 'game-save-panel__value';
-    const currentStats = document.createElement('span');
-    currentStats.className = 'game-save-panel__meta';
-    current.append(currentLabel, currentMap, currentStats);
-
-    const slot = document.createElement('section');
-    slot.className = 'game-save-panel__section game-save-panel__section--slot';
-    const slotLabel = document.createElement('span');
-    slotLabel.className = 'game-save-panel__label';
-    slotLabel.textContent = t('game.save.slot');
-    const slotTitle = document.createElement('strong');
-    slotTitle.className = 'game-save-panel__value';
-    const slotMeta = document.createElement('span');
-    slotMeta.className = 'game-save-panel__meta';
-    const slotStats = document.createElement('span');
-    slotStats.className = 'game-save-panel__meta';
-    slot.append(slotLabel, slotTitle, slotMeta, slotStats);
-
-    const actions = document.createElement('div');
-    actions.className = 'game-save-panel__actions';
-    const saveButton = this.createSaveButton(t('game.save.save'));
-    const resumeButton = this.createSaveButton(t('game.save.resume'));
-    const newButton = this.createSaveButton(t('game.save.new'));
-    const deleteButton = this.createSaveButton(t('game.save.delete'), 'ghost');
-    actions.append(saveButton, resumeButton, newButton, deleteButton);
-
-    const message = document.createElement('p');
-    message.className = 'game-save-panel__message';
-    message.setAttribute('aria-live', 'polite');
-
-    saveButton.addEventListener('click', () => this.runSavePanelAction(controls.onSave));
-    resumeButton.addEventListener('click', () => this.runSavePanelAction(controls.onResume));
-    newButton.addEventListener('click', () => this.runSavePanelAction(controls.onNewGame));
-    deleteButton.addEventListener('click', () => this.runSavePanelAction(controls.onDelete));
-
-    root.append(eyebrow, title, current, slot, actions, message);
+    root.append(restartButton);
     this.savePanel = {
       root,
-      eyebrow,
-      title,
-      currentLabel,
-      currentMap,
-      currentStats,
-      slotLabel,
-      slotTitle,
-      slotMeta,
-      slotStats,
-      message,
-      saveButton,
-      resumeButton,
-      newButton,
-      deleteButton,
+      restartButton,
     };
     this.updateSavePanel();
     return root;
@@ -351,10 +276,10 @@ export class Renderer {
     Promise.resolve(handler())
       .then((result) => {
         if (Object.prototype.hasOwnProperty.call(result, 'slot')) this.saveSlot = result.slot ?? null;
-        this.savePanelMessage = result.message;
+        void result.message;
       })
       .catch(() => {
-        this.savePanelMessage = t('game.save.failed');
+        return undefined;
       })
       .finally(() => {
         this.savePanelBusy = false;
@@ -364,40 +289,7 @@ export class Renderer {
 
   private updateSavePanel() {
     if (!this.savePanel) return;
-
-    const remain = Math.max(0, this.state.requiredCarrots - this.state.inventory.carrots);
-    this.savePanel.currentMap.textContent = formatMapName(this.state.mapName);
-    this.savePanel.currentStats.textContent = t('game.save.currentStats', {
-      time: Math.floor(this.state.stats.timeElapsed),
-      steps: this.state.stats.steps,
-      remain,
-    });
-
-    if (this.saveSlot) {
-      const snapshot = this.saveSlot.state;
-      const savedRemain = Math.max(0, snapshot.requiredCarrots - snapshot.inventory.carrots);
-      const savedPlayer = snapshot.entities.find((entity) => entity.id === snapshot.playerId);
-      const col = savedPlayer ? Math.round(savedPlayer.pos.x / snapshot.tileSize) + 1 : null;
-      const row = savedPlayer ? Math.round(savedPlayer.pos.y / snapshot.tileSize) + 1 : null;
-      this.savePanel.slotTitle.textContent = formatMapName(snapshot.mapName);
-      this.savePanel.slotMeta.textContent = t('game.save.savedAt', { time: formatSaveTime(this.saveSlot.savedAt) });
-      this.savePanel.slotStats.textContent = t('game.save.slotStats', {
-        time: Math.floor(snapshot.stats.timeElapsed),
-        steps: snapshot.stats.steps,
-        remain: savedRemain,
-        position: col && row ? t('game.save.position', { col, row }) : '',
-      });
-    } else {
-      this.savePanel.slotTitle.textContent = t('game.save.emptyTitle');
-      this.savePanel.slotMeta.textContent = t('game.save.emptyMeta');
-      this.savePanel.slotStats.textContent = '';
-    }
-
-    this.savePanel.message.textContent = this.savePanelMessage;
-    this.savePanel.saveButton.disabled = this.savePanelBusy;
-    this.savePanel.newButton.disabled = this.savePanelBusy;
-    this.savePanel.resumeButton.disabled = this.savePanelBusy || !this.saveSlot;
-    this.savePanel.deleteButton.disabled = this.savePanelBusy || !this.saveSlot;
+    this.savePanel.restartButton.disabled = this.savePanelBusy;
   }
 
   draw() {
@@ -618,14 +510,7 @@ export class Renderer {
     }
     if (this.savePanel) {
       this.savePanel.root.setAttribute('aria-label', t('game.save.aria'));
-      this.savePanel.eyebrow.textContent = t('game.save.eyebrow');
-      this.savePanel.title.textContent = t('game.save.title');
-      this.savePanel.currentLabel.textContent = t('game.save.current');
-      this.savePanel.slotLabel.textContent = t('game.save.slot');
-      this.savePanel.saveButton.textContent = t('game.save.save');
-      this.savePanel.resumeButton.textContent = t('game.save.resume');
-      this.savePanel.newButton.textContent = t('game.save.new');
-      this.savePanel.deleteButton.textContent = t('game.save.delete');
+      this.savePanel.restartButton.textContent = t('game.save.restart');
       this.updateSavePanel();
     }
   }
