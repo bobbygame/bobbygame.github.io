@@ -910,13 +910,14 @@
     }
 
     .touch-dpad {
+      --dpad-offset-x: 0px;
       --dpad-size: clamp(142px, 34vw, 176px);
       --dpad-button: clamp(46px, 11vw, 58px);
       --dpad-glass: rgba(10, 38, 28, 0.46);
       --dpad-edge: rgba(255, 255, 255, 0.46);
       --dpad-accent: #ffdd37;
       position: fixed;
-      left: 50%;
+      left: calc(50% + var(--dpad-offset-x));
       bottom: max(14px, env(safe-area-inset-bottom));
       width: var(--dpad-size);
       height: var(--dpad-size);
@@ -1118,7 +1119,8 @@
       .touch-dpad {
         --dpad-size: var(--mobile-dpad-size);
         --dpad-button: var(--mobile-dpad-button);
-        left: 50%;
+        --dpad-offset-x: clamp(48px, 12vw, 78px);
+        left: calc(50% + var(--dpad-offset-x));
         right: auto;
         bottom: max(28px, calc(env(safe-area-inset-bottom) + 18px));
         display: grid;
