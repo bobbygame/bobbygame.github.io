@@ -197,7 +197,8 @@ export class BrowserGameRuntime {
       showEditorLink: true,
       savePanel: {
         initialSlot: this.saveSlot,
-        onRestart: () => this.startNewGame(),
+        onRestartLevel: () => this.restartCurrentLevel(),
+        onStartOver: () => this.startNewGame(),
       },
     });
   }
@@ -280,6 +281,12 @@ export class BrowserGameRuntime {
     return { ok: true, message: t('game.save.newStarted'), slot: this.saveSlot };
   }
 
+  private async restartCurrentLevel(): Promise<SaveActionResult> {
+    if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
+    await this.reloadCurrentLevel();
+    return { ok: true, message: t('game.restart.currentStarted'), slot: this.saveSlot };
+  }
+
   private tick = (now: number) => {
     const dt = Math.min((now - this.lastFrameTime) / 1000, 0.05);
     this.lastFrameTime = now;
@@ -291,7 +298,7 @@ export class BrowserGameRuntime {
           void this.loadLevel(this.currentMap);
         }
       } else if (this.simulation.status() === 'playing') {
-        const joystickDirection = this.joystick?.direction();
+        const joystickDirection = this.joystick?.consumeDirection();
         if (joystickDirection) this.simulation.dispatch({ type: 'move', direction: joystickDirection });
 
         const step = this.simulation.update(dt);

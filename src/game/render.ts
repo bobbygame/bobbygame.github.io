@@ -6,14 +6,18 @@ import { language, languageToggleLabel, languageToggleText, t, toggleLanguage } 
 
 type SaveActionHandler = () => SaveActionResult | Promise<SaveActionResult>;
 
-interface SavePanelControls {
+interface RestartControls {
   initialSlot: GameSaveSlot | null;
-  onRestart: SaveActionHandler;
+  onRestartLevel: SaveActionHandler;
+  onStartOver: SaveActionHandler;
 }
 
-interface SavePanelElements {
+interface RestartDialogElements {
   root: HTMLElement;
-  restartButton: HTMLButtonElement;
+  title: HTMLElement;
+  body: HTMLElement;
+  currentButton: HTMLButtonElement;
+  startOverButton: HTMLButtonElement;
 }
 
 function fallbackColor(kind: string): string {
@@ -36,10 +40,10 @@ export class Renderer {
   private readonly root: HTMLElement;
   private readonly scene?: HTMLDivElement;
   private readonly device?: HTMLDivElement;
-  private readonly savePanelControls?: SavePanelControls;
-  private savePanel?: SavePanelElements;
+  private readonly restartControls?: RestartControls;
+  private restartDialog?: RestartDialogElements;
   private saveSlot: GameSaveSlot | null = null;
-  private savePanelBusy = false;
+  private restartBusy = false;
   private readonly handleResize = () => this.resize();
   private readonly stage: HTMLDivElement;
   private readonly hudTimeLabel: HTMLElement;
@@ -56,6 +60,7 @@ export class Renderer {
   private readonly winButton: HTMLButtonElement;
   private readonly editorLink?: HTMLAnchorElement;
   private readonly languageButton?: HTMLButtonElement;
+  private readonly restartButton?: HTMLButtonElement;
   private renderedLanguage = language();
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
@@ -65,9 +70,9 @@ export class Renderer {
     container: HTMLElement,
     private sprites: SpriteLoader,
     private readonly onAdvance: () => void,
-    options: { shell?: 'device' | 'bare'; showEditorLink?: boolean; savePanel?: SavePanelControls } = {}
+    options: { shell?: 'device' | 'bare'; showEditorLink?: boolean; savePanel?: RestartControls } = {}
   ) {
-    this.savePanelControls = options.savePanel;
+    this.restartControls = options.savePanel;
     this.saveSlot = options.savePanel?.initialSlot ?? null;
     this.stage = document.createElement('div');
     this.stage.className = 'game-stage';
@@ -99,6 +104,7 @@ export class Renderer {
     this.winStepsLabel = winOverlay.steps.label;
     this.winSteps = winOverlay.steps.value;
     this.winButton = winOverlay.button;
+    const restartOverlay = this.restartControls ? this.createRestartDialog(this.restartControls) : null;
 
     const ctx = this.canvas.getContext('2d');
     if (!ctx) throw new Error('Canvas not supported');
@@ -107,6 +113,7 @@ export class Renderer {
     this.canvas.style.imageRendering = 'pixelated';
 
     this.stage.append(this.canvas, hud, winOverlay.root);
+    if (restartOverlay) this.stage.append(restartOverlay.root);
 
     if (options.shell === 'device') {
       const scene = document.createElement('div');
@@ -126,9 +133,9 @@ export class Renderer {
         const sceneActions = this.createSceneActions();
         this.editorLink = sceneActions.editorLink;
         this.languageButton = sceneActions.languageButton;
+        this.restartButton = sceneActions.restartButton;
         scene.append(sceneActions.root);
       }
-      if (this.savePanelControls) scene.append(this.createSavePanel(this.savePanelControls));
       screen.append(this.stage);
       device.append(leftRope, rightRope, screen);
       scene.append(device);
@@ -212,6 +219,13 @@ export class Renderer {
     languageButton.setAttribute('aria-label', languageToggleLabel());
     languageButton.addEventListener('click', () => toggleLanguage());
 
+    const restartButton = document.createElement('button');
+    restartButton.type = 'button';
+    restartButton.className = 'game-scene-link game-scene-link--restart';
+    restartButton.textContent = t('game.restart.open');
+    restartButton.setAttribute('aria-label', t('game.restart.open'));
+    restartButton.addEventListener('click', () => this.openRestartDialog());
+
     const githubLink = document.createElement('a');
     githubLink.className = 'game-scene-link game-scene-link--github';
     githubLink.href = 'https://github.com/bobbygame/bobbygame.github.io';
@@ -220,8 +234,8 @@ export class Renderer {
     githubLink.setAttribute('aria-label', t('game.github'));
     githubLink.append(this.createGithubIcon(), document.createTextNode('GitHub'));
 
-    actions.append(editorLink, languageButton, githubLink);
-    return { root: actions, editorLink, languageButton };
+    actions.append(editorLink, languageButton, restartButton, githubLink);
+    return { root: actions, editorLink, languageButton, restartButton };
   }
 
   private createGithubIcon() {
@@ -239,40 +253,81 @@ export class Renderer {
   setSaveSlot(slot: GameSaveSlot | null, message = '') {
     this.saveSlot = slot;
     void message;
-    this.updateSavePanel();
+    this.updateRestartDialog();
   }
 
-  private createSavePanel(controls: SavePanelControls): HTMLElement {
-    const root = document.createElement('aside');
-    root.className = 'game-save-panel';
-    root.setAttribute('aria-label', t('game.save.aria'));
-    root.addEventListener('keydown', (event) => event.stopPropagation());
+  private createRestartDialog(controls: RestartControls) {
+    const root = document.createElement('div');
+    root.className = 'game-restart';
+    root.setAttribute('aria-live', 'polite');
+    root.addEventListener('keydown', (event) => {
+      event.stopPropagation();
+      if (event.key === 'Escape') this.closeRestartDialog();
+    });
+    root.addEventListener('click', (event) => {
+      if (event.target === root) this.closeRestartDialog();
+    });
 
-    const restartButton = this.createSaveButton(t('game.save.restart'), 'ghost');
+    const panel = document.createElement('div');
+    panel.className = 'game-restart__panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'game-restart-title');
 
-    restartButton.addEventListener('click', () => this.runSavePanelAction(controls.onRestart));
+    const title = document.createElement('strong');
+    title.id = 'game-restart-title';
+    title.className = 'game-restart__title';
+    title.textContent = t('game.restart.title');
 
-    root.append(restartButton);
-    this.savePanel = {
+    const body = document.createElement('p');
+    body.className = 'game-restart__body';
+    body.textContent = t('game.restart.body');
+
+    const actions = document.createElement('div');
+    actions.className = 'game-restart__actions';
+
+    const currentButton = this.createRestartButton(t('game.restart.current'), 'primary');
+    const startOverButton = this.createRestartButton(t('game.restart.startOver'), 'ghost');
+    currentButton.addEventListener('click', () => this.runRestartAction(controls.onRestartLevel));
+    startOverButton.addEventListener('click', () => this.runRestartAction(controls.onStartOver));
+    actions.append(currentButton, startOverButton);
+    panel.append(title, body, actions);
+    root.append(panel);
+
+    this.restartDialog = {
       root,
-      restartButton,
+      title,
+      body,
+      currentButton,
+      startOverButton,
     };
-    this.updateSavePanel();
-    return root;
+    this.updateRestartDialog();
+    return { root, title, body, currentButton, startOverButton };
   }
 
-  private createSaveButton(label: string, variant: 'primary' | 'ghost' = 'primary') {
+  private createRestartButton(label: string, variant: 'primary' | 'ghost' = 'primary') {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = `game-save-panel__button game-save-panel__button--${variant}`;
+    button.className = `game-restart__button game-restart__button--${variant}`;
     button.textContent = label;
     return button;
   }
 
-  private runSavePanelAction(handler: SaveActionHandler) {
-    if (this.savePanelBusy) return;
-    this.savePanelBusy = true;
-    this.updateSavePanel();
+  private openRestartDialog() {
+    if (!this.restartDialog) return;
+    this.stage.classList.add('game-stage--restart-open');
+    this.restartDialog.currentButton.focus();
+  }
+
+  private closeRestartDialog() {
+    this.stage.classList.remove('game-stage--restart-open');
+  }
+
+  private runRestartAction(handler: SaveActionHandler) {
+    if (this.restartBusy) return;
+    this.restartBusy = true;
+    this.updateRestartDialog();
+    this.closeRestartDialog();
     Promise.resolve(handler())
       .then((result) => {
         if (Object.prototype.hasOwnProperty.call(result, 'slot')) this.saveSlot = result.slot ?? null;
@@ -282,14 +337,15 @@ export class Renderer {
         return undefined;
       })
       .finally(() => {
-        this.savePanelBusy = false;
-        this.updateSavePanel();
+        this.restartBusy = false;
+        this.updateRestartDialog();
       });
   }
 
-  private updateSavePanel() {
-    if (!this.savePanel) return;
-    this.savePanel.restartButton.disabled = this.savePanelBusy;
+  private updateRestartDialog() {
+    if (!this.restartDialog) return;
+    this.restartDialog.currentButton.disabled = this.restartBusy;
+    this.restartDialog.startOverButton.disabled = this.restartBusy;
   }
 
   draw() {
@@ -301,7 +357,7 @@ export class Renderer {
     this.drawEntities();
     this.drawHud();
     this.drawOverlay();
-    this.updateSavePanel();
+    this.updateRestartDialog();
   }
 
   private drawTilemap() {
@@ -438,7 +494,7 @@ export class Renderer {
 
     if (state.player.dead) {
       ctx.save();
-      ctx.font = 'bold 44px comic, system-ui, sans-serif';
+      ctx.font = 'bold 44px comicbd, "bobby-cn", comic, bgothm, sans-serif';
       ctx.fillStyle = '#ef4444';
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
       ctx.lineWidth = 5;
@@ -508,10 +564,16 @@ export class Renderer {
       this.languageButton.textContent = languageToggleText();
       this.languageButton.setAttribute('aria-label', languageToggleLabel());
     }
-    if (this.savePanel) {
-      this.savePanel.root.setAttribute('aria-label', t('game.save.aria'));
-      this.savePanel.restartButton.textContent = t('game.save.restart');
-      this.updateSavePanel();
+    if (this.restartButton) {
+      this.restartButton.textContent = t('game.restart.open');
+      this.restartButton.setAttribute('aria-label', t('game.restart.open'));
+    }
+    if (this.restartDialog) {
+      this.restartDialog.title.textContent = t('game.restart.title');
+      this.restartDialog.body.textContent = t('game.restart.body');
+      this.restartDialog.currentButton.textContent = t('game.restart.current');
+      this.restartDialog.startOverButton.textContent = t('game.restart.startOver');
+      this.updateRestartDialog();
     }
   }
 

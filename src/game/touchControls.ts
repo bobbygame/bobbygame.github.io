@@ -9,11 +9,15 @@ const DIRECTIONS: Array<{ direction: ButtonDirection; labelKey: string }> = [
   { direction: 'right', labelKey: 'game.touch.right' },
   { direction: 'down', labelKey: 'game.touch.down' },
 ];
+const INITIAL_REPEAT_DELAY_MS = 320;
+const REPEAT_INTERVAL_MS = 230;
 
 export class VirtualJoystick {
   private readonly root: HTMLDivElement;
   private pointerId: number | null = null;
   private activeDirection: Direction = null;
+  private pendingDirection: Direction = null;
+  private nextRepeatAt = 0;
   private activeButton: HTMLButtonElement | null = null;
   private readonly unsubscribeLanguage: () => void;
 
@@ -38,7 +42,18 @@ export class VirtualJoystick {
     this.unsubscribeLanguage = subscribeLanguage(() => this.updateLanguage());
   }
 
-  direction(): Direction {
+  consumeDirection(): Direction {
+    if (this.pendingDirection) {
+      const direction = this.pendingDirection;
+      this.pendingDirection = null;
+      return direction;
+    }
+
+    if (!this.activeDirection) return null;
+
+    const now = performance.now();
+    if (now < this.nextRepeatAt) return null;
+    this.nextRepeatAt = now + REPEAT_INTERVAL_MS;
     return this.activeDirection;
   }
 
@@ -53,6 +68,8 @@ export class VirtualJoystick {
     this.pointerId = event.pointerId;
     this.activeButton = button;
     this.activeDirection = direction;
+    this.pendingDirection = direction;
+    this.nextRepeatAt = performance.now() + INITIAL_REPEAT_DELAY_MS;
     button.setPointerCapture(event.pointerId);
     button.classList.add('touch-dpad__button--active');
     event.preventDefault();
@@ -63,6 +80,8 @@ export class VirtualJoystick {
     this.activeButton?.classList.remove('touch-dpad__button--active');
     this.pointerId = null;
     this.activeDirection = null;
+    this.pendingDirection = null;
+    this.nextRepeatAt = 0;
     this.activeButton = null;
   };
 
