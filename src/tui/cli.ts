@@ -91,7 +91,7 @@ function directionForKey(input: string): Direction {
 }
 
 function tileToken(tileId: number, mode: RenderMode) {
-  if (mode === 'emoji') return isWalkableTileId(tileId) ? '▫️ ' : '🟩';
+  if (mode === 'emoji') return isWalkableTileId(tileId) ? '⬛️' : '🪨';
   if (isWalkableTileId(tileId)) return `${colors.path}  ${RESET}`;
   return `${colors.grass}..${RESET}`;
 }
@@ -107,19 +107,19 @@ function directionToken(entity: Entity) {
 
 function entityToken(entity: Entity, mode: RenderMode) {
   if (mode === 'emoji') {
-    if (entity.kind === 'player') return '🐰';
-    if (entity.kind === 'wall') return '🪵';
-    if (entity.kind === 'carrot') return '🥕';
+    if (entity.kind === 'player') return '🦊';
+    if (entity.kind === 'wall') return '🪨';
+    if (entity.kind === 'carrot') return '🐥';
     if (entity.kind === 'goal' || entity.kind === 'channel') return '🎯';
-    if (entity.kind === 'trap') return Boolean(entity.data.isSharp) ? '💥' : '🕳️';
+    if (entity.kind === 'trap') return Boolean(entity.data.isSharp) ? '❌' : '✅';
     if (entity.kind === 'key') return { 1: '🟡', 2: '🔴', 3: '🔵' }[Number(entity.data.sign ?? 1)] ?? '🔑';
     if (entity.kind === 'lock') return { 1: '🔒', 2: '⛔', 3: '🔐' }[Number(entity.data.sign ?? 1)] ?? '🔒';
     if (entity.kind === 'conveyorButton') return Boolean(entity.data.open) ? '🟨' : '🟫';
     if (entity.kind === 'stoneButton') return Boolean(entity.data.open) ? '🟥' : '🟫';
     if (entity.kind === 'conveyorX') return Number(entity.data.direction1 ?? 0) === 0 ? '◀️ ' : '▶️ ';
     if (entity.kind === 'conveyorY') return Number(entity.data.direction1 ?? 0) === 0 ? '🔼' : '🔽';
-    if (entity.kind === 'stone') return Number(entity.data.sign ?? 1) === 1 ? '↔ ' : '↕ ';
-    if (entity.kind === 'stoneAngle') return ['  ', '↘ ', '↙ ', '↖ ', '↗ '][Number(entity.data.sign ?? 1)] ?? '↗ ';
+    if (entity.kind === 'stone') return Number(entity.data.sign ?? 1) === 1 ? '↔️ ' : '↕️ ';
+    if (entity.kind === 'stoneAngle') return ['  ', '↘️ ', '↙️ ', '↖️ ', '↗️ '][Number(entity.data.sign ?? 1)] ?? '↗️ ';
   }
 
   if (entity.kind === 'player') return `${colors.player}B ${RESET}`;
@@ -137,29 +137,30 @@ function entityToken(entity: Entity, mode: RenderMode) {
 }
 
 function visibleEntityAt(state: GameState, x: number, y: number): Entity | null {
-  const priority = [
-    'player',
-    'wall',
-    'lock',
-    'key',
-    'carrot',
-    'goal',
-    'channel',
-    'trap',
-    'conveyorButton',
-    'stoneButton',
-    'conveyorX',
-    'conveyorY',
-    'stone',
-    'stoneAngle',
-  ];
+  const priority: Partial<Record<Entity['kind'], number>> = {
+    player: 0,
+    wall: 1,
+    lock: 2,
+    key: 3,
+    carrot: 4,
+    goal: 5,
+    channel: 6,
+    trap: 7,
+    conveyorButton: 8,
+    stoneButton: 9,
+    conveyorX: 10,
+    conveyorY: 11,
+    stone: 12,
+    stoneAngle: 13,
+    bornPlace: 14,
+  };
   const entities = state.entities
     .filter((entity) => {
       if (entity.dead) return false;
       const pos = cell(entity, state.tileSize);
       return pos.x === x && pos.y === y;
     })
-    .sort((a, b) => priority.indexOf(a.kind) - priority.indexOf(b.kind));
+    .sort((a, b) => (priority[a.kind] ?? 99) - (priority[b.kind] ?? 99));
   return entities[0] ?? null;
 }
 
@@ -262,7 +263,7 @@ class TuiGame {
       output += '\n';
     }
 
-    if (this.state.won) output += '\nSUCCESS! Press N for next level or R to replay.\n';
+    if (this.state.won) output += '\n🎉 SUCCESS! Press N for next level or R to replay.\n';
     if (this.state.player.dead) output += '\nTRY AGAIN. Press R to restart.\n';
     process.stdout.write(output);
   }

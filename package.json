@@ -1,9 +1,10 @@
 {
   "name": "bobbygame",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "bin": {
-    "bobby-carrot": "dist-tui/cli.js"
+    "bobby-carrot": "dist-tui/cli.js",
+    "bobbyc": "dist-tui/cli.js"
   },
   "files": [
     "dist-tui",
