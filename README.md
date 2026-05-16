@@ -4,6 +4,13 @@ Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家
 
 在线试玩：[https://g.snapre.online/](https://g.snapre.online/)
 
+终端版已发布到 npm：
+
+```sh
+npm install -g bobbygame
+bobby-carrot
+```
+
 ## 游戏目标
 
 每一关都是一个小型机关谜题：
@@ -12,6 +19,7 @@ Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家
 - 避开或利用陷阱、方向石、传送带、锁和按钮。
 - 找到可行路径，到达终点或打开出口。
 - 在移动端可以使用底部方向舵，桌面端使用方向键或 WASD。
+- 网页游戏和 `/editor` 都支持中文 / English 切换。
 
 ## 关卡设计
 
@@ -91,11 +99,22 @@ npm run build
 项目同时提供一个 TUI 版本，可以在终端里直接玩同一套关卡数据：
 
 ```sh
-npm install -g github:bobbygame/bobbygame.github.io
+npm install -g bobbygame
 bobby-carrot
 ```
 
-发布到 npm registry 后，也可以使用 `npm install -g bobbygame` 安装。
+安装后会提供两个命令入口，`bobby-carrot` 是完整命令，`bobbyc` 是短命令：
+
+```sh
+bobby-carrot --map map1
+bobbyc --map map20 --ascii
+```
+
+也可以不全局安装，直接临时运行 npm 包：
+
+```sh
+npx --package bobbygame bobbyc --map map1
+```
 
 本地开发时可以先构建再运行：
 
@@ -104,10 +123,10 @@ npm run build:tui
 node dist-tui/cli.js --map map1
 ```
 
-TUI 默认使用 emoji 语义渲染：兔子、胡萝卜、木头栅栏、叶子背景、钥匙、锁、按钮、传送带都会用对应图标展示。部分终端对 emoji 宽度处理不一致时，可以切换到 ASCII 模式：
+TUI 默认使用 emoji / symbol 渲染，地砖、障碍、玩家、目标、钥匙、锁、按钮和传送带都会用终端字符展示。部分终端对 emoji 宽度处理不一致时，可以切换到 ASCII 模式：
 
 ```sh
-node dist-tui/cli.js --map map1 --ascii
+bobby-carrot --map map1 --ascii
 ```
 
 终端控制：
@@ -121,7 +140,7 @@ node dist-tui/cli.js --map map1 --ascii
 
 ```sh
 npm pack
-npm install -g ./bobbygame-0.0.0.tgz
+npm install -g ./bobbygame-*.tgz
 bobby-carrot
 ```
 
