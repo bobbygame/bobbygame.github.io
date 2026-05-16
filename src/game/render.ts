@@ -20,6 +20,11 @@ interface RestartDialogElements {
   startOverButton: HTMLButtonElement;
 }
 
+interface DeathOverlayElements {
+  root: HTMLElement;
+  title: HTMLElement;
+}
+
 interface AudioControls {
   isMuted: () => boolean;
   onToggleMute: () => boolean;
@@ -64,6 +69,7 @@ export class Renderer {
   private readonly winStepsLabel: HTMLElement;
   private readonly winSteps: HTMLElement;
   private readonly winButton: HTMLButtonElement;
+  private readonly deathTitle: HTMLElement;
   private readonly editorLink?: HTMLAnchorElement;
   private readonly languageButton?: HTMLButtonElement;
   private readonly restartButton?: HTMLButtonElement;
@@ -112,6 +118,8 @@ export class Renderer {
     this.winStepsLabel = winOverlay.steps.label;
     this.winSteps = winOverlay.steps.value;
     this.winButton = winOverlay.button;
+    const deathOverlay = this.createDeathOverlay();
+    this.deathTitle = deathOverlay.title;
     const restartOverlay = this.restartControls ? this.createRestartDialog(this.restartControls) : null;
 
     const ctx = this.canvas.getContext('2d');
@@ -120,7 +128,7 @@ export class Renderer {
     this.ctx.imageSmoothingEnabled = false;
     this.canvas.style.imageRendering = 'pixelated';
 
-    this.stage.append(this.canvas, hud, winOverlay.root);
+    this.stage.append(this.canvas, hud, winOverlay.root, deathOverlay.root);
     if (restartOverlay) this.stage.append(restartOverlay.root);
 
     if (options.shell === 'device') {
@@ -525,7 +533,7 @@ export class Renderer {
   }
 
   private drawOverlay() {
-    const { ctx, state } = this;
+    const { state } = this;
 
     if (state.won) {
       this.stage.classList.add('game-stage--won');
@@ -539,13 +547,10 @@ export class Renderer {
     }
 
     if (state.player.dead) {
-      ctx.save();
-      ctx.font = 'bold 44px comicbd, "bobby-cn", comic, bgothm, sans-serif';
-      ctx.fillStyle = '#ef4444';
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
-      ctx.lineWidth = 5;
-      this.strokeFillText(t('game.tryAgain'), 205, 350);
-      ctx.restore();
+      this.stage.classList.add('game-stage--dead');
+      this.updateHudText(this.deathTitle, t('game.tryAgain'));
+    } else {
+      this.stage.classList.remove('game-stage--dead');
     }
   }
 
@@ -579,6 +584,24 @@ export class Renderer {
     return { root, title, time, steps, button };
   }
 
+  private createDeathOverlay(): DeathOverlayElements {
+    const root = document.createElement('div');
+    root.className = 'game-death';
+    root.setAttribute('aria-live', 'polite');
+
+    const panel = document.createElement('div');
+    panel.className = 'game-death__panel';
+
+    const title = document.createElement('strong');
+    title.className = 'game-death__title';
+    title.textContent = t('game.tryAgain');
+
+    panel.append(title);
+    root.append(panel);
+
+    return { root, title };
+  }
+
   private createWinStat(labelKey: string) {
     const root = document.createElement('div');
     root.className = 'game-win__stat';
@@ -602,6 +625,7 @@ export class Renderer {
     this.winTimeLabel.textContent = t('game.win.timeUsed');
     this.winStepsLabel.textContent = t('game.win.steps');
     this.winButton.textContent = t('game.win.continue');
+    this.deathTitle.textContent = t('game.tryAgain');
     if (this.editorLink) {
       this.editorLink.textContent = t('game.editor');
       this.editorLink.setAttribute('aria-label', t('game.editor'));
@@ -622,11 +646,6 @@ export class Renderer {
       this.restartDialog.startOverButton.textContent = t('game.restart.startOver');
       this.updateRestartDialog();
     }
-  }
-
-  private strokeFillText(text: string, x: number, y: number) {
-    this.ctx.strokeText(text, x, y);
-    this.ctx.fillText(text, x, y);
   }
 
   private updateSoundButton() {
