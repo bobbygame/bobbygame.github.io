@@ -20,6 +20,11 @@ interface RestartDialogElements {
   startOverButton: HTMLButtonElement;
 }
 
+interface AudioControls {
+  isMuted: () => boolean;
+  onToggleMute: () => boolean;
+}
+
 function fallbackColor(kind: string): string {
   switch (kind) {
     case 'player': return '#7dd3fc';
@@ -40,6 +45,7 @@ export class Renderer {
   private readonly root: HTMLElement;
   private readonly scene?: HTMLDivElement;
   private readonly device?: HTMLDivElement;
+  private readonly audioControls?: AudioControls;
   private readonly restartControls?: RestartControls;
   private restartDialog?: RestartDialogElements;
   private saveSlot: GameSaveSlot | null = null;
@@ -61,6 +67,7 @@ export class Renderer {
   private readonly editorLink?: HTMLAnchorElement;
   private readonly languageButton?: HTMLButtonElement;
   private readonly restartButton?: HTMLButtonElement;
+  private readonly soundButton?: HTMLButtonElement;
   private renderedLanguage = language();
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
@@ -70,8 +77,9 @@ export class Renderer {
     container: HTMLElement,
     private sprites: SpriteLoader,
     private readonly onAdvance: () => void,
-    options: { shell?: 'device' | 'bare'; showEditorLink?: boolean; savePanel?: RestartControls } = {}
+    options: { shell?: 'device' | 'bare'; showEditorLink?: boolean; savePanel?: RestartControls; audioControls?: AudioControls } = {}
   ) {
+    this.audioControls = options.audioControls;
     this.restartControls = options.savePanel;
     this.saveSlot = options.savePanel?.initialSlot ?? null;
     this.stage = document.createElement('div');
@@ -134,6 +142,7 @@ export class Renderer {
         this.editorLink = sceneActions.editorLink;
         this.languageButton = sceneActions.languageButton;
         this.restartButton = sceneActions.restartButton;
+        this.soundButton = sceneActions.soundButton;
         scene.append(sceneActions.root);
       }
       screen.append(this.stage);
@@ -206,6 +215,8 @@ export class Renderer {
     actions.className = 'game-scene-actions';
     actions.setAttribute('aria-label', t('game.tools'));
 
+    const soundButton = this.audioControls ? this.createSoundButton() : undefined;
+
     const editorLink = document.createElement('a');
     editorLink.className = 'game-scene-link game-scene-link--editor';
     editorLink.href = appUrl('editor');
@@ -235,7 +246,42 @@ export class Renderer {
     githubLink.append(this.createGithubIcon(), document.createTextNode('GitHub'));
 
     actions.append(editorLink, languageButton, restartButton, githubLink);
-    return { root: actions, editorLink, languageButton, restartButton };
+    if (soundButton) actions.append(soundButton);
+    return { root: actions, editorLink, languageButton, restartButton, soundButton };
+  }
+
+  private createSoundButton() {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'game-scene-link game-scene-link--sound';
+    button.append(this.createSoundIcon());
+    button.addEventListener('click', () => {
+      this.audioControls?.onToggleMute();
+      this.updateSoundButton();
+    });
+    return button;
+  }
+
+  private createSoundIcon() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'game-scene-link__icon game-scene-link__icon--stroke');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+
+    const speaker = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    speaker.setAttribute('d', 'M4 9v6h4l5 4V5L8 9H4Z');
+
+    const waves = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    waves.setAttribute('class', 'game-sound-icon__wave');
+    waves.setAttribute('d', 'M16.5 8.5a5 5 0 0 1 0 7M19.2 5.8a8.8 8.8 0 0 1 0 12.4');
+
+    const slash = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    slash.setAttribute('class', 'game-sound-icon__slash');
+    slash.setAttribute('d', 'M4 4l16 16');
+
+    svg.append(speaker, waves, slash);
+    return svg;
   }
 
   private createGithubIcon() {
@@ -568,6 +614,7 @@ export class Renderer {
       this.restartButton.textContent = t('game.restart.open');
       this.restartButton.setAttribute('aria-label', t('game.restart.open'));
     }
+    this.updateSoundButton();
     if (this.restartDialog) {
       this.restartDialog.title.textContent = t('game.restart.title');
       this.restartDialog.body.textContent = t('game.restart.body');
@@ -580,5 +627,15 @@ export class Renderer {
   private strokeFillText(text: string, x: number, y: number) {
     this.ctx.strokeText(text, x, y);
     this.ctx.fillText(text, x, y);
+  }
+
+  private updateSoundButton() {
+    if (!this.soundButton || !this.audioControls) return;
+    const muted = this.audioControls.isMuted();
+    const label = t(muted ? 'game.audio.unmute' : 'game.audio.mute');
+    this.soundButton.classList.toggle('game-scene-link--muted', muted);
+    this.soundButton.setAttribute('aria-pressed', String(muted));
+    this.soundButton.setAttribute('aria-label', label);
+    this.soundButton.setAttribute('title', label);
   }
 }

@@ -2,9 +2,20 @@ import { assetUrl } from './paths';
 
 export type SoundEffect = 'move' | 'collect' | 'button' | 'die' | 'win' | 'unlock';
 
+const MUTE_STORAGE_KEY = 'bobby-carrot.audio-muted';
+
 type AudioContextWindow = Window & typeof globalThis & {
   webkitAudioContext?: typeof AudioContext;
 };
+
+function readStoredMute(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(MUTE_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
 
 class AudioManager {
   private sounds = new Map<SoundEffect, HTMLAudioElement>();
@@ -13,7 +24,7 @@ class AudioManager {
   private effectGain?: GainNode;
   private bgMusic?: HTMLAudioElement;
   private bgMusicRequested = false;
-  private muted = false;
+  private muted = readStoredMute();
   private unlocked = false;
 
   constructor() {
@@ -79,14 +90,28 @@ class AudioManager {
     this.pauseBgMusic();
   }
 
+  isMuted() {
+    return this.muted;
+  }
+
   toggleMute() {
     this.muted = !this.muted;
+    this.storeMute();
     if (this.muted) {
       this.pauseBgMusic();
     } else if (this.bgMusicRequested) {
       this.playBgMusic();
     }
     return this.muted;
+  }
+
+  private storeMute() {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(MUTE_STORAGE_KEY, String(this.muted));
+    } catch {
+      // Muting still works for the current session if storage is unavailable.
+    }
   }
 
   private pauseBgMusic() {

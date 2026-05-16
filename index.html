@@ -164,6 +164,20 @@
       cursor: pointer;
     }
 
+    .game-scene-link--sound {
+      width: 42px;
+      min-width: 42px;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .game-scene-link--muted {
+      background:
+        linear-gradient(180deg, rgba(255, 225, 225, 0.76), rgba(235, 170, 170, 0.40)),
+        rgba(78, 30, 30, 0.32);
+      color: #411318;
+    }
+
     .game-scene-link--editor::before {
       content: "";
       width: 17px;
@@ -185,6 +199,26 @@
       height: 18px;
       flex: 0 0 auto;
       fill: currentColor;
+    }
+
+    .game-scene-link__icon--stroke {
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 2;
+    }
+
+    .game-sound-icon__slash {
+      opacity: 0;
+    }
+
+    .game-scene-link--sound[aria-pressed="true"] .game-sound-icon__wave {
+      opacity: 0;
+    }
+
+    .game-scene-link--sound[aria-pressed="true"] .game-sound-icon__slash {
+      opacity: 1;
     }
 
     .game-scene-link:hover {
@@ -428,6 +462,12 @@
         min-height: 38px;
         padding-inline: 11px 13px;
         font-size: 13px;
+      }
+
+      .game-scene-link--sound {
+        width: 38px;
+        min-width: 38px;
+        padding: 0;
       }
 
       .game-scene-link--editor::before,
@@ -1009,6 +1049,12 @@
         padding: 0 12px 0 10px;
         gap: 8px;
         font-size: 13px;
+      }
+
+      .game-scene-link--sound {
+        width: 36px;
+        min-width: 36px;
+        padding: 0;
       }
 
       .game-scene-link--editor::before,

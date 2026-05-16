@@ -195,6 +195,10 @@ export class BrowserGameRuntime {
     }, {
       shell: 'device',
       showEditorLink: true,
+      audioControls: {
+        isMuted: () => audio.isMuted(),
+        onToggleMute: () => audio.toggleMute(),
+      },
       savePanel: {
         initialSlot: this.saveSlot,
         onRestartLevel: () => this.restartCurrentLevel(),
