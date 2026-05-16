@@ -2,7 +2,7 @@
 
 Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家控制兔子在 50px 网格地图中移动，收集每关要求的胡萝卜，理解机关规则，最终抵达出口。
 
-在线试玩：[https://bobbygame.github.io/](https://bobbygame.github.io/)
+在线试玩：[https://g.snapre.online/](https://g.snapre.online/)
 
 ## 游戏目标
 
@@ -166,4 +166,4 @@ public/assets/              图片、音频、字体素材
 
 ## 技术说明
 
-当前项目是纯 Vite + TypeScript 工程，运行时不依赖 Construct runtime。地图、精灵、机关和状态机都由仓库内代码和数据驱动，方便社区继续维护和扩展。
+当前项目是纯 Vite + TypeScript 工程。地图、精灵、机关和状态机都由仓库内代码和数据驱动，方便社区继续维护和扩展。
