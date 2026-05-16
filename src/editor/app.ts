@@ -11,6 +11,17 @@ import {
   type CommunityLevelDifficulty,
 } from '../game/communityLevel';
 import { gameStateFromLevelDefinition } from '../game/levelAdapter';
+import {
+  editorGroupLabel,
+  editorTileLabel,
+  editorToolDescription,
+  editorToolLabel,
+  formatDiagnosticMessage,
+  languageToggleLabel,
+  languageToggleText,
+  t,
+  toggleLanguage,
+} from '../game/i18n';
 import type { LevelEntityDefinition } from '../game/levelDefinition';
 import { loadLevelDefinition } from '../game/loader';
 import { validateLevelDefinition } from '../game/levelValidation';
@@ -102,6 +113,8 @@ class LevelEditor {
   private assetFrames!: HTMLElement;
   private assetFrameEditor!: HTMLElement;
   private assetMeta!: HTMLElement;
+  private tooltip!: HTMLElement;
+  private tooltipAnchor: HTMLElement | null = null;
   private pointerPainting = false;
   private pointerHistoryCaptured = false;
   private draggingEntityId: number | null = null;
@@ -148,6 +161,7 @@ class LevelEditor {
     this.assetFrames = q(this.root, '[data-asset-frames]');
     this.assetFrameEditor = q(this.root, '[data-asset-frame-editor]');
     this.assetMeta = q(this.root, '[data-asset-meta]');
+    this.tooltip = q(this.root, '[data-editor-tooltip]');
 
     await this.preloadSprites();
     this.bindEvents();
@@ -172,22 +186,28 @@ class LevelEditor {
   private template() {
     const levelOptions = levelNames.map((name) => `<option value="${name}">${name}</option>`).join('');
     const tileButtons = tilePalette.map((tile) => `
-      <button class="editor-chip editor-chip--tile" type="button" data-tool="tile" data-tile-id="${tile.id}" title="${tile.label}">
+      <button class="editor-chip editor-chip--tile" type="button" data-tool="tile" data-tile-id="${tile.id}" title="${escapeHtml(editorTileLabel(tile.id))}">
         <canvas class="editor-tool-preview" width="28" height="28" data-tile-preview="${tile.id}" aria-hidden="true"></canvas>
         <span>${tile.id}</span>
       </button>
     `).join('');
     const groups = Array.from(new Set(entityTools.map((tool) => tool.group)));
     const entitySections = groups.map((group) => {
-      const entityButtons = entityTools.filter((tool) => tool.group === group).map((tool) => `
-      <button class="editor-chip" type="button" data-tool="entity" data-entity-tool="${tool.tool}">
+      const entityButtons = entityTools.filter((tool) => tool.group === group).map((tool) => {
+        const label = editorToolLabel(tool.tool);
+        const description = editorToolDescription(tool.tool);
+        const tooltipLabel = `${label} (${tool.typeName})`;
+        const ariaLabel = `${tooltipLabel}: ${description}`;
+        return `
+      <button class="editor-chip" type="button" data-tool="entity" data-entity-tool="${tool.tool}" data-tooltip-title="${escapeHtml(tooltipLabel)}" data-tooltip-body="${escapeHtml(description)}" aria-label="${escapeHtml(ariaLabel)}">
         <canvas class="editor-tool-preview" width="28" height="28" data-entity-preview="${tool.tool}" aria-hidden="true"></canvas>
-        <span>${tool.label}</span>
+        <span>${escapeHtml(label)}</span>
       </button>
-      `).join('');
+      `;
+      }).join('');
       return `
         <section>
-          <h2>${escapeHtml(group)}</h2>
+          <h2 data-editor-group="${escapeHtml(group)}">${escapeHtml(editorGroupLabel(group))}</h2>
           <div class="editor-chip-grid">${entityButtons}</div>
         </section>
       `;
@@ -196,36 +216,37 @@ class LevelEditor {
     return `
       <header class="editor-topbar">
         <div class="editor-brand">
-          <strong>Bobby Editor</strong>
+          <strong data-i18n="editor.brand">${t('editor.brand')}</strong>
           <span data-stats></span>
         </div>
         <div class="editor-actions">
-          <select data-built-in-level aria-label="Built in level">${levelOptions}</select>
-          <button type="button" data-action="load-built-in">Load</button>
-          <select data-local-level aria-label="Local community level"></select>
-          <button type="button" data-action="load-local">Open</button>
-          <button type="button" data-action="save-local">Save Local</button>
-          <button type="button" data-action="delete-local">Delete</button>
-          <button type="button" data-action="open-game">Open Game</button>
-          <button type="button" data-action="new">New</button>
-          <button type="button" data-action="undo" data-history="undo">Undo</button>
-          <button type="button" data-action="redo" data-history="redo">Redo</button>
-          <button type="button" data-action="import">Import</button>
-          <button type="button" data-action="export">Export</button>
-          <button type="button" data-action="playtest" class="editor-primary">Playtest</button>
-          <a href="${appUrl()}" class="editor-link">Game</a>
+          <select data-built-in-level data-i18n-aria-label="editor.aria.builtInLevel" aria-label="${t('editor.aria.builtInLevel')}">${levelOptions}</select>
+          <button type="button" data-action="load-built-in" data-i18n="editor.actions.loadBuiltIn">${t('editor.actions.loadBuiltIn')}</button>
+          <select data-local-level data-i18n-aria-label="editor.aria.localLevel" aria-label="${t('editor.aria.localLevel')}"></select>
+          <button type="button" data-action="load-local" data-i18n="editor.actions.openLocal">${t('editor.actions.openLocal')}</button>
+          <button type="button" data-action="save-local" data-i18n="editor.actions.saveLocal">${t('editor.actions.saveLocal')}</button>
+          <button type="button" data-action="delete-local" data-i18n="editor.actions.deleteLocal">${t('editor.actions.deleteLocal')}</button>
+          <button type="button" data-action="open-game" data-i18n="editor.actions.openGame">${t('editor.actions.openGame')}</button>
+          <button type="button" data-action="new" data-i18n="editor.actions.new">${t('editor.actions.new')}</button>
+          <button type="button" data-action="undo" data-history="undo" data-i18n="editor.actions.undo">${t('editor.actions.undo')}</button>
+          <button type="button" data-action="redo" data-history="redo" data-i18n="editor.actions.redo">${t('editor.actions.redo')}</button>
+          <button type="button" data-action="import" data-i18n="editor.actions.import">${t('editor.actions.import')}</button>
+          <button type="button" data-action="export" data-i18n="editor.actions.export">${t('editor.actions.export')}</button>
+          <button type="button" data-action="language" data-language-toggle aria-label="${languageToggleLabel()}">${languageToggleText()}</button>
+          <button type="button" data-action="playtest" class="editor-primary" data-i18n="editor.actions.playtest">${t('editor.actions.playtest')}</button>
+          <a href="${appUrl()}" class="editor-link" data-i18n="editor.link.game">${t('editor.link.game')}</a>
           <input data-import-file type="file" accept="application/json,.json,.bobby-level.json" hidden />
         </div>
       </header>
       <main class="editor-shell">
         <aside class="editor-panel editor-tools">
           <section>
-            <h2>Tools</h2>
-            <button class="editor-chip" type="button" data-tool="select">Select</button>
-            <button class="editor-chip" type="button" data-tool="erase">Erase</button>
+            <h2 data-i18n="editor.tools.heading">${t('editor.tools.heading')}</h2>
+            <button class="editor-chip" type="button" data-tool="select" data-i18n="editor.tools.select">${t('editor.tools.select')}</button>
+            <button class="editor-chip" type="button" data-tool="erase" data-i18n="editor.tools.erase">${t('editor.tools.erase')}</button>
           </section>
           <section>
-            <h2>Tiles</h2>
+            <h2 data-i18n="editor.tiles.heading">${t('editor.tiles.heading')}</h2>
             <div class="editor-chip-grid">${tileButtons}</div>
           </section>
           ${entitySections}
@@ -237,58 +258,75 @@ class LevelEditor {
         </section>
         <aside class="editor-panel editor-inspector">
           <section class="editor-fieldset">
-            <h2>Level</h2>
+            <h2 data-i18n="editor.level.heading">${t('editor.level.heading')}</h2>
             <p data-library-status class="editor-muted"></p>
-            <label>Title<input data-meta="title" /></label>
-            <label>Author<input data-meta="author" /></label>
-            <label>Name<input data-level-field="name" /></label>
-            <label>Difficulty
+            <label><span data-i18n="editor.level.title">${t('editor.level.title')}</span><input data-meta="title" /></label>
+            <label><span data-i18n="editor.level.author">${t('editor.level.author')}</span><input data-meta="author" /></label>
+            <label><span data-i18n="editor.level.name">${t('editor.level.name')}</span><input data-level-field="name" /></label>
+            <label><span data-i18n="editor.level.difficulty">${t('editor.level.difficulty')}</span>
               <select data-meta="difficulty">
-                <option value="easy">easy</option>
-                <option value="normal">normal</option>
-                <option value="hard">hard</option>
-                <option value="expert">expert</option>
+                <option value="easy" data-i18n="editor.difficulty.easy">${t('editor.difficulty.easy')}</option>
+                <option value="normal" data-i18n="editor.difficulty.normal">${t('editor.difficulty.normal')}</option>
+                <option value="hard" data-i18n="editor.difficulty.hard">${t('editor.difficulty.hard')}</option>
+                <option value="expert" data-i18n="editor.difficulty.expert">${t('editor.difficulty.expert')}</option>
               </select>
             </label>
-            <label>Tags<input data-meta="tags" /></label>
+            <label><span data-i18n="editor.level.tags">${t('editor.level.tags')}</span><input data-meta="tags" /></label>
             <div class="editor-field-row">
-              <label>Cols<input data-size-field="cols" type="number" min="8" max="32" /></label>
-              <label>Rows<input data-size-field="rows" type="number" min="8" max="32" /></label>
+              <label><span data-i18n="editor.level.cols">${t('editor.level.cols')}</span><input data-size-field="cols" type="number" min="8" max="32" /></label>
+              <label><span data-i18n="editor.level.rows">${t('editor.level.rows')}</span><input data-size-field="rows" type="number" min="8" max="32" /></label>
             </div>
-            <label>Required carrots<input data-level-field="requiredCarrots" type="number" min="0" /></label>
+            <label><span data-i18n="editor.level.requiredCarrots">${t('editor.level.requiredCarrots')}</span><input data-level-field="requiredCarrots" type="number" min="0" /></label>
           </section>
           <section class="editor-fieldset">
-            <h2>Asset Animation</h2>
-            <label>Object<select data-asset-field="object" data-asset-object></select></label>
-            <label>Animation<select data-asset-field="animation" data-asset-animation></select></label>
+            <h2 data-i18n="editor.asset.heading">${t('editor.asset.heading')}</h2>
+            <label><span data-i18n="editor.asset.object">${t('editor.asset.object')}</span><select data-asset-field="object" data-asset-object></select></label>
+            <label><span data-i18n="editor.asset.animation">${t('editor.asset.animation')}</span><select data-asset-field="animation" data-asset-animation></select></label>
             <div class="editor-asset-preview">
               <canvas data-asset-preview width="128" height="128"></canvas>
             </div>
             <p data-asset-meta class="editor-muted"></p>
             <div data-asset-frames class="editor-frame-strip"></div>
             <div class="editor-field-row">
-              <label>Speed<input data-asset-field="speed" type="number" min="0" step="1" /></label>
-              <label>Loop
+              <label><span data-i18n="editor.asset.speed">${t('editor.asset.speed')}</span><input data-asset-field="speed" type="number" min="0" step="1" /></label>
+              <label><span data-i18n="editor.asset.loop">${t('editor.asset.loop')}</span>
                 <select data-asset-field="looping">
-                  <option value="true">loop</option>
-                  <option value="false">once</option>
+                  <option value="true" data-i18n="editor.asset.loopValue">${t('editor.asset.loopValue')}</option>
+                  <option value="false" data-i18n="editor.asset.onceValue">${t('editor.asset.onceValue')}</option>
                 </select>
               </label>
             </div>
             <div data-asset-frame-editor></div>
-            <button type="button" data-action="export-assets" class="editor-export-button">Export Asset JSON</button>
+            <button type="button" data-action="export-assets" class="editor-export-button" data-i18n="editor.actions.exportAssets">${t('editor.actions.exportAssets')}</button>
           </section>
           <section data-inspector class="editor-fieldset"></section>
           <section class="editor-fieldset">
-            <h2>Diagnostics</h2>
+            <h2 data-i18n="editor.diagnostics.heading">${t('editor.diagnostics.heading')}</h2>
             <div data-diagnostics class="editor-diagnostics"></div>
           </section>
         </aside>
       </main>
+      <div class="editor-tooltip" data-editor-tooltip role="tooltip" hidden></div>
     `;
   }
 
   private bindEvents() {
+    this.root.addEventListener('pointerover', (event) => {
+      const target = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-tooltip-title]') : null;
+      if (target) this.showTooltip(target);
+    });
+    this.root.addEventListener('pointerout', (event) => {
+      if (!this.tooltipAnchor) return;
+      const related = event.relatedTarget instanceof Node ? event.relatedTarget : null;
+      if (related && this.tooltipAnchor.contains(related)) return;
+      this.hideTooltip();
+    });
+    this.root.addEventListener('focusin', (event) => {
+      const target = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-tooltip-title]') : null;
+      if (target) this.showTooltip(target);
+    });
+    this.root.addEventListener('focusout', () => this.hideTooltip());
+
     this.root.addEventListener('click', (event) => {
       const target = event.target instanceof Element ? event.target : null;
       const frameButton = target?.closest<HTMLButtonElement>('[data-asset-frame]');
@@ -365,7 +403,93 @@ class LevelEditor {
     });
   }
 
+  private showTooltip(anchor: HTMLElement) {
+    this.tooltipAnchor = anchor;
+    const title = anchor.dataset.tooltipTitle ?? '';
+    const body = anchor.dataset.tooltipBody ?? '';
+    this.tooltip.innerHTML = `
+      <strong>${escapeHtml(title)}</strong>
+      <span>${escapeHtml(body)}</span>
+    `;
+    this.tooltip.hidden = false;
+    this.positionTooltip(anchor);
+  }
+
+  private hideTooltip() {
+    this.tooltipAnchor = null;
+    this.tooltip.hidden = true;
+  }
+
+  private positionTooltip(anchor: HTMLElement) {
+    const gap = 10;
+    const margin = 8;
+    const anchorRect = anchor.getBoundingClientRect();
+    const tooltipRect = this.tooltip.getBoundingClientRect();
+    let left = anchorRect.right + gap;
+    if (left + tooltipRect.width > window.innerWidth - margin) {
+      left = anchorRect.left - tooltipRect.width - gap;
+    }
+    left = clamp(left, margin, Math.max(margin, window.innerWidth - tooltipRect.width - margin));
+
+    let top = anchorRect.top + (anchorRect.height - tooltipRect.height) / 2;
+    top = clamp(top, margin, Math.max(margin, window.innerHeight - tooltipRect.height - margin));
+
+    this.tooltip.style.left = `${left}px`;
+    this.tooltip.style.top = `${top}px`;
+  }
+
+  private renderLocalizedText() {
+    for (const element of this.root.querySelectorAll<HTMLElement>('[data-i18n]')) {
+      const key = element.dataset.i18n;
+      if (key) element.textContent = t(key);
+    }
+
+    for (const element of this.root.querySelectorAll<HTMLElement>('[data-i18n-aria-label]')) {
+      const key = element.dataset.i18nAriaLabel;
+      if (key) element.setAttribute('aria-label', t(key));
+    }
+
+    const languageButton = this.root.querySelector<HTMLButtonElement>('[data-language-toggle]');
+    if (languageButton) {
+      languageButton.textContent = languageToggleText();
+      languageButton.setAttribute('aria-label', languageToggleLabel());
+    }
+
+    for (const heading of this.root.querySelectorAll<HTMLElement>('[data-editor-group]')) {
+      const group = heading.dataset.editorGroup;
+      if (group) heading.textContent = editorGroupLabel(group);
+    }
+
+    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-entity-tool]')) {
+      const tool = button.dataset.entityTool;
+      if (!tool) continue;
+      const definition = toolForEntity(tool);
+      const label = editorToolLabel(tool);
+      const description = editorToolDescription(tool);
+      const tooltipLabel = `${label} (${definition.typeName})`;
+      button.dataset.tooltipTitle = tooltipLabel;
+      button.dataset.tooltipBody = description;
+      button.setAttribute('aria-label', `${tooltipLabel}: ${description}`);
+      const labelElement = button.querySelector('span');
+      if (labelElement) labelElement.textContent = label;
+    }
+
+    for (const button of this.root.querySelectorAll<HTMLButtonElement>('[data-tile-id]')) {
+      const tileId = Number(button.dataset.tileId ?? 0);
+      button.title = editorTileLabel(tileId);
+    }
+
+    if (this.tooltipAnchor) this.showTooltip(this.tooltipAnchor);
+  }
+
   private async handleAction(action: string) {
+    if (action === 'language') {
+      toggleLanguage();
+      this.renderLocalizedText();
+      this.renderLibraryOptions(this.librarySelect.value || this.document.id);
+      this.renderAll();
+      return;
+    }
     if (action === 'new') {
       this.pushHistory();
       this.document = createBlankLevel();
@@ -479,16 +603,18 @@ class LevelEditor {
   private saveCurrentToLibrary() {
     saveCommunityLevel(this.document);
     this.renderLibraryOptions(this.document.id);
-    this.libraryStatus.textContent = `Saved locally as ${this.document.title}.`;
+    this.libraryStatus.textContent = t('editor.library.saved', { title: this.document.title });
   }
 
   private renderLibraryOptions(selectedId = this.document.id) {
     const levels = listCommunityLevels();
     this.librarySelect.innerHTML = levels.length === 0
-      ? '<option value="">No local levels</option>'
+      ? `<option value="">${t('editor.library.emptyOption')}</option>`
       : levels.map((level) => `<option value="${escapeHtml(level.id)}">${escapeHtml(level.title)}</option>`).join('');
     this.librarySelect.value = levels.some((level) => level.id === selectedId) ? selectedId : (levels[0]?.id ?? '');
-    this.libraryStatus.textContent = levels.length === 0 ? 'Local library is empty.' : `${levels.length} local level${levels.length === 1 ? '' : 's'} available.`;
+    this.libraryStatus.textContent = levels.length === 0
+      ? t('editor.library.empty')
+      : t(levels.length === 1 ? 'editor.library.available.one' : 'editor.library.available.other', { count: levels.length });
     this.renderHistoryState();
   }
 
@@ -664,7 +790,12 @@ class LevelEditor {
   private renderStats() {
     const level = this.document.level;
     const carrotCount = level.entities.filter((entity) => entity.kind === 'carrot').length;
-    this.stats.textContent = `${level.tilemap.cols}x${level.tilemap.rows} / ${level.entities.length} entities / ${carrotCount} carrots`;
+    this.stats.textContent = t('editor.stats', {
+      cols: level.tilemap.cols,
+      rows: level.tilemap.rows,
+      entities: level.entities.length,
+      carrots: carrotCount,
+    });
   }
 
   private assetObjects(): Array<[string, ObjectAsset]> {
@@ -723,7 +854,7 @@ class LevelEditor {
 
   private renderAssetPanel() {
     if (!this.assetManifest) {
-      this.assetMeta.textContent = 'Assets could not be loaded.';
+      this.assetMeta.textContent = t('editor.asset.unavailable');
       return;
     }
 
@@ -736,7 +867,7 @@ class LevelEditor {
     const object = this.assetManifest.objects[this.selectedAssetName];
     const animationNames = object ? this.animationNamesForObject(object) : [];
     this.assetAnimationSelect.innerHTML = animationNames.map((name) => (
-      `<option value="${escapeHtml(name)}" ${name === this.selectedAssetAnimation ? 'selected' : ''}>${name === '__frame' ? 'Static frame' : escapeHtml(name)}</option>`
+      `<option value="${escapeHtml(name)}" ${name === this.selectedAssetAnimation ? 'selected' : ''}>${name === '__frame' ? t('editor.asset.staticFrame') : escapeHtml(name)}</option>`
     )).join('');
 
     const selected = this.selectedAssetAnimationEntry();
@@ -750,8 +881,8 @@ class LevelEditor {
 
     const frames = selected?.frames ?? [];
     this.assetMeta.textContent = selected
-      ? `${selected.object.name} / ${selected.name === '__frame' ? 'static' : selected.name} / ${frames.length} frame${frames.length === 1 ? '' : 's'}`
-      : 'No animation selected.';
+      ? `${selected.object.name} / ${selected.name === '__frame' ? t('editor.asset.static') : selected.name} / ${frames.length} ${t(frames.length === 1 ? 'editor.asset.frame' : 'editor.asset.frames')}`
+      : t('editor.asset.none');
 
     this.assetFrames.innerHTML = frames.map((_, index) => `
       <button type="button" class="editor-frame-button ${index === this.selectedAssetFrameIndex ? 'is-active' : ''}" data-asset-frame="${index}">
@@ -762,7 +893,7 @@ class LevelEditor {
 
     const frame = frames[this.selectedAssetFrameIndex];
     this.assetFrameEditor.innerHTML = frame ? `
-      <label>Sheet<input data-asset-frame-field="sheet" value="${escapeHtml(frame.sheet)}" /></label>
+      <label><span data-i18n="editor.asset.sheet">${t('editor.asset.sheet')}</span><input data-asset-frame-field="sheet" value="${escapeHtml(frame.sheet)}" /></label>
       <div class="editor-field-row">
         <label>X<input data-asset-frame-field="x" type="number" min="0" value="${frame.x}" /></label>
         <label>Y<input data-asset-frame-field="y" type="number" min="0" value="${frame.y}" /></label>
@@ -771,7 +902,7 @@ class LevelEditor {
         <label>W<input data-asset-frame-field="w" type="number" min="1" value="${frame.w}" /></label>
         <label>H<input data-asset-frame-field="h" type="number" min="1" value="${frame.h}" /></label>
       </div>
-    ` : '<p class="editor-muted">No frame selected.</p>';
+    ` : `<p class="editor-muted">${t('editor.asset.noFrame')}</p>`;
 
     this.drawAssetFrameStrip();
     this.drawAssetPreview();
@@ -1067,23 +1198,23 @@ class LevelEditor {
   private renderInspector() {
     const entity = this.selectedEntity();
     if (!entity) {
-      this.inspector.innerHTML = '<h2>Selection</h2><p class="editor-muted">No entity selected.</p>';
+      this.inspector.innerHTML = `<h2>${t('editor.selection.heading')}</h2><p class="editor-muted">${t('editor.selection.empty')}</p>`;
       return;
     }
 
     const controls: string[] = [
-      `<h2>Selection</h2>`,
-      `<p class="editor-muted">${entity.kind} / id ${entity.id} / ${entity.cell.col}, ${entity.cell.row}</p>`,
+      `<h2>${t('editor.selection.heading')}</h2>`,
+      `<p class="editor-muted">${t('editor.selection.meta', { kind: entity.kind, id: entity.id, col: entity.cell.col, row: entity.cell.row })}</p>`,
     ];
 
-    if (entity.kind === 'stone') controls.push(this.numberSelect('sign', 'Direction', Number(entity.data.sign ?? 1), [[1, 'horizontal'], [2, 'vertical']]));
-    if (entity.kind === 'stoneAngle') controls.push(this.numberSelect('sign', 'Corner', Number(entity.data.sign ?? 1), [[1, 'down-right'], [2, 'down-left'], [3, 'up-left'], [4, 'up-right']]));
-    if (entity.kind === 'key' || entity.kind === 'lock') controls.push(this.numberSelect('sign', 'Color', Number(entity.data.sign ?? 1), [[1, 'yellow'], [2, 'red'], [3, 'blue']]));
-    if (entity.kind === 'conveyorX') controls.push(this.numberSelect('direction1', 'Direction', Number(entity.data.direction1 ?? 0), [[0, 'left'], [1, 'right']]));
-    if (entity.kind === 'conveyorY') controls.push(this.numberSelect('direction1', 'Direction', Number(entity.data.direction1 ?? 0), [[0, 'up'], [1, 'down']]));
-    if (entity.kind === 'conveyorButton' || entity.kind === 'stoneButton') controls.push(this.numberSelect('open', 'Open', Number(entity.data.open ?? 1), [[1, 'true'], [0, 'false']]));
-    if (entity.kind === 'trap') controls.push(this.numberSelect('isSharp', 'Sharp', Number(entity.data.isSharp ?? 0), [[0, 'false'], [1, 'true']]));
-    controls.push(`<label>Angle<input data-entity-field="angle" type="number" value="${entity.angle}" /></label>`);
+    if (entity.kind === 'stone') controls.push(this.numberSelect('sign', t('editor.selection.direction'), Number(entity.data.sign ?? 1), [[1, t('editor.option.horizontal')], [2, t('editor.option.vertical')]]));
+    if (entity.kind === 'stoneAngle') controls.push(this.numberSelect('sign', t('editor.selection.corner'), Number(entity.data.sign ?? 1), [[1, t('editor.option.downRight')], [2, t('editor.option.downLeft')], [3, t('editor.option.upLeft')], [4, t('editor.option.upRight')]]));
+    if (entity.kind === 'key' || entity.kind === 'lock') controls.push(this.numberSelect('sign', t('editor.selection.color'), Number(entity.data.sign ?? 1), [[1, t('editor.option.yellow')], [2, t('editor.option.red')], [3, t('editor.option.blue')]]));
+    if (entity.kind === 'conveyorX') controls.push(this.numberSelect('direction1', t('editor.selection.direction'), Number(entity.data.direction1 ?? 0), [[0, t('editor.option.left')], [1, t('editor.option.right')]]));
+    if (entity.kind === 'conveyorY') controls.push(this.numberSelect('direction1', t('editor.selection.direction'), Number(entity.data.direction1 ?? 0), [[0, t('editor.option.up')], [1, t('editor.option.down')]]));
+    if (entity.kind === 'conveyorButton' || entity.kind === 'stoneButton') controls.push(this.numberSelect('open', t('editor.selection.open'), Number(entity.data.open ?? 1), [[1, t('editor.option.true')], [0, t('editor.option.false')]]));
+    if (entity.kind === 'trap') controls.push(this.numberSelect('isSharp', t('editor.selection.sharp'), Number(entity.data.isSharp ?? 0), [[0, t('editor.option.false')], [1, t('editor.option.true')]]));
+    controls.push(`<label>${t('editor.selection.angle')}<input data-entity-field="angle" type="number" value="${entity.angle}" /></label>`);
 
     this.inspector.innerHTML = controls.join('');
   }
@@ -1098,12 +1229,12 @@ class LevelEditor {
   private renderDiagnostics() {
     const diagnostics = validateLevelDefinition(this.document.level);
     if (diagnostics.length === 0) {
-      this.diagnosticsList.innerHTML = '<p class="editor-ok">No issues found.</p>';
+      this.diagnosticsList.innerHTML = `<p class="editor-ok">${t('editor.diagnostics.ok')}</p>`;
       return;
     }
     this.diagnosticsList.innerHTML = diagnostics.map((diagnostic) => `
       <p class="editor-diagnostic editor-diagnostic--${diagnostic.severity}">
-        <strong>${diagnostic.severity}</strong>${diagnostic.entityId ? ` #${diagnostic.entityId}` : ''}: ${diagnostic.message}
+        <strong>${t(`editor.diagnostics.${diagnostic.severity}`)}</strong>${diagnostic.entityId ? ` #${diagnostic.entityId}` : ''}: ${formatDiagnosticMessage(diagnostic.message)}
       </p>
     `).join('');
   }
@@ -1122,7 +1253,7 @@ class LevelEditor {
       this.fillDocumentFields();
       this.renderLibraryOptions(this.document.id);
       this.renderAll();
-      this.libraryStatus.textContent = `Imported and saved ${this.document.title}.`;
+      this.libraryStatus.textContent = t('editor.library.imported', { title: this.document.title });
     } catch (error) {
       this.diagnosticsList.innerHTML = `<p class="editor-diagnostic editor-diagnostic--error">${error instanceof Error ? error.message : String(error)}</p>`;
     }
@@ -1158,9 +1289,9 @@ class LevelEditor {
     overlay.className = 'editor-playtest';
     overlay.innerHTML = `
       <div class="editor-playtest__bar">
-        <strong>Playtest</strong>
-        <button type="button" data-playtest="restart">Restart</button>
-        <button type="button" data-playtest="close">Close</button>
+        <strong>${t('editor.playtest.title')}</strong>
+        <button type="button" data-playtest="restart">${t('editor.playtest.restart')}</button>
+        <button type="button" data-playtest="close">${t('editor.playtest.close')}</button>
       </div>
       <div class="editor-playtest__stage"></div>
     `;

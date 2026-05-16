@@ -3,7 +3,6 @@ import { DEFAULT_TILE_SIZE, type LevelDefinition, type LevelEntityDefinition } f
 import type { Entity, EntityKind, GameState, LayoutFile } from './types';
 
 const kindMap: Record<string, EntityKind> = {
-  wall: 'wall',
   stone: 'stone',
   stoneAngle: 'stoneAngle',
   lock: 'lock',
@@ -22,21 +21,35 @@ const kindMap: Record<string, EntityKind> = {
 
 const skipTypes = new Set<string>([
   'continue',
-  'downCtrl',
-  'leftCtrl',
-  'restartLevel',
-  'restartLevel2',
+  'carrotnum',
+  'downctrl',
+  'leftctrl',
+  'level',
   'restart',
-  'rightCtrl',
-  'Touch',
+  'restartlevel',
+  'restartlevel2',
+  'rightctrl',
+  'steps',
+  'sucecess',
+  'success',
+  'timer',
   'touch',
-  'upCtrl',
-  'whiteLayer',
+  'timeuse',
+  'upctrl',
+  'whitelayer',
 ]);
+
+function isSkippedType(typeName: string): boolean {
+  return skipTypes.has(typeName.trim().toLowerCase());
+}
+
+function isSkippedInstance(inst: LayoutFile['layers'][number]['instances'][number]): boolean {
+  return isSkippedType(inst.type) || typeof inst.properties?.text === 'string';
+}
 
 function toKind(typeName: string): EntityKind {
   const normalized = typeName.trim();
-  if (skipTypes.has(normalized)) return 'other';
+  if (isSkippedType(normalized)) return 'other';
   if (normalized.startsWith('bar')) return 'wall';
   return kindMap[normalized] ?? (normalized === 'bobby' ? 'player' : 'other');
 }
@@ -58,7 +71,7 @@ function createEntityDefinition(
   inst: LayoutFile['layers'][number]['instances'][number],
   tileSize: number
 ): LevelEntityDefinition | null {
-  if (skipTypes.has(inst.type.trim())) return null;
+  if (isSkippedInstance(inst)) return null;
 
   const pos = { x: inst.world.x, y: inst.world.y };
   return {

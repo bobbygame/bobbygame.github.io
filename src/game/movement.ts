@@ -1,4 +1,5 @@
 import type { Entity, GameState } from './types';
+import { isWalkableTileId } from './walkability';
 
 export type Direction = 'left' | 'right' | 'up' | 'down' | null;
 
@@ -133,6 +134,7 @@ export class MovementSystem {
   private canMove(dir: Exclude<Direction, null>, targetX: number, targetY: number): boolean {
     const { entities, tilemap, tileSize } = this.state;
     if (targetX < 0 || targetY < 0 || targetX + tileSize > tilemap.width || targetY + tileSize > tilemap.height) return false;
+    if (!this.isWalkableAt(targetX, targetY)) return false;
 
     const targetW = tileSize;
     const targetH = tileSize;
@@ -217,6 +219,7 @@ export class MovementSystem {
   private isBlockedAt(x: number, y: number): boolean {
     const { entities, tilemap, tileSize } = this.state;
     if (x < 0 || y < 0 || x + tileSize > tilemap.width || y + tileSize > tilemap.height) return true;
+    if (!this.isWalkableAt(x, y)) return true;
 
     for (const e of entities) {
       if (e.dead) continue;
@@ -226,6 +229,13 @@ export class MovementSystem {
     }
 
     return false;
+  }
+
+  private isWalkableAt(x: number, y: number): boolean {
+    const { tilemap, tileSize } = this.state;
+    const col = Math.round(x / tileSize);
+    const row = Math.round(y / tileSize);
+    return isWalkableTileId(tilemap.data[row * tilemap.cols + col]);
   }
 
   private tryUnlock(lock: Entity): boolean {

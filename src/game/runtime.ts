@@ -20,6 +20,7 @@ import {
 import { GameSimulation } from './simulation';
 import { SpriteLoader } from './sprites';
 import { VirtualJoystick } from './touchControls';
+import { t } from './i18n';
 import type { GameAction } from './actions';
 import type { GameState } from './types';
 
@@ -70,6 +71,7 @@ export class BrowserGameRuntime {
   stop() {
     if (this.animationFrame) cancelAnimationFrame(this.animationFrame);
     this.input?.unbindKeyboard();
+    this.joystick?.destroy();
   }
 
   private async dispatch(action: GameAction) {
@@ -189,34 +191,34 @@ export class BrowserGameRuntime {
   }
 
   private saveCurrentGame(): SaveActionResult {
-    if (!this.simulation) return { ok: false, message: '还没有可保存的进度' };
-    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
-    if (this.simulation.isMoving()) return { ok: false, message: '角色停稳后再存档' };
-    if (this.simulation.status() === 'dead') return { ok: false, message: '失败状态不能存档' };
-    if (this.simulation.status() === 'won') return { ok: false, message: '进入下一关后再存档' };
+    if (!this.simulation) return { ok: false, message: t('game.save.noProgress') };
+    if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
+    if (this.simulation.isMoving()) return { ok: false, message: t('game.save.moving') };
+    if (this.simulation.status() === 'dead') return { ok: false, message: t('game.save.dead') };
+    if (this.simulation.status() === 'won') return { ok: false, message: t('game.save.won') };
 
     try {
       const slot = createGameSave(this.simulation.state, this.currentMap, this.currentCommunityId);
       storeGameSave(slot);
       this.saveSlot = slot;
-      this.renderer?.setSaveSlot(slot, '已保存当前进度');
-      return { ok: true, message: '已保存当前进度', slot };
+      this.renderer?.setSaveSlot(slot, t('game.save.success'));
+      return { ok: true, message: t('game.save.success'), slot };
     } catch {
-      return { ok: false, message: '存档失败，浏览器拒绝写入' };
+      return { ok: false, message: t('game.save.denied') };
     }
   }
 
   private resumeSavedGame(): SaveActionResult {
-    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
+    if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
     this.saveSlot = loadGameSave();
-    if (!this.saveSlot) return { ok: false, message: '没有可继续的存档', slot: null };
+    if (!this.saveSlot) return { ok: false, message: t('game.save.none'), slot: null };
 
     const state = restoreGameState(this.saveSlot);
     if (!state) {
       clearGameSave();
       this.saveSlot = null;
-      this.renderer?.setSaveSlot(null, '存档损坏，已清除');
-      return { ok: false, message: '存档损坏，已清除', slot: null };
+      this.renderer?.setSaveSlot(null, t('game.save.corrupt'));
+      return { ok: false, message: t('game.save.corrupt'), slot: null };
     }
 
     this.currentMap = this.saveSlot.currentMap;
@@ -227,26 +229,26 @@ export class BrowserGameRuntime {
     this.simulation = new GameSimulation(state);
     if (this.renderer) this.renderer.setState(state);
     else this.createRenderer(state);
-    this.renderer?.setSaveSlot(this.saveSlot, '已从存档继续');
+    this.renderer?.setSaveSlot(this.saveSlot, t('game.save.resumed'));
     this.renderer?.draw();
-    return { ok: true, message: '已从存档继续', slot: this.saveSlot };
+    return { ok: true, message: t('game.save.resumed'), slot: this.saveSlot };
   }
 
   private async startNewGame(): Promise<SaveActionResult> {
-    if (this.loadingLevel) return { ok: false, message: '关卡正在加载' };
+    if (this.loadingLevel) return { ok: false, message: t('game.save.loading') };
     clearGameSave();
     this.saveSlot = null;
-    this.renderer?.setSaveSlot(null, '已清除存档，开始新游戏');
+    this.renderer?.setSaveSlot(null, t('game.save.clearedStarting'));
     await this.loadLevel(FIRST_LEVEL);
-    this.renderer?.setSaveSlot(null, '已开始新游戏');
-    return { ok: true, message: '已开始新游戏', slot: null };
+    this.renderer?.setSaveSlot(null, t('game.save.newStarted'));
+    return { ok: true, message: t('game.save.newStarted'), slot: null };
   }
 
   private deleteSavedGame(): SaveActionResult {
     clearGameSave();
     this.saveSlot = null;
-    this.renderer?.setSaveSlot(null, '已删除存档');
-    return { ok: true, message: '已删除存档', slot: null };
+    this.renderer?.setSaveSlot(null, t('game.save.deleted'));
+    return { ok: true, message: t('game.save.deleted'), slot: null };
   }
 
   private tick = (now: number) => {

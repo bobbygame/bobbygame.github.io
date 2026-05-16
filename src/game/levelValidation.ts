@@ -1,5 +1,6 @@
 import type { Entity, EntityKind, GameState } from './types';
 import type { LevelDefinition, LevelEntityDefinition } from './levelDefinition';
+import { isWalkableTileId } from './walkability';
 
 export type LevelDiagnosticSeverity = 'warning' | 'error';
 
@@ -41,6 +42,7 @@ type ValidatableEntity = Pick<Entity | LevelEntityDefinition, 'id' | 'kind' | 'p
 interface ValidatableLevel {
   name: string;
   requiredCarrots: number;
+  tileSize: number;
   tilemap: {
     cols: number;
     rows: number;
@@ -50,6 +52,23 @@ interface ValidatableLevel {
   };
   entities: ValidatableEntity[];
 }
+
+const groundRequiredKinds = new Set<EntityKind>([
+  'player',
+  'stone',
+  'stoneAngle',
+  'lock',
+  'key',
+  'carrot',
+  'trap',
+  'goal',
+  'channel',
+  'conveyorX',
+  'conveyorY',
+  'conveyorButton',
+  'stoneButton',
+  'bornPlace',
+]);
 
 function validateEntityData(entity: ValidatableEntity, diagnostics: LevelDiagnostic[]) {
   if (entity.kind === 'stone' && !numberInRange(entity.data.sign ?? 1, 1, 2)) {
@@ -107,6 +126,7 @@ function validateLevel(level: ValidatableLevel): LevelDiagnostic[] {
 
   for (const entity of level.entities) {
     validateEntityBounds(level, entity, diagnostics);
+    validateEntityGround(level, entity, diagnostics);
     validateEntityData(entity, diagnostics);
   }
 
@@ -129,14 +149,33 @@ function validateEntityBounds(level: ValidatableLevel, entity: ValidatableEntity
   }
 }
 
+function validateEntityGround(level: ValidatableLevel, entity: ValidatableEntity, diagnostics: LevelDiagnostic[]) {
+  if (!groundRequiredKinds.has(entity.kind)) return;
+
+  const col = Math.round(entity.pos.x / level.tileSize);
+  const row = Math.round(entity.pos.y / level.tileSize);
+  const tileId = level.tilemap.data[row * level.tilemap.cols + col];
+  if (isWalkableTileId(tileId)) return;
+
+  diagnostics.push({
+    severity: 'warning',
+    entityId: entity.id,
+    message: `${entity.kind} ${entity.id} is not on walkable ground`,
+  });
+}
+
 export function validateLevelDefinition(level: LevelDefinition): LevelDiagnostic[] {
-  return validateLevel(level);
+  return validateLevel({
+    ...level,
+    tileSize: level.tilemap.tileSize,
+  });
 }
 
 export function validateGameState(state: GameState): LevelDiagnostic[] {
   return validateLevel({
     name: state.mapName,
     requiredCarrots: state.requiredCarrots,
+    tileSize: state.tileSize,
     tilemap: state.tilemap,
     entities: state.entities,
   });

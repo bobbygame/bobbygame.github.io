@@ -2,6 +2,7 @@ import type { GameState, Entity } from './types';
 import { SpriteLoader } from './sprites';
 import { appUrl } from './paths';
 import type { GameSaveSlot, SaveActionResult } from './saveSystem';
+import { formatMapName, formatSaveTime, language, languageToggleLabel, languageToggleText, t, toggleLanguage } from './i18n';
 
 type SaveActionHandler = () => SaveActionResult | Promise<SaveActionResult>;
 
@@ -15,8 +16,12 @@ interface SavePanelControls {
 
 interface SavePanelElements {
   root: HTMLElement;
+  eyebrow: HTMLElement;
+  title: HTMLElement;
+  currentLabel: HTMLElement;
   currentMap: HTMLElement;
   currentStats: HTMLElement;
+  slotLabel: HTMLElement;
   slotTitle: HTMLElement;
   slotMeta: HTMLElement;
   slotStats: HTMLElement;
@@ -54,13 +59,21 @@ export class Renderer {
   private savePanelMessage = '';
   private readonly handleResize = () => this.resize();
   private readonly stage: HTMLDivElement;
+  private readonly hudTimeLabel: HTMLElement;
   private readonly hudTime: HTMLElement;
+  private readonly hudLevelLabel: HTMLElement;
   private readonly hudLevel: HTMLElement;
+  private readonly hudRemainLabel: HTMLElement;
   private readonly hudRemain: HTMLElement;
   private readonly winTitle: HTMLElement;
+  private readonly winTimeLabel: HTMLElement;
   private readonly winTime: HTMLElement;
+  private readonly winStepsLabel: HTMLElement;
   private readonly winSteps: HTMLElement;
   private readonly winButton: HTMLButtonElement;
+  private readonly editorLink?: HTMLAnchorElement;
+  private readonly languageButton?: HTMLButtonElement;
+  private renderedLanguage = language();
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
 
@@ -79,24 +92,29 @@ export class Renderer {
     this.canvas = document.createElement('canvas');
     this.canvas.width = state.tilemap.width || 650;
     this.canvas.height = state.tilemap.height || 800;
-    this.canvas.setAttribute('aria-label', 'Bobby Carrot game canvas');
+    this.canvas.setAttribute('aria-label', t('game.canvas'));
 
     const hud = document.createElement('div');
     hud.className = 'game-hud';
-    hud.setAttribute('aria-label', 'Game status');
+    hud.setAttribute('aria-label', t('game.status'));
 
-    const timePill = this.createHudPill('Time', 'time');
-    const levelPill = this.createHudPill('Level', 'level');
-    const remainPill = this.createHudPill('Remain', 'remain');
+    const timePill = this.createHudPill('game.hud.time', 'time');
+    const levelPill = this.createHudPill('game.hud.level', 'level');
+    const remainPill = this.createHudPill('game.hud.remain', 'remain');
+    this.hudTimeLabel = timePill.label;
     this.hudTime = timePill.value;
+    this.hudLevelLabel = levelPill.label;
     this.hudLevel = levelPill.value;
+    this.hudRemainLabel = remainPill.label;
     this.hudRemain = remainPill.value;
     hud.append(timePill.root, levelPill.root, remainPill.root);
 
     const winOverlay = this.createWinOverlay();
     this.winTitle = winOverlay.title;
-    this.winTime = winOverlay.time;
-    this.winSteps = winOverlay.steps;
+    this.winTimeLabel = winOverlay.time.label;
+    this.winTime = winOverlay.time.value;
+    this.winStepsLabel = winOverlay.steps.label;
+    this.winSteps = winOverlay.steps.value;
     this.winButton = winOverlay.button;
 
     const ctx = this.canvas.getContext('2d');
@@ -121,7 +139,12 @@ export class Renderer {
       rightRope.className = 'game-hanger-rope game-hanger-rope--right';
       rightRope.setAttribute('aria-hidden', 'true');
 
-      if (options.showEditorLink !== false) scene.append(this.createSceneActions());
+      if (options.showEditorLink !== false) {
+        const sceneActions = this.createSceneActions();
+        this.editorLink = sceneActions.editorLink;
+        this.languageButton = sceneActions.languageButton;
+        scene.append(sceneActions.root);
+      }
       if (this.savePanelControls) scene.append(this.createSavePanel(this.savePanelControls));
       screen.append(this.stage);
       device.append(leftRope, rightRope, screen);
@@ -134,6 +157,7 @@ export class Renderer {
     }
 
     container.replaceChildren(this.root);
+    this.updateLanguage();
     this.resize();
     window.addEventListener('resize', this.handleResize);
     window.visualViewport?.addEventListener('resize', this.handleResize);
@@ -190,24 +214,31 @@ export class Renderer {
   private createSceneActions() {
     const actions = document.createElement('nav');
     actions.className = 'game-scene-actions';
-    actions.setAttribute('aria-label', 'Game tools');
+    actions.setAttribute('aria-label', t('game.tools'));
 
     const editorLink = document.createElement('a');
     editorLink.className = 'game-scene-link game-scene-link--editor';
     editorLink.href = appUrl('editor');
-    editorLink.textContent = '自定义地图';
-    editorLink.setAttribute('aria-label', 'Open map editor');
+    editorLink.textContent = t('game.editor');
+    editorLink.setAttribute('aria-label', t('game.editor'));
+
+    const languageButton = document.createElement('button');
+    languageButton.type = 'button';
+    languageButton.className = 'game-scene-link game-scene-link--language';
+    languageButton.textContent = languageToggleText();
+    languageButton.setAttribute('aria-label', languageToggleLabel());
+    languageButton.addEventListener('click', () => toggleLanguage());
 
     const githubLink = document.createElement('a');
     githubLink.className = 'game-scene-link game-scene-link--github';
     githubLink.href = 'https://github.com/bobbygame/bobbygame.github.io';
     githubLink.target = '_blank';
     githubLink.rel = 'noopener noreferrer';
-    githubLink.setAttribute('aria-label', 'Open GitHub repository');
+    githubLink.setAttribute('aria-label', t('game.github'));
     githubLink.append(this.createGithubIcon(), document.createTextNode('GitHub'));
 
-    actions.append(editorLink, githubLink);
-    return actions;
+    actions.append(editorLink, languageButton, githubLink);
+    return { root: actions, editorLink, languageButton };
   }
 
   private createGithubIcon() {
@@ -231,22 +262,22 @@ export class Renderer {
   private createSavePanel(controls: SavePanelControls): HTMLElement {
     const root = document.createElement('aside');
     root.className = 'game-save-panel';
-    root.setAttribute('aria-label', 'Save management');
+    root.setAttribute('aria-label', t('game.save.aria'));
     root.addEventListener('keydown', (event) => event.stopPropagation());
 
     const eyebrow = document.createElement('span');
     eyebrow.className = 'game-save-panel__eyebrow';
-    eyebrow.textContent = 'Save Slot';
+    eyebrow.textContent = t('game.save.eyebrow');
 
     const title = document.createElement('strong');
     title.className = 'game-save-panel__title';
-    title.textContent = '游戏存档';
+    title.textContent = t('game.save.title');
 
     const current = document.createElement('section');
     current.className = 'game-save-panel__section';
     const currentLabel = document.createElement('span');
     currentLabel.className = 'game-save-panel__label';
-    currentLabel.textContent = '当前进度';
+    currentLabel.textContent = t('game.save.current');
     const currentMap = document.createElement('strong');
     currentMap.className = 'game-save-panel__value';
     const currentStats = document.createElement('span');
@@ -257,7 +288,7 @@ export class Renderer {
     slot.className = 'game-save-panel__section game-save-panel__section--slot';
     const slotLabel = document.createElement('span');
     slotLabel.className = 'game-save-panel__label';
-    slotLabel.textContent = '上次存档';
+    slotLabel.textContent = t('game.save.slot');
     const slotTitle = document.createElement('strong');
     slotTitle.className = 'game-save-panel__value';
     const slotMeta = document.createElement('span');
@@ -268,10 +299,10 @@ export class Renderer {
 
     const actions = document.createElement('div');
     actions.className = 'game-save-panel__actions';
-    const saveButton = this.createSaveButton('保存当前');
-    const resumeButton = this.createSaveButton('继续上次');
-    const newButton = this.createSaveButton('新开一局');
-    const deleteButton = this.createSaveButton('删除存档', 'ghost');
+    const saveButton = this.createSaveButton(t('game.save.save'));
+    const resumeButton = this.createSaveButton(t('game.save.resume'));
+    const newButton = this.createSaveButton(t('game.save.new'));
+    const deleteButton = this.createSaveButton(t('game.save.delete'), 'ghost');
     actions.append(saveButton, resumeButton, newButton, deleteButton);
 
     const message = document.createElement('p');
@@ -286,8 +317,12 @@ export class Renderer {
     root.append(eyebrow, title, current, slot, actions, message);
     this.savePanel = {
       root,
+      eyebrow,
+      title,
+      currentLabel,
       currentMap,
       currentStats,
+      slotLabel,
       slotTitle,
       slotMeta,
       slotStats,
@@ -319,7 +354,7 @@ export class Renderer {
         this.savePanelMessage = result.message;
       })
       .catch(() => {
-        this.savePanelMessage = '操作失败，请稍后再试';
+        this.savePanelMessage = t('game.save.failed');
       })
       .finally(() => {
         this.savePanelBusy = false;
@@ -331,8 +366,12 @@ export class Renderer {
     if (!this.savePanel) return;
 
     const remain = Math.max(0, this.state.requiredCarrots - this.state.inventory.carrots);
-    this.savePanel.currentMap.textContent = this.formatMapName(this.state.mapName);
-    this.savePanel.currentStats.textContent = `${Math.floor(this.state.stats.timeElapsed)} 秒 / ${this.state.stats.steps} 步 / 剩 ${remain}`;
+    this.savePanel.currentMap.textContent = formatMapName(this.state.mapName);
+    this.savePanel.currentStats.textContent = t('game.save.currentStats', {
+      time: Math.floor(this.state.stats.timeElapsed),
+      steps: this.state.stats.steps,
+      remain,
+    });
 
     if (this.saveSlot) {
       const snapshot = this.saveSlot.state;
@@ -340,12 +379,17 @@ export class Renderer {
       const savedPlayer = snapshot.entities.find((entity) => entity.id === snapshot.playerId);
       const col = savedPlayer ? Math.round(savedPlayer.pos.x / snapshot.tileSize) + 1 : null;
       const row = savedPlayer ? Math.round(savedPlayer.pos.y / snapshot.tileSize) + 1 : null;
-      this.savePanel.slotTitle.textContent = this.formatMapName(snapshot.mapName);
-      this.savePanel.slotMeta.textContent = `保存于 ${this.formatSaveTime(this.saveSlot.savedAt)}`;
-      this.savePanel.slotStats.textContent = `${Math.floor(snapshot.stats.timeElapsed)} 秒 / ${snapshot.stats.steps} 步 / 剩 ${savedRemain}${col && row ? ` / ${col},${row}` : ''}`;
+      this.savePanel.slotTitle.textContent = formatMapName(snapshot.mapName);
+      this.savePanel.slotMeta.textContent = t('game.save.savedAt', { time: formatSaveTime(this.saveSlot.savedAt) });
+      this.savePanel.slotStats.textContent = t('game.save.slotStats', {
+        time: Math.floor(snapshot.stats.timeElapsed),
+        steps: snapshot.stats.steps,
+        remain: savedRemain,
+        position: col && row ? t('game.save.position', { col, row }) : '',
+      });
     } else {
-      this.savePanel.slotTitle.textContent = '暂无存档';
-      this.savePanel.slotMeta.textContent = '保存当前进度后，可从这里继续';
+      this.savePanel.slotTitle.textContent = t('game.save.emptyTitle');
+      this.savePanel.slotMeta.textContent = t('game.save.emptyMeta');
       this.savePanel.slotStats.textContent = '';
     }
 
@@ -356,22 +400,8 @@ export class Renderer {
     this.savePanel.deleteButton.disabled = this.savePanelBusy || !this.saveSlot;
   }
 
-  private formatMapName(mapName: string) {
-    const level = mapName.match(/^map(\d+)$/)?.[1];
-    return level ? `第 ${level} 关` : mapName;
-  }
-
-  private formatSaveTime(timestamp: number) {
-    const date = new Date(timestamp);
-    return date.toLocaleString('zh-CN', {
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  }
-
   draw() {
+    if (this.renderedLanguage !== language()) this.updateLanguage();
     const { ctx } = this;
     ctx.imageSmoothingEnabled = false;
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -462,20 +492,20 @@ export class Renderer {
     this.drawInventoryKeys();
   }
 
-  private createHudPill(label: string, modifier: string) {
+  private createHudPill(labelKey: string, modifier: string) {
     const root = document.createElement('div');
     root.className = `game-hud__pill game-hud__pill--${modifier}`;
 
     const labelEl = document.createElement('span');
     labelEl.className = 'game-hud__label';
-    labelEl.textContent = label;
+    labelEl.textContent = t(labelKey);
 
     const value = document.createElement('strong');
     value.className = 'game-hud__value';
     value.textContent = '0';
 
     root.append(labelEl, value);
-    return { root, value };
+    return { root, label: labelEl, value };
   }
 
   private updateHudText(target: HTMLElement, value: string) {
@@ -506,7 +536,7 @@ export class Renderer {
     if (state.won) {
       this.stage.classList.add('game-stage--won');
       this.winButton.disabled = false;
-      this.updateHudText(this.winTitle, 'SUCCESS!');
+      this.updateHudText(this.winTitle, t('game.win.title'));
       this.updateHudText(this.winTime, String(Math.floor(state.stats.timeElapsed)));
       this.updateHudText(this.winSteps, String(state.stats.steps));
     } else {
@@ -520,7 +550,7 @@ export class Renderer {
       ctx.fillStyle = '#ef4444';
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.65)';
       ctx.lineWidth = 5;
-      this.strokeFillText('TRY AGAIN', 205, 350);
+      this.strokeFillText(t('game.tryAgain'), 205, 350);
       ctx.restore();
     }
   }
@@ -538,35 +568,66 @@ export class Renderer {
 
     const stats = document.createElement('div');
     stats.className = 'game-win__stats';
-    const time = this.createWinStat('Time Used');
-    const steps = this.createWinStat('Steps');
+    const time = this.createWinStat('game.win.timeUsed');
+    const steps = this.createWinStat('game.win.steps');
     stats.append(time.root, steps.root);
 
     const button = document.createElement('button');
     button.className = 'game-win__continue';
     button.type = 'button';
-    button.textContent = 'Continue';
+    button.textContent = t('game.win.continue');
     button.disabled = true;
     button.addEventListener('click', () => this.onAdvance());
 
     panel.append(title, stats, button);
     root.append(panel);
 
-    return { root, title, time: time.value, steps: steps.value, button };
+    return { root, title, time, steps, button };
   }
 
-  private createWinStat(label: string) {
+  private createWinStat(labelKey: string) {
     const root = document.createElement('div');
     root.className = 'game-win__stat';
 
     const labelEl = document.createElement('span');
-    labelEl.textContent = label;
+    labelEl.textContent = t(labelKey);
 
     const value = document.createElement('strong');
     value.textContent = '0';
 
     root.append(labelEl, value);
-    return { root, value };
+    return { root, label: labelEl, value };
+  }
+
+  private updateLanguage() {
+    this.renderedLanguage = language();
+    this.canvas.setAttribute('aria-label', t('game.canvas'));
+    this.hudTimeLabel.textContent = t('game.hud.time');
+    this.hudLevelLabel.textContent = t('game.hud.level');
+    this.hudRemainLabel.textContent = t('game.hud.remain');
+    this.winTimeLabel.textContent = t('game.win.timeUsed');
+    this.winStepsLabel.textContent = t('game.win.steps');
+    this.winButton.textContent = t('game.win.continue');
+    if (this.editorLink) {
+      this.editorLink.textContent = t('game.editor');
+      this.editorLink.setAttribute('aria-label', t('game.editor'));
+    }
+    if (this.languageButton) {
+      this.languageButton.textContent = languageToggleText();
+      this.languageButton.setAttribute('aria-label', languageToggleLabel());
+    }
+    if (this.savePanel) {
+      this.savePanel.root.setAttribute('aria-label', t('game.save.aria'));
+      this.savePanel.eyebrow.textContent = t('game.save.eyebrow');
+      this.savePanel.title.textContent = t('game.save.title');
+      this.savePanel.currentLabel.textContent = t('game.save.current');
+      this.savePanel.slotLabel.textContent = t('game.save.slot');
+      this.savePanel.saveButton.textContent = t('game.save.save');
+      this.savePanel.resumeButton.textContent = t('game.save.resume');
+      this.savePanel.newButton.textContent = t('game.save.new');
+      this.savePanel.deleteButton.textContent = t('game.save.delete');
+      this.updateSavePanel();
+    }
   }
 
   private strokeFillText(text: string, x: number, y: number) {

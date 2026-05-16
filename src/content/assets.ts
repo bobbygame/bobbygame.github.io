@@ -474,230 +474,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "CarrotNum": {
-      "name": "CarrotNum",
-      "animations": {}
-    },
-    "carrotnum": {
-      "name": "CarrotNum",
-      "animations": {}
-    },
-    "Timer": {
-      "name": "Timer",
-      "animations": {}
-    },
-    "timer": {
-      "name": "Timer",
-      "animations": {}
-    },
-    "upCtrl": {
-      "name": "upCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 129,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 129,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "upctrl": {
-      "name": "upCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 129,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 129,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "rightCtrl": {
-      "name": "rightCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "rightctrl": {
-      "name": "rightCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "leftCtrl": {
-      "name": "leftCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "leftctrl": {
-      "name": "leftCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "downCtrl": {
-      "name": "downCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "downctrl": {
-      "name": "downCtrl",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 193,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 193,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
     "channel": {
       "name": "channel",
       "animations": {
@@ -869,32 +645,6 @@ export const assetManifest: AssetManifest = {
         "y": 385,
         "w": 50,
         "h": 50
-      }
-    },
-    "wall": {
-      "name": "wall",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet0.png",
-              "x": 1,
-              "y": 1,
-              "w": 250,
-              "h": 250
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet0.png",
-        "x": 1,
-        "y": 1,
-        "w": 250,
-        "h": 250
       }
     },
     "barLeftTop": {
@@ -1105,58 +855,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "carrotMark": {
-      "name": "carrotMark",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 257,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 257,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
-    "carrotmark": {
-      "name": "carrotMark",
-      "animations": {
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 257,
-              "y": 193,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
-      },
-      "frame": {
-        "sheet": "images/shared-0-sheet1.png",
-        "x": 257,
-        "y": 193,
-        "w": 50,
-        "h": 50
-      }
-    },
     "conveyorBeltX": {
       "name": "conveyorBeltX",
       "animations": {
@@ -1296,20 +994,6 @@ export const assetManifest: AssetManifest = {
             }
           ]
         },
-        "Animation 2": {
-          "name": "Animation 2",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 105,
-              "y": 449,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
       },
       "frame": {
         "sheet": "images/shared-0-sheet1.png",
@@ -1318,14 +1002,6 @@ export const assetManifest: AssetManifest = {
         "w": 50,
         "h": 50
       }
-    },
-    "Level": {
-      "name": "Level",
-      "animations": {}
-    },
-    "level": {
-      "name": "Level",
-      "animations": {}
     },
     "conveyorBeltY": {
       "name": "conveyorBeltY",
@@ -1435,34 +1111,6 @@ export const assetManifest: AssetManifest = {
         "h": 50
       }
     },
-    "sucecess": {
-      "name": "sucecess",
-      "animations": {}
-    },
-    "TimeUse": {
-      "name": "TimeUse",
-      "animations": {}
-    },
-    "timeuse": {
-      "name": "TimeUse",
-      "animations": {}
-    },
-    "Steps": {
-      "name": "Steps",
-      "animations": {}
-    },
-    "steps": {
-      "name": "Steps",
-      "animations": {}
-    },
-    "Continue": {
-      "name": "Continue",
-      "animations": {}
-    },
-    "continue": {
-      "name": "Continue",
-      "animations": {}
-    },
     "stone": {
       "name": "stone",
       "animations": {
@@ -1494,20 +1142,6 @@ export const assetManifest: AssetManifest = {
             }
           ]
         },
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 385,
-              "y": 321,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
       },
       "frame": {
         "sheet": "images/shared-0-sheet1.png",
@@ -1576,34 +1210,6 @@ export const assetManifest: AssetManifest = {
             }
           ]
         },
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 105,
-              "y": 321,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        },
-        "Animation 2": {
-          "name": "Animation 2",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 157,
-              "y": 321,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
       },
       "frame": {
         "sheet": "images/shared-0-sheet1.png",
@@ -1672,34 +1278,6 @@ export const assetManifest: AssetManifest = {
             }
           ]
         },
-        "Animation 1": {
-          "name": "Animation 1",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 105,
-              "y": 321,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        },
-        "Animation 2": {
-          "name": "Animation 2",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 157,
-              "y": 321,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        }
       },
       "frame": {
         "sheet": "images/shared-0-sheet1.png",
@@ -1712,20 +1290,6 @@ export const assetManifest: AssetManifest = {
     "conveyorBeltButton": {
       "name": "conveyorBeltButton",
       "animations": {
-        "2": {
-          "name": "2",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 53,
-              "y": 257,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        },
         "false": {
           "name": "false",
           "speed": 5,
@@ -1766,20 +1330,6 @@ export const assetManifest: AssetManifest = {
     "conveyorbeltbutton": {
       "name": "conveyorBeltButton",
       "animations": {
-        "2": {
-          "name": "2",
-          "speed": 5,
-          "looping": true,
-          "frames": [
-            {
-              "sheet": "images/shared-0-sheet1.png",
-              "x": 53,
-              "y": 257,
-              "w": 50,
-              "h": 50
-            }
-          ]
-        },
         "false": {
           "name": "false",
           "speed": 5,
@@ -2004,14 +1554,6 @@ export const assetManifest: AssetManifest = {
         "w": 50,
         "h": 50
       }
-    },
-    "restartLevel": {
-      "name": "restartLevel",
-      "animations": {}
-    },
-    "restartlevel": {
-      "name": "restartLevel",
-      "animations": {}
     },
     "Tilemap": {
       "name": "Tilemap",

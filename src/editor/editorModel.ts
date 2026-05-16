@@ -1,4 +1,5 @@
 import { createCommunityLevel, isCommunityLevel, type CommunityLevel } from '../game/communityLevel';
+import { t } from '../game/i18n';
 import { DEFAULT_TILE_SIZE, type LevelDefinition, type LevelEntityDefinition } from '../game/levelDefinition';
 import type { EntityKind } from '../game/types';
 
@@ -16,55 +17,48 @@ export interface EntityToolDefinition {
   typeName: string;
   label: string;
   group: string;
+  description: string;
   data: Record<string, unknown>;
   unique?: boolean;
 }
 
 export const entityTools: EntityToolDefinition[] = [
-  { tool: 'player', kind: 'player', typeName: 'bobby', label: 'Player', group: 'Essentials', data: {}, unique: true },
-  { tool: 'bornPlace', kind: 'bornPlace', typeName: 'bornPlace', label: 'Spawn', group: 'Essentials', data: {}, unique: true },
-  { tool: 'channel', kind: 'channel', typeName: 'channel', label: 'Exit', group: 'Essentials', data: {}, unique: true },
-  { tool: 'carrot', kind: 'carrot', typeName: 'carrot1', label: 'Carrot', group: 'Essentials', data: {} },
+  { tool: 'player', kind: 'player', typeName: 'bobby', label: 'Player', group: 'Essentials', description: '玩家控制的兔子；每关唯一，只能移动到黑色石砖地砖上。', data: {}, unique: true },
+  { tool: 'bornPlace', kind: 'bornPlace', typeName: 'bornPlace', label: 'Spawn', group: 'Essentials', description: '出生点标记；每关唯一，用来标记兔子的初始位置。', data: {}, unique: true },
+  { tool: 'channel', kind: 'channel', typeName: 'channel', label: 'Exit', group: 'Essentials', description: '出口；收集足够胡萝卜后打开，兔子进入后通关。', data: {}, unique: true },
+  { tool: 'carrot', kind: 'carrot', typeName: 'carrot1', label: 'Carrot', group: 'Essentials', description: '收集目标；吃到后计数增加，用于打开出口。', data: {} },
 
-  { tool: 'barX', kind: 'wall', typeName: 'barX', label: 'Fence X', group: 'Walls', data: {} },
-  { tool: 'barY', kind: 'wall', typeName: 'barY', label: 'Fence Y', group: 'Walls', data: {} },
-  { tool: 'barLeftTop', kind: 'wall', typeName: 'barLeftTop', label: 'Fence LT', group: 'Walls', data: {} },
-  { tool: 'barRightTop', kind: 'wall', typeName: 'barRightTop', label: 'Fence RT', group: 'Walls', data: {} },
-  { tool: 'barLeftBottom', kind: 'wall', typeName: 'barLeftBottom', label: 'Fence LB', group: 'Walls', data: {} },
-  { tool: 'barRightBottom', kind: 'wall', typeName: 'barRightBottom', label: 'Fence RB', group: 'Walls', data: {} },
+  { tool: 'barX', kind: 'wall', typeName: 'barX', label: 'Fence X', group: 'Walls', description: '横向可见围栏；实体障碍，阻挡兔子进入该格。', data: {} },
+  { tool: 'barY', kind: 'wall', typeName: 'barY', label: 'Fence Y', group: 'Walls', description: '纵向可见围栏；实体障碍，阻挡兔子进入该格。', data: {} },
+  { tool: 'barLeftTop', kind: 'wall', typeName: 'barLeftTop', label: 'Fence LT', group: 'Walls', description: '左上转角围栏；实体障碍，阻挡兔子进入该格。', data: {} },
+  { tool: 'barRightTop', kind: 'wall', typeName: 'barRightTop', label: 'Fence RT', group: 'Walls', description: '右上转角围栏；实体障碍，阻挡兔子进入该格。', data: {} },
+  { tool: 'barLeftBottom', kind: 'wall', typeName: 'barLeftBottom', label: 'Fence LB', group: 'Walls', description: '左下转角围栏；实体障碍，阻挡兔子进入该格。', data: {} },
+  { tool: 'barRightBottom', kind: 'wall', typeName: 'barRightBottom', label: 'Fence RB', group: 'Walls', description: '右下转角围栏；实体障碍，阻挡兔子进入该格。', data: {} },
 
-  { tool: 'trapSafe', kind: 'trap', typeName: 'trap', label: 'Trap Safe', group: 'Hazards', data: { isSharp: 0 } },
-  { tool: 'trapSharp', kind: 'trap', typeName: 'trap', label: 'Trap Sharp', group: 'Hazards', data: { isSharp: 1 } },
-  { tool: 'trapGray', kind: 'other', typeName: 'trap', label: 'Trap Gray', group: 'Hazards', data: { sprite: 'Animation 2' } },
-  { tool: 'stoneHorizontal', kind: 'stone', typeName: 'stone', label: 'Stone H', group: 'Hazards', data: { sign: 1 } },
-  { tool: 'stoneVertical', kind: 'stone', typeName: 'stone', label: 'Stone V', group: 'Hazards', data: { sign: 2 } },
-  { tool: 'stoneAngleDR', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner DR', group: 'Hazards', data: { sign: 1 } },
-  { tool: 'stoneAngleDL', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner DL', group: 'Hazards', data: { sign: 2 } },
-  { tool: 'stoneAngleUL', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner UL', group: 'Hazards', data: { sign: 3 } },
-  { tool: 'stoneAngleUR', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner UR', group: 'Hazards', data: { sign: 4 } },
+  { tool: 'trapSafe', kind: 'trap', typeName: 'trap', label: 'Trap Safe', group: 'Hazards', description: '未触发陷阱；兔子踩上去安全，离开后会变成尖刺。', data: { isSharp: 0 } },
+  { tool: 'trapSharp', kind: 'trap', typeName: 'trap', label: 'Trap Sharp', group: 'Hazards', description: '尖刺陷阱；兔子踩上去会死亡并重开。', data: { isSharp: 1 } },
+  { tool: 'stoneHorizontal', kind: 'stone', typeName: 'stone', label: 'Stone H', group: 'Hazards', description: '水平单向石板；只允许左右方向通过，离开后切换方向。', data: { sign: 1 } },
+  { tool: 'stoneVertical', kind: 'stone', typeName: 'stone', label: 'Stone V', group: 'Hazards', description: '垂直单向石板；只允许上下方向通过，离开后切换方向。', data: { sign: 2 } },
+  { tool: 'stoneAngleDR', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner DR', group: 'Hazards', description: '转角石板；按图示连接两个方向，离开后旋转到下一方向。', data: { sign: 1 } },
+  { tool: 'stoneAngleDL', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner DL', group: 'Hazards', description: '转角石板；按图示连接两个方向，离开后旋转到下一方向。', data: { sign: 2 } },
+  { tool: 'stoneAngleUL', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner UL', group: 'Hazards', description: '转角石板；按图示连接两个方向，离开后旋转到下一方向。', data: { sign: 3 } },
+  { tool: 'stoneAngleUR', kind: 'stoneAngle', typeName: 'stoneAngle', label: 'Corner UR', group: 'Hazards', description: '转角石板；按图示连接两个方向，离开后旋转到下一方向。', data: { sign: 4 } },
 
-  { tool: 'conveyorLeft', kind: 'conveyorX', typeName: 'conveyorBeltX', label: 'Belt Left', group: 'Conveyors', data: { direction1: 0, isLeft: true } },
-  { tool: 'conveyorRight', kind: 'conveyorX', typeName: 'conveyorBeltX', label: 'Belt Right', group: 'Conveyors', data: { direction1: 1, isLeft: false } },
-  { tool: 'conveyorUp', kind: 'conveyorY', typeName: 'conveyorBeltY', label: 'Belt Up', group: 'Conveyors', data: { direction1: 0, isUp: true } },
-  { tool: 'conveyorDown', kind: 'conveyorY', typeName: 'conveyorBeltY', label: 'Belt Down', group: 'Conveyors', data: { direction1: 1, isUp: false } },
-  { tool: 'conveyorButtonOn', kind: 'conveyorButton', typeName: 'conveyorBeltButton', label: 'Belt On', group: 'Switches', data: { open: 1 } },
-  { tool: 'conveyorButtonOff', kind: 'conveyorButton', typeName: 'conveyorBeltButton', label: 'Belt Off', group: 'Switches', data: { open: 0 } },
-  { tool: 'conveyorButtonMid', kind: 'other', typeName: 'conveyorBeltButton', label: 'Belt Mid', group: 'Switches', data: { sprite: '2' } },
-  { tool: 'stoneButtonOn', kind: 'stoneButton', typeName: 'stoneButton', label: 'Stone On', group: 'Switches', data: { open: 1 } },
-  { tool: 'stoneButtonOff', kind: 'stoneButton', typeName: 'stoneButton', label: 'Stone Off', group: 'Switches', data: { open: 0 } },
+  { tool: 'conveyorLeft', kind: 'conveyorX', typeName: 'conveyorBeltX', label: 'Belt Left', group: 'Conveyors', description: '横向传送带；只能沿箭头方向进入，并把兔子送到连续传送带出口。', data: { direction1: 0, isLeft: true } },
+  { tool: 'conveyorRight', kind: 'conveyorX', typeName: 'conveyorBeltX', label: 'Belt Right', group: 'Conveyors', description: '横向传送带；只能沿箭头方向进入，并把兔子送到连续传送带出口。', data: { direction1: 1, isLeft: false } },
+  { tool: 'conveyorUp', kind: 'conveyorY', typeName: 'conveyorBeltY', label: 'Belt Up', group: 'Conveyors', description: '纵向传送带；只能沿箭头方向进入，并把兔子送到连续传送带出口。', data: { direction1: 0, isUp: true } },
+  { tool: 'conveyorDown', kind: 'conveyorY', typeName: 'conveyorBeltY', label: 'Belt Down', group: 'Conveyors', description: '纵向传送带；只能沿箭头方向进入，并把兔子送到连续传送带出口。', data: { direction1: 1, isUp: false } },
+  { tool: 'conveyorButtonOn', kind: 'conveyorButton', typeName: 'conveyorBeltButton', label: 'Belt On', group: 'Switches', description: '传送带开关；踩到开启状态会反转所有传送带方向，并切换其他传送带按钮状态。', data: { open: 1 } },
+  { tool: 'conveyorButtonOff', kind: 'conveyorButton', typeName: 'conveyorBeltButton', label: 'Belt Off', group: 'Switches', description: '关闭状态的传送带开关；当前不会触发，等待其他同类按钮切换。', data: { open: 0 } },
+  { tool: 'stoneButtonOn', kind: 'stoneButton', typeName: 'stoneButton', label: 'Stone On', group: 'Switches', description: '石板开关；踩到开启状态会切换所有直线/转角石板方向，并切换其他石板按钮状态。', data: { open: 1 } },
+  { tool: 'stoneButtonOff', kind: 'stoneButton', typeName: 'stoneButton', label: 'Stone Off', group: 'Switches', description: '关闭状态的石板开关；当前不会触发，等待其他同类按钮切换。', data: { open: 0 } },
 
-  { tool: 'keyYellow', kind: 'key', typeName: 'key', label: 'Key Yellow', group: 'Keys', data: { sign: 1 } },
-  { tool: 'keyRed', kind: 'key', typeName: 'key', label: 'Key Red', group: 'Keys', data: { sign: 2 } },
-  { tool: 'keyBlue', kind: 'key', typeName: 'key', label: 'Key Blue', group: 'Keys', data: { sign: 3 } },
-  { tool: 'lockYellow', kind: 'lock', typeName: 'lock', label: 'Lock Yellow', group: 'Keys', data: { sign: 1 } },
-  { tool: 'lockRed', kind: 'lock', typeName: 'lock', label: 'Lock Red', group: 'Keys', data: { sign: 2 } },
-  { tool: 'lockBlue', kind: 'lock', typeName: 'lock', label: 'Lock Blue', group: 'Keys', data: { sign: 3 } },
-
-  { tool: 'carrotMark', kind: 'other', typeName: 'carrotMark', label: 'Carrot Mark', group: 'Decor', data: {} },
-  { tool: 'upCtrl', kind: 'other', typeName: 'upCtrl', label: 'Ctrl Up', group: 'Decor', data: {} },
-  { tool: 'rightCtrl', kind: 'other', typeName: 'rightCtrl', label: 'Ctrl Right', group: 'Decor', data: {} },
-  { tool: 'leftCtrl', kind: 'other', typeName: 'leftCtrl', label: 'Ctrl Left', group: 'Decor', data: {} },
-  { tool: 'downCtrl', kind: 'other', typeName: 'downCtrl', label: 'Ctrl Down', group: 'Decor', data: {} },
+  { tool: 'keyYellow', kind: 'key', typeName: 'key', label: 'Key Yellow', group: 'Keys', description: '黄色钥匙；收集后可打开一个黄色锁。', data: { sign: 1 } },
+  { tool: 'keyRed', kind: 'key', typeName: 'key', label: 'Key Red', group: 'Keys', description: '红色钥匙；收集后可打开一个红色锁。', data: { sign: 2 } },
+  { tool: 'keyBlue', kind: 'key', typeName: 'key', label: 'Key Blue', group: 'Keys', description: '蓝色钥匙；收集后可打开一个蓝色锁。', data: { sign: 3 } },
+  { tool: 'lockYellow', kind: 'lock', typeName: 'lock', label: 'Lock Yellow', group: 'Keys', description: '黄色锁；没有黄色钥匙时阻挡兔子，有钥匙时进入会消耗钥匙并解锁。', data: { sign: 1 } },
+  { tool: 'lockRed', kind: 'lock', typeName: 'lock', label: 'Lock Red', group: 'Keys', description: '红色锁；没有红色钥匙时阻挡兔子，有钥匙时进入会消耗钥匙并解锁。', data: { sign: 2 } },
+  { tool: 'lockBlue', kind: 'lock', typeName: 'lock', label: 'Lock Blue', group: 'Keys', description: '蓝色锁；没有蓝色钥匙时阻挡兔子，有钥匙时进入会消耗钥匙并解锁。', data: { sign: 3 } },
 ];
 
 export const tilePalette = [
@@ -82,6 +76,20 @@ export const tilePalette = [
   { id: 11, label: 'Stone 5', color: '#36515a' },
 ];
 
+function createDefaultTileData(cols: number, rows: number): number[] {
+  const data = new Array(cols * rows).fill(0);
+  const setStone = (col: number, row: number) => {
+    if (col >= 0 && row >= 0 && col < cols && row < rows) data[row * cols + col] = 7;
+  };
+
+  for (let col = 1; col <= 8; col += 1) setStone(col, 1);
+  for (let row = 1; row <= 8; row += 1) setStone(8, row);
+  for (let col = 8; col <= 14; col += 1) setStone(col, 8);
+  for (let row = 8; row <= 14; row += 1) setStone(14, row);
+
+  return data;
+}
+
 export function createBlankLevel(): CommunityLevel {
   const cols = 16;
   const rows = 16;
@@ -96,7 +104,7 @@ export function createBlankLevel(): CommunityLevel {
       height: rows * DEFAULT_TILE_SIZE,
       tileSize: DEFAULT_TILE_SIZE,
       typeName: 'Tilemap',
-      data: new Array(cols * rows).fill(0),
+      data: createDefaultTileData(cols, rows),
     },
     entities: [
       createEntity(entityTools[0], 1, 1, 1),
@@ -106,8 +114,8 @@ export function createBlankLevel(): CommunityLevel {
     ],
   };
   return createCommunityLevel(level, {
-    title: 'New Community Level',
-    author: 'community',
+    title: t('editor.defaultTitle'),
+    author: t('editor.defaultAuthor'),
     tags: ['draft'],
   });
 }

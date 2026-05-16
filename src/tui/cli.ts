@@ -3,6 +3,7 @@ import { nextMapName } from '../game/levelProgression';
 import { GameSimulation } from '../game/simulation';
 import type { Direction } from '../game/movement';
 import type { Entity, GameState } from '../game/types';
+import { isWalkableTileId } from '../game/walkability';
 
 declare const process: {
   argv: string[];
@@ -90,9 +91,9 @@ function directionForKey(input: string): Direction {
 }
 
 function tileToken(tileId: number, mode: RenderMode) {
-  if (mode === 'emoji') return tileId === 0 ? '🟩' : '▫️ ';
-  if (tileId === 0) return `${colors.grass}..${RESET}`;
-  return `${colors.path}  ${RESET}`;
+  if (mode === 'emoji') return isWalkableTileId(tileId) ? '▫️ ' : '🟩';
+  if (isWalkableTileId(tileId)) return `${colors.path}  ${RESET}`;
+  return `${colors.grass}..${RESET}`;
 }
 
 function directionToken(entity: Entity) {

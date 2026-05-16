@@ -21,7 +21,8 @@ Observed against `https://game.snapre.online` in Chrome on 2026-05-09 and cross-
 
 ## Mechanics
 
-- Walls and bar objects block movement.
+- Bobby can move only on the dark stone ground tile IDs `7-11`; grass/decorative ground tile IDs `0-6` are not walkable.
+- Bar objects block movement as visible fence entities.
 - Traps kill Bobby only when their `isSharp` instance variable is set; death plays the dead animation/audio and restarts the layout.
 - Horizontal and vertical conveyor belts are one-way movement gates: entering a belt against its `direction1` is blocked.
 - Conveyor belt buttons toggle every conveyor button and flip all belt directions.

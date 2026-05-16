@@ -121,6 +121,8 @@
     }
 
     .game-scene-link {
+      appearance: none;
+      -webkit-appearance: none;
       min-height: 42px;
       display: inline-flex;
       align-items: center;
@@ -143,6 +145,7 @@
       white-space: nowrap;
       backdrop-filter: blur(22px) saturate(1.18);
       -webkit-backdrop-filter: blur(22px) saturate(1.18);
+      cursor: pointer;
     }
 
     .game-scene-link--editor::before {
@@ -1315,6 +1318,42 @@
       border-radius: 3px;
       background: #0f120b;
       border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .editor-tooltip {
+      position: fixed;
+      z-index: 50;
+      width: min(280px, calc(100vw - 16px));
+      padding: 10px 12px;
+      border: 1px solid #747959;
+      border-radius: 6px;
+      background: #11130d;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      color: var(--text);
+      pointer-events: none;
+    }
+
+    .editor-tooltip[hidden] {
+      display: none;
+    }
+
+    .editor-tooltip strong,
+    .editor-tooltip span {
+      display: block;
+      letter-spacing: 0;
+    }
+
+    .editor-tooltip strong {
+      font-size: 13px;
+      line-height: 1.25;
+      color: #fff7c7;
+    }
+
+    .editor-tooltip span {
+      margin-top: 4px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: #d9d1ac;
     }
 
     .editor-link {
