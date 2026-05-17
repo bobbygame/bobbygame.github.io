@@ -3,6 +3,7 @@ import { assetUrl } from './paths';
 export type SoundEffect = 'move' | 'collect' | 'button' | 'die' | 'win' | 'unlock';
 
 const MUTE_STORAGE_KEY = 'bobby-carrot.audio-muted';
+const BG_PAUSING_EFFECTS = new Set<SoundEffect>(['die', 'win']);
 
 type AudioContextWindow = Window & typeof globalThis & {
   webkitAudioContext?: typeof AudioContext;
@@ -24,6 +25,9 @@ class AudioManager {
   private effectGain?: GainNode;
   private bgMusic?: HTMLAudioElement;
   private bgMusicRequested = false;
+  private bgMusicHeld = false;
+  private bgMusicResumePending = false;
+  private bgPausingEffectCount = 0;
   private muted = readStoredMute();
   private unlocked = false;
 
@@ -67,27 +71,45 @@ class AudioManager {
 
   play(effect: SoundEffect) {
     if (this.muted) return;
-    if (this.playBuffer(effect)) return;
+    const releaseBgHold = this.holdBgMusicForEffect(effect);
+    if (this.playBuffer(effect, releaseBgHold)) return;
 
     const audio = this.sounds.get(effect);
-    if (!audio) return;
+    if (!audio) {
+      releaseBgHold?.();
+      return;
+    }
     audio.currentTime = 0;
+    if (releaseBgHold) audio.addEventListener('ended', releaseBgHold, { once: true });
     audio.play().catch(() => {
+      releaseBgHold?.();
       // Ignore autoplay policy errors
     });
   }
 
   playBgMusic() {
     this.bgMusicRequested = true;
-    if (this.muted || !this.bgMusic) return;
+    if (this.muted || !this.bgMusic || this.bgMusicHeld) return;
     this.bgMusic.play().catch(() => {
       // Ignore autoplay policy errors
     });
   }
 
+  resumeBgMusic() {
+    if (this.bgPausingEffectCount > 0) {
+      this.bgMusicResumePending = true;
+      return;
+    }
+    this.bgMusicResumePending = false;
+    this.bgMusicHeld = false;
+    if (this.bgMusicRequested) this.playBgMusic();
+  }
+
   stopBgMusic() {
     this.bgMusicRequested = false;
-    this.pauseBgMusic();
+    this.bgMusicHeld = false;
+    this.bgMusicResumePending = false;
+    this.pauseBgMusic(true);
   }
 
   isMuted() {
@@ -98,8 +120,8 @@ class AudioManager {
     this.muted = !this.muted;
     this.storeMute();
     if (this.muted) {
-      this.pauseBgMusic();
-    } else if (this.bgMusicRequested) {
+      this.pauseBgMusic(true);
+    } else if (this.bgMusicRequested && !this.bgMusicHeld) {
       this.playBgMusic();
     }
     return this.muted;
@@ -114,10 +136,26 @@ class AudioManager {
     }
   }
 
-  private pauseBgMusic() {
+  private pauseBgMusic(reset = false) {
     if (!this.bgMusic) return;
     this.bgMusic.pause();
-    this.bgMusic.currentTime = 0;
+    if (reset) this.bgMusic.currentTime = 0;
+  }
+
+  private holdBgMusicForEffect(effect: SoundEffect): (() => void) | undefined {
+    if (!BG_PAUSING_EFFECTS.has(effect) || !this.bgMusic || !this.bgMusicRequested) return undefined;
+    this.bgMusicHeld = true;
+    this.bgMusicResumePending = false;
+    this.bgPausingEffectCount += 1;
+    this.pauseBgMusic();
+
+    let released = false;
+    return () => {
+      if (released) return;
+      released = true;
+      this.bgPausingEffectCount = Math.max(0, this.bgPausingEffectCount - 1);
+      if (this.bgMusicResumePending && this.bgPausingEffectCount === 0) this.resumeBgMusic();
+    };
   }
 
   private createAudioContext(): AudioContext | undefined {
@@ -149,7 +187,7 @@ class AudioManager {
       });
   }
 
-  private playBuffer(effect: SoundEffect): boolean {
+  private playBuffer(effect: SoundEffect, onEnded?: () => void): boolean {
     if (!this.audioContext || !this.effectGain) return false;
     const buffer = this.buffers.get(effect);
     if (!buffer) return false;
@@ -157,6 +195,7 @@ class AudioManager {
     const source = this.audioContext.createBufferSource();
     source.buffer = buffer;
     source.connect(this.effectGain);
+    if (onEnded) source.addEventListener('ended', onEnded, { once: true });
     source.start();
     return true;
   }

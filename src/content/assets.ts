@@ -344,7 +344,7 @@ export const assetManifest: AssetManifest = {
         "dead": {
           "name": "dead",
           "speed": 10,
-          "looping": true,
+          "looping": false,
           "frames": [
             {
               "sheet": "images/bobby-sheet0.png",

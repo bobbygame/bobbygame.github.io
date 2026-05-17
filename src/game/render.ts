@@ -75,6 +75,7 @@ export class Renderer {
   private readonly restartButton?: HTMLButtonElement;
   private readonly soundButton?: HTMLButtonElement;
   private renderedLanguage = language();
+  private deathOverlayVisible = false;
   public readonly canvas: HTMLCanvasElement;
   public readonly ctx: CanvasRenderingContext2D;
 
@@ -173,9 +174,14 @@ export class Renderer {
 
   setState(state: GameState) {
     this.state = state;
+    this.deathOverlayVisible = false;
     this.canvas.width = state.tilemap.width || 650;
     this.canvas.height = state.tilemap.height || 800;
     this.resize();
+  }
+
+  setDeathOverlayVisible(visible: boolean) {
+    this.deathOverlayVisible = visible;
   }
 
   resize() {
@@ -451,7 +457,7 @@ export class Renderer {
 
   private drawEntities() {
     const ordered = this.state.entities
-      .filter((entity) => !entity.dead)
+      .filter((entity) => entity.kind === 'player' || !entity.dead)
       .sort((a, b) => {
         if (a.kind === 'player') return 1;
         if (b.kind === 'player') return -1;
@@ -546,7 +552,7 @@ export class Renderer {
       this.winButton.disabled = true;
     }
 
-    if (state.player.dead) {
+    if (state.player.dead && this.deathOverlayVisible) {
       this.stage.classList.add('game-stage--dead');
       this.updateHudText(this.deathTitle, t('game.tryAgain'));
     } else {

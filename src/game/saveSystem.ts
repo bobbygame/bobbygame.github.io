@@ -68,7 +68,7 @@ export function createGameSave(
     lastStoneAngleSteppedId: state.lastStoneAngleSteppedId ?? null,
     lastTrapSteppedId: state.lastTrapSteppedId ?? null,
     stats: { ...state.stats },
-    animation: { ...state.animation, state: 'idle' },
+    animation: { ...state.animation, state: 'idle', idleElapsed: 0 },
     playerId: state.player.id,
   };
 
@@ -110,7 +110,7 @@ export function restoreGameState(slot: GameSaveSlot): GameState | null {
       lastStoneAngleSteppedId: snapshot.lastStoneAngleSteppedId ?? null,
       lastTrapSteppedId: snapshot.lastTrapSteppedId ?? null,
       stats: { ...snapshot.stats },
-      animation: { ...snapshot.animation, state: 'idle' },
+      animation: { ...snapshot.animation, state: 'idle', idleElapsed: 0 },
     };
   } catch {
     return null;

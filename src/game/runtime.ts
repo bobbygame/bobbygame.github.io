@@ -24,6 +24,9 @@ import { t } from './i18n';
 import type { GameAction } from './actions';
 import type { GameState } from './types';
 
+const FALLBACK_DEATH_ANIMATION_SECONDS = 0.8;
+const DEATH_RESTART_DELAY_SECONDS = 2;
+
 export interface BrowserGameRuntimeOptions {
   container: HTMLElement;
   initialMap: string;
@@ -42,6 +45,7 @@ export class BrowserGameRuntime {
   private currentMap: string;
   private currentCommunityId: string | null = null;
   private deathTimer = 0;
+  private deathAnimationDuration = FALLBACK_DEATH_ANIMATION_SECONDS;
   private loadingLevel = false;
   private saveSlot: GameSaveSlot | null = loadGameSave();
   private autoSaveSignature = '';
@@ -59,6 +63,7 @@ export class BrowserGameRuntime {
     const manifest = await loadAssetManifest();
     this.sprites = new SpriteLoader(manifest);
     await this.sprites.preloadAll();
+    this.deathAnimationDuration = this.sprites.getAnimationDuration('bobby', 'dead') ?? FALLBACK_DEATH_ANIMATION_SECONDS;
     this.joystick = new VirtualJoystick();
     this.input = new BrowserInputManager((action) => {
       void this.dispatch(action);
@@ -89,6 +94,11 @@ export class BrowserGameRuntime {
 
   private async dispatch(action: GameAction) {
     if (!this.simulation) return;
+
+    if (this.simulation.status() === 'playing' && !this.simulation.isMoving()) {
+      this.simulation.state.animation.idleElapsed = 0;
+      this.simulation.state.animation.state = 'idle';
+    }
 
     if (action.type === 'restart') {
       await this.reloadCurrentLevel();
@@ -137,6 +147,7 @@ export class BrowserGameRuntime {
       }
       this.renderer?.draw();
       this.autoSaveCurrentGame(true);
+      audio.resumeBgMusic();
     } finally {
       this.loadingLevel = false;
     }
@@ -169,6 +180,7 @@ export class BrowserGameRuntime {
       }
       this.renderer?.draw();
       this.autoSaveCurrentGame(true);
+      audio.resumeBgMusic();
     } finally {
       this.loadingLevel = false;
     }
@@ -298,10 +310,13 @@ export class BrowserGameRuntime {
     if (this.simulation) {
       if (this.simulation.status() === 'dead') {
         this.deathTimer += dt;
-        if (this.deathTimer > 2) {
+        this.simulation.state.animation.deathElapsed = this.deathTimer;
+        this.renderer?.setDeathOverlayVisible(this.deathTimer >= this.deathAnimationDuration);
+        if (this.deathTimer > DEATH_RESTART_DELAY_SECONDS) {
           void this.loadLevel(this.currentMap);
         }
       } else if (this.simulation.status() === 'playing') {
+        this.renderer?.setDeathOverlayVisible(false);
         const joystickDirection = this.joystick?.consumeDirection();
         if (joystickDirection) this.simulation.dispatch({ type: 'move', direction: joystickDirection });
 
@@ -309,6 +324,11 @@ export class BrowserGameRuntime {
         for (const event of step.events) {
           const sound = soundForGameEvent(event);
           if (sound) audio.play(sound);
+        }
+        if (this.simulation.status() === 'dead') {
+          this.deathTimer = 0;
+          this.simulation.state.animation.deathElapsed = 0;
+          this.renderer?.setDeathOverlayVisible(false);
         }
         this.autoSaveCurrentGame();
       }

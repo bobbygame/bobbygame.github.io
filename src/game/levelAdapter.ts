@@ -194,6 +194,7 @@ export function gameStateFromLevelDefinition(level: LevelDefinition): GameState 
     animation: {
       state: 'idle',
       direction: 'down',
+      idleElapsed: 0,
     },
   };
 }

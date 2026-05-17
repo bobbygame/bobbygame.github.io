@@ -95,6 +95,7 @@ export function handleArrival(state: GameState) {
         state.events.push('Hit trap');
         state.player.dead = true;
         state.animation.state = 'dead';
+        state.animation.deathElapsed = 0;
       } else {
         // First press: mark to arm after leaving this tile
         state.lastTrapSteppedId = e.id;

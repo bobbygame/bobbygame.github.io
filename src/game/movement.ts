@@ -1,4 +1,5 @@
 import type { Entity, GameState } from './types';
+import { WAITING_ANIMATION_DELAY_SECONDS } from './animation';
 import { isWalkableTileId } from './walkability';
 
 export type Direction = 'left' | 'right' | 'up' | 'down' | null;
@@ -90,12 +91,16 @@ export class MovementSystem {
 
   update(dt: number) {
     const { player, tileSize } = this.state;
+    let idleTimerReset = false;
 
     if (!this.moving && this.intent) {
       const dir = this.intent;
       const delta = dirVec[dir];
       const targetX = player.pos.x + delta.x * tileSize;
       const targetY = player.pos.y + delta.y * tileSize;
+      this.state.animation.idleElapsed = 0;
+      this.state.animation.state = 'idle';
+      idleTimerReset = true;
 
       if (this.canMove(dir, targetX, targetY)) {
         const conveyorTarget = this.resolveConveyorTarget(dir, targetX, targetY);
@@ -121,10 +126,18 @@ export class MovementSystem {
         player.pos.y = this.target.y;
         this.moving = false;
         this.state.animation.state = 'idle';
+        this.state.animation.idleElapsed = 0;
+        idleTimerReset = true;
       } else {
         player.pos.x += (dx / dist) * step;
         player.pos.y += (dy / dist) * step;
       }
+    }
+
+    if (!this.moving && this.state.animation.state === 'idle') {
+      this.state.animation.idleElapsed = idleTimerReset
+        ? 0
+        : (this.state.animation.idleElapsed ?? 0) + dt;
     }
 
     // Track elapsed time

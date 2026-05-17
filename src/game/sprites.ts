@@ -1,5 +1,6 @@
-import type { AssetManifest, ObjectAsset, SpriteFrame } from './assets';
+import type { AssetManifest, ObjectAsset, SpriteAnimation, SpriteFrame } from './assets';
 import type { Entity, GameState } from './types';
+import { WAITING_ANIMATION_DELAY_SECONDS } from './animation';
 import { assetUrl } from './paths';
 
 export class SpriteLoader {
@@ -68,6 +69,16 @@ export class SpriteLoader {
     return object.frame;
   }
 
+  getAnimation(typeName: string, animationName: string): SpriteAnimation | undefined {
+    return this.getObject(typeName)?.animations[animationName];
+  }
+
+  getAnimationDuration(typeName: string, animationName: string): number | undefined {
+    const animation = this.getAnimation(typeName, animationName);
+    if (!animation || animation.speed <= 0 || animation.frames.length === 0) return undefined;
+    return animation.frames.length / animation.speed;
+  }
+
   drawSprite(
     ctx: CanvasRenderingContext2D,
     frame: SpriteFrame,
@@ -103,9 +114,15 @@ export class SpriteLoader {
     if (entity.kind === 'player') {
       const direction = state.animation.direction;
       if (state.animation.state === 'moving') return this.getFrame(entity.typeName, `${direction}Go`, state.stats.timeElapsed);
-      if (state.animation.state === 'dead') return this.getFrame(entity.typeName, 'dead', state.stats.timeElapsed);
-      return this.getFrame(entity.typeName, `${direction}Stop`, state.stats.timeElapsed)
-        ?? this.getFrame(entity.typeName, 'waiting', state.stats.timeElapsed);
+      if (state.animation.state === 'dead') return this.getFrame(entity.typeName, 'dead', state.animation.deathElapsed ?? 0);
+      const idleElapsed = state.animation.idleElapsed ?? 0;
+      const stopFrame = this.getFrame(entity.typeName, `${direction}Stop`, state.stats.timeElapsed);
+      if (idleElapsed >= WAITING_ANIMATION_DELAY_SECONDS) {
+        return this.getFrame(entity.typeName, 'waiting', idleElapsed - WAITING_ANIMATION_DELAY_SECONDS)
+          ?? stopFrame
+          ?? this.getFrame(entity.typeName, 'waiting', state.stats.timeElapsed);
+      }
+      return stopFrame ?? this.getFrame(entity.typeName, 'waiting', state.stats.timeElapsed);
     }
 
     if (entity.kind === 'channel' && state.channelOpen) {

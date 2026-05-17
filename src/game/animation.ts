@@ -1,0 +1,1 @@
+export const WAITING_ANIMATION_DELAY_SECONDS = 3;

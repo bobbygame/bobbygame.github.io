@@ -62,6 +62,8 @@ export interface GameState {
   animation: {
     state: 'idle' | 'moving' | 'dead';
     direction: 'left' | 'right' | 'up' | 'down';
+    idleElapsed?: number;
+    deathElapsed?: number;
   };
 }
 
