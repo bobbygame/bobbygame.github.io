@@ -186,3 +186,14 @@ public/assets/              图片、音频、字体素材
 ## 技术说明
 
 当前项目是纯 Vite + TypeScript 工程。地图、精灵、机关和状态机都由仓库内代码和数据驱动，方便社区继续维护和扩展。
+
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=bobbygame%2Fbobbygame.github.io&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=bobbygame/bobbygame.github.io&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=bobbygame/bobbygame.github.io&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=bobbygame/bobbygame.github.io&type=date&legend=top-left" />
+ </picture>
+</a>
