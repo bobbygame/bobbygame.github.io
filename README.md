@@ -1,5 +1,8 @@
 # Bobby Carrot 🐰🥕
 
+语言：中文 | [English](README.en.md)  
+架构文档：[中文](docs/architecture.md) | [English](docs/architecture.en.md)
+
 Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家控制兔子在 50px 网格地图中移动，收集每关要求的胡萝卜，理解机关规则，最终抵达出口。
 
 ![image](./public/game.png)
@@ -148,7 +151,7 @@ bobby-carrot
 
 ## 项目结构
 
-完整架构说明见 [`docs/architecture.md`](docs/architecture.md)。
+完整架构说明见 [`docs/architecture.md`](docs/architecture.md)，英文版见 [`docs/architecture.en.md`](docs/architecture.en.md)。
 
 ```txt
 src/main.ts                 浏览器启动入口

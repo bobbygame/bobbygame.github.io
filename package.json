@@ -8,7 +8,10 @@
   },
   "files": [
     "dist-tui",
-    "README.md"
+    "README.md",
+    "README.en.md",
+    "docs/architecture.md",
+    "docs/architecture.en.md"
   ],
   "scripts": {
     "dev": "vite",

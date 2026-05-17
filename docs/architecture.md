@@ -1,5 +1,7 @@
 # Bobby Carrot 项目架构文档
 
+语言：中文 | [English](architecture.en.md)
+
 本文档基于当前仓库代码梳理，用于说明 Bobby Carrot 的系统边界、模块职责、核心数据流和后续扩展入口。
 
 ## 1. 项目定位
