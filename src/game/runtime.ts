@@ -317,7 +317,7 @@ export class BrowserGameRuntime {
         }
       } else if (this.simulation.status() === 'playing') {
         this.renderer?.setDeathOverlayVisible(false);
-        const joystickDirection = this.joystick?.consumeDirection();
+        const joystickDirection = this.joystick?.consumeDirection(this.simulation.isMoving());
         if (joystickDirection) this.simulation.dispatch({ type: 'move', direction: joystickDirection });
 
         const step = this.simulation.update(dt);

@@ -9,8 +9,9 @@ const DIRECTIONS: Array<{ direction: ButtonDirection; labelKey: string }> = [
   { direction: 'right', labelKey: 'game.touch.right' },
   { direction: 'down', labelKey: 'game.touch.down' },
 ];
-const INITIAL_REPEAT_DELAY_MS = 320;
-const REPEAT_INTERVAL_MS = 230;
+// Bobby needs about 208ms to cross one tile, so repeat before that to keep holds continuous.
+const INITIAL_REPEAT_DELAY_MS = 150;
+const REPEAT_INTERVAL_MS = 150;
 
 export class VirtualJoystick {
   private readonly root: HTMLDivElement;
@@ -42,14 +43,16 @@ export class VirtualJoystick {
     this.unsubscribeLanguage = subscribeLanguage(() => this.updateLanguage());
   }
 
-  consumeDirection(): Direction {
+  consumeDirection(isMoving = false): Direction {
     if (this.pendingDirection) {
       const direction = this.pendingDirection;
       this.pendingDirection = null;
+      this.nextRepeatAt = performance.now() + INITIAL_REPEAT_DELAY_MS;
       return direction;
     }
 
     if (!this.activeDirection) return null;
+    if (isMoving) return null;
 
     const now = performance.now();
     if (now < this.nextRepeatAt) return null;
@@ -69,7 +72,7 @@ export class VirtualJoystick {
     this.activeButton = button;
     this.activeDirection = direction;
     this.pendingDirection = direction;
-    this.nextRepeatAt = performance.now() + INITIAL_REPEAT_DELAY_MS;
+    this.nextRepeatAt = 0;
     button.setPointerCapture(event.pointerId);
     button.classList.add('touch-dpad__button--active');
     event.preventDefault();
