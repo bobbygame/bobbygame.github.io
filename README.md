@@ -152,7 +152,8 @@ bobby-carrot
 src/main.ts                 浏览器启动入口
 src/game/runtime.ts         浏览器运行时生命周期、输入、渲染调度
 src/game/simulation.ts      纯游戏状态更新入口
-src/game/levelAdapter.ts    Construct 导出布局到内部关卡定义的适配层
+src/game/levelDefinition.ts 关卡定义数据结构
+src/game/stateFactory.ts    关卡定义到运行时状态的转换
 src/game/levelValidation.ts 关卡结构和数据质量校验
 src/game/movement.ts        网格移动、碰撞、锁、传送带移动
 src/game/interactions.ts    胡萝卜、钥匙、陷阱、出口等到达格处理

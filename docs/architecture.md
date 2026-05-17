@@ -4,14 +4,14 @@
 
 ## 1. 项目定位
 
-Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。项目运行时不依赖 Construct runtime，而是把从 Construct 项目导出的布局、精灵和关卡规则转换为仓库内可维护的数据与状态机。
+Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。内置关卡以 `LevelDefinition` TypeScript 模块维护，游戏规则集中在状态机和模拟器中。
 
 当前仓库包含四类能力：
 
 - 浏览器游戏：`src/main.ts` 启动，`src/game/runtime.ts` 管理资源加载、输入、模拟器和 Canvas 渲染。
 - 社区关卡编辑器：访问 `/editor` 时按需加载 `src/editor/app.ts`，支持本地编辑、导入导出、保存到 localStorage 和浏览器内 Playtest。
 - 终端版本：`src/tui/cli.ts` 构建为 `dist-tui/cli.js`，通过同一套关卡数据和 `GameSimulation` 在终端渲染。
-- 数据与校验工具：`scripts/export-game-data.mjs` 用于从源数据导出内容文件，`src/tools/validate-levels.ts` 用于批量校验内置关卡。
+- 数据校验工具：`src/tools/validate-levels.ts` 用于批量校验内置关卡。
 
 ## 2. 技术栈与运行形态
 
@@ -50,8 +50,8 @@ flowchart TD
   TUI["src/tui/cli.ts"] --> Loader["loadGame/loadLevelDefinition"]
   Tools["validate-levels CLI"] --> Loader
   Loader --> Content["src/content/levels + asset manifest"]
-  Loader --> Adapter["layoutToLevelDefinition"]
-  Adapter --> State["GameState"]
+  Loader --> StateFactory["gameStateFromLevelDefinition"]
+  StateFactory --> State["GameState"]
   State --> Simulation
 ```
 
@@ -62,13 +62,12 @@ flowchart TD
 | 路径 | 职责 |
 | --- | --- |
 | `src/main.ts` | Web 入口；根据路由选择游戏运行时或编辑器 |
-| `src/game/` | 游戏领域核心、浏览器运行时、渲染、输入、资源、音频、关卡适配与校验 |
+| `src/game/` | 游戏领域核心、浏览器运行时、渲染、输入、资源、音频、状态生成与关卡校验 |
 | `src/content/` | 内置关卡和资源 manifest；`index.ts` 提供动态关卡加载 |
 | `src/content/levels/` | 30 个内置关卡，每关一个 `mapXX.ts` |
 | `src/editor/` | 社区关卡编辑器 UI 和编辑模型 |
 | `src/tui/` | 终端版入口和字符渲染 |
 | `src/tools/` | Node 工具入口，目前是关卡校验 CLI |
-| `scripts/` | 一次性/维护性数据导出脚本 |
 | `public/assets/` | 图片、音频、字体等静态资源 |
 | `dist/`、`dist-tui/`、`dist-tools/` | 构建产物 |
 
@@ -80,9 +79,9 @@ flowchart TD
 
 - `LevelDefinition`：关卡名称、像素尺寸、目标胡萝卜数量、tilemap 和实体列表。
 - `LevelTilemapDefinition`：网格列数、行数、tile 大小、tile 数据和 tilemap 类型名。
-- `LevelEntityDefinition`：实体 ID、语义类型、原始类型名、像素位置、网格位置、尺寸、实例变量和角度。
+- `LevelEntityDefinition`：实体 ID、语义类型、资源类型名、像素位置、网格位置、尺寸、实例变量和角度。
 
-内置关卡最初保留接近 Construct 导出结构的 `Layout` 形态，运行时通过 `layoutToLevelDefinition()` 转换为统一关卡定义。
+内置关卡直接导出 `LevelDefinition`，社区关卡也使用同一套结构。
 
 ### 5.2 GameState
 
@@ -115,7 +114,7 @@ flowchart TD
 - `src/main.ts`
 - `src/game/runtime.ts`
 - `src/game/loader.ts`
-- `src/game/levelAdapter.ts`
+- `src/game/stateFactory.ts`
 - `src/game/render.ts`
 - `src/game/input.ts`
 - `src/game/touchControls.ts`
@@ -163,7 +162,7 @@ sequenceDiagram
 
 内置内容分两类：
 
-- 关卡布局：`src/content/levels/map1.ts` 到 `map30.ts`，由 `src/content/index.ts` 通过动态 import 加载。
+- 关卡定义：`src/content/levels/map1.ts` 到 `map30.ts`，由 `src/content/index.ts` 通过动态 import 加载。
 - 资源 manifest：`src/content/assets.ts`，描述对象名、默认帧、动画帧、精灵图坐标和动画速度。
 
 资源加载路径：
@@ -176,7 +175,7 @@ flowchart LR
   AudioFiles["public/assets/audio"] --> AudioManager["AudioManager"]
 ```
 
-`scripts/export-game-data.mjs` 是维护脚本，用于把源 JSON 中的布局、实例变量、tilemap RLE 和动画帧导出为当前 TypeScript 内容文件。日常开发不依赖它运行，只有重新生成关卡/资源数据时才需要使用。
+关卡文件直接保存 tilemap、实体和目标胡萝卜数量。修改内容后应运行 `npm run validate:levels` 检查结构一致性。
 
 ## 9. 编辑器架构
 
@@ -227,7 +226,7 @@ Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/in
 | --- | --- | --- |
 | 纯客户端静态架构 | 部署简单，GitHub Pages 即可承载；离线规则逻辑易于复现 | 没有服务端能力，社区关卡只能本地存储或通过文件/PR 流转 |
 | 规则核心集中在 `GameSimulation` | 浏览器、TUI、编辑器 Playtest 共享同一套规则，减少分叉 | `GameState` 是可变对象，新增规则时要注意状态字段语义和副作用顺序 |
-| 关卡数据使用 TypeScript 模块 | 可被 Vite 静态分析和动态 import，类型引用方便 | 从源数据再生成时需要维护导出脚本一致性 |
+| 关卡数据使用 TypeScript 模块 | 可被 Vite 静态分析和动态 import，类型引用方便 | 新增关卡时需要同步索引和关卡进度配置 |
 | 渲染与规则分离 | Canvas/TUI/编辑器可以各自适配输出，不污染核心规则 | UI 层仍直接读取实体结构，实体字段变更会影响多个渲染端 |
 | 编辑器本地化 | 不依赖账号和后台，便于社区低成本创作 | localStorage 容量和跨设备同步能力有限，导出文件仍是正式流转方式 |
 
@@ -237,21 +236,18 @@ Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/in
 
 1. 新增 `src/content/levels/map31.ts`。
 2. 更新 `src/content/index.ts` 的 `levelNames` 和 `levelLoaders`。
-3. 更新 `src/game/config.ts` 的 `REQUIRED_CARROTS`。
+3. 在新增关卡的 `requiredCarrots` 字段中写入目标胡萝卜数量。
 4. 更新 `src/game/levelProgression.ts` 的 `LAST_LEVEL_NUMBER`。
 5. 运行 `npm run typecheck` 和 `npm run validate:levels`。
-
-如果关卡来自源 Construct 数据，优先通过 `scripts/export-game-data.mjs` 批量再生成，避免手工结构漂移。
 
 ### 新增实体/机关
 
 1. 在 `src/game/types.ts` 扩展 `EntityKind`。
-2. 在 `src/game/levelAdapter.ts` 更新 `kindMap` 或类型归类。
-3. 在 `src/game/levelValidation.ts` 增加字段范围和结构校验。
-4. 根据规则性质修改 `movement.ts`、`buttons.ts` 或 `interactions.ts`。
-5. 在 `src/game/sprites.ts` 补充实体到动画帧的选择逻辑。
-6. 在 `src/editor/editorModel.ts` 增加编辑器工具，并在 `src/editor/app.ts` 确认属性面板支持。
-7. 在 `src/tui/cli.ts` 增加终端 token 和优先级。
+2. 在 `src/game/levelValidation.ts` 增加字段范围和结构校验。
+3. 根据规则性质修改 `movement.ts`、`buttons.ts` 或 `interactions.ts`。
+4. 在 `src/game/sprites.ts` 补充实体到动画帧的选择逻辑。
+5. 在 `src/editor/editorModel.ts` 增加编辑器工具，并在 `src/editor/app.ts` 确认属性面板支持。
+6. 在 `src/tui/cli.ts` 增加终端 token 和优先级。
 
 ### 引入服务端社区能力
 
@@ -267,8 +263,8 @@ Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/in
 | 风险 | 影响 | 缓解方向 |
 | --- | --- | --- |
 | `GameState` 可变更新分散在多个模块 | 新机关可能引入顺序相关 bug | 对复杂机关补最小回归关卡或模拟器单元测试 |
-| 内置关卡和资源 manifest 由脚本生成 | 手工修改与源数据可能不一致 | 明确源数据权威性，重新生成后运行校验 |
-| 编辑器、浏览器和 TUI 都读取实体字段 | 字段重命名会有多端影响 | 新字段先通过类型和校验集中定义，再扩散到适配层 |
+| 内置关卡和资源 manifest 体积较大 | 手工修改容易漏字段或破坏结构 | 修改后运行关卡校验，并尽量通过编辑器导出关卡 |
+| 编辑器、浏览器和 TUI 都读取实体字段 | 字段重命名会有多端影响 | 新字段先通过类型和校验集中定义，再扩散到各端 |
 | localStorage 社区关卡无同步 | 用户换设备或清缓存会丢失本地库 | 强化导出文件流程，未来引入远程社区库 |
 | Canvas 渲染无自动视觉回归 | UI/素材改动可能只在人工试玩中发现 | 对关键关卡和编辑器增加截图 smoke test |
 
@@ -281,7 +277,7 @@ Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/in
 - 到达格交互：`src/game/interactions.ts`
 - 按钮系统：`src/game/buttons.ts`
 - 关卡定义：`src/game/levelDefinition.ts`
-- 关卡适配：`src/game/levelAdapter.ts`
+- 状态生成：`src/game/stateFactory.ts`
 - 关卡校验：`src/game/levelValidation.ts`
 - Canvas 渲染：`src/game/render.ts`
 - 精灵选择和绘制：`src/game/sprites.ts`
@@ -290,4 +286,3 @@ Vite Web 构建使用根路径 `base: /`。GitHub Pages 发布时会把 `dist/in
 - 编辑器模型：`src/editor/editorModel.ts`
 - TUI：`src/tui/cli.ts`
 - 校验 CLI：`src/tools/validate-levels.ts`
-- 内容导出脚本：`scripts/export-game-data.mjs`

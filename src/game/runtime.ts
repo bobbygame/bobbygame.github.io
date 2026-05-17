@@ -4,7 +4,6 @@ import { soundForGameEvent } from './audioEvents';
 import { getCommunityLevel } from './communityLevel';
 import { BrowserInputManager } from './input';
 import { loadLevelDefinition } from './loader';
-import { gameStateFromLevelDefinition } from './levelAdapter';
 import { FIRST_LEVEL, nextOrFirstMapName } from './levelProgression';
 import { formatLevelDiagnostics, validateLevelDefinition } from './levelValidation';
 import { Renderer } from './render';
@@ -19,6 +18,7 @@ import {
 } from './saveSystem';
 import { GameSimulation } from './simulation';
 import { SpriteLoader } from './sprites';
+import { gameStateFromLevelDefinition } from './stateFactory';
 import { VirtualJoystick } from './touchControls';
 import { t } from './i18n';
 import type { GameAction } from './actions';

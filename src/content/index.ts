@@ -1,4 +1,4 @@
-import type { Layout } from '../game/layout';
+import type { LevelDefinition } from '../game/levelDefinition';
 
 export const levelNames = [
   "map1",
@@ -35,7 +35,7 @@ export const levelNames = [
 
 export type LevelName = typeof levelNames[number];
 
-const levelLoaders: Record<string, () => Promise<{ default: Layout }>> = {
+const levelLoaders: Record<string, () => Promise<{ default: LevelDefinition }>> = {
   "map1": () => import('./levels/map1'),
   "map2": () => import('./levels/map2'),
   "map3": () => import('./levels/map3'),
@@ -68,9 +68,9 @@ const levelLoaders: Record<string, () => Promise<{ default: Layout }>> = {
   "map30": () => import('./levels/map30'),
 };
 
-export async function loadLevel(name: string): Promise<Layout> {
+export async function loadLevel(name: string): Promise<LevelDefinition> {
   const loader = levelLoaders[name];
-  if (!loader) throw new Error(`Layout not found: ${name}`);
+  if (!loader) throw new Error(`Level not found: ${name}`);
   const module = await loader();
   return structuredClone(module.default);
 }

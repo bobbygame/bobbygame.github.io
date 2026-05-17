@@ -1,1291 +1,1872 @@
-import type { Layout } from '../../game/layout';
+import type { LevelDefinition } from '../../game/levelDefinition';
 
-export const map18: Layout = {
+export const map18: LevelDefinition = {
   "name": "map18",
-  "width": 800,
-  "height": 800,
-  "sid": 692930175033939,
-  "layers": [
+  "pixelSize": {
+    "x": 800,
+    "y": 800
+  },
+  "requiredCarrots": 18,
+  "tilemap": {
+    "cols": 16,
+    "rows": 16,
+    "width": 800,
+    "height": 800,
+    "tileSize": 50,
+    "data": [
+      1,
+      4,
+      4,
+      6,
+      3,
+      6,
+      4,
+      1,
+      3,
+      2,
+      2,
+      0,
+      4,
+      5,
+      6,
+      2,
+      6,
+      0,
+      0,
+      1,
+      1,
+      0,
+      2,
+      6,
+      5,
+      6,
+      2,
+      0,
+      5,
+      3,
+      5,
+      2,
+      6,
+      6,
+      0,
+      1,
+      6,
+      5,
+      4,
+      1,
+      10,
+      10,
+      8,
+      6,
+      6,
+      6,
+      5,
+      4,
+      1,
+      2,
+      5,
+      1,
+      8,
+      8,
+      9,
+      8,
+      8,
+      8,
+      8,
+      11,
+      8,
+      11,
+      9,
+      0,
+      4,
+      6,
+      3,
+      4,
+      11,
+      10,
+      9,
+      1,
+      1,
+      7,
+      1,
+      6,
+      8,
+      9,
+      9,
+      6,
+      0,
+      3,
+      4,
+      3,
+      4,
+      0,
+      5,
+      5,
+      6,
+      9,
+      3,
+      4,
+      3,
+      2,
+      3,
+      1,
+      4,
+      4,
+      0,
+      5,
+      1,
+      9,
+      11,
+      11,
+      11,
+      8,
+      11,
+      7,
+      9,
+      9,
+      10,
+      1,
+      4,
+      11,
+      9,
+      7,
+      7,
+      10,
+      11,
+      8,
+      9,
+      10,
+      1,
+      9,
+      8,
+      10,
+      11,
+      1,
+      2,
+      11,
+      7,
+      7,
+      11,
+      10,
+      9,
+      8,
+      9,
+      8,
+      4,
+      9,
+      9,
+      8,
+      8,
+      3,
+      4,
+      8,
+      10,
+      8,
+      11,
+      7,
+      8,
+      7,
+      11,
+      9,
+      9,
+      11,
+      11,
+      9,
+      9,
+      0,
+      6,
+      11,
+      10,
+      10,
+      9,
+      8,
+      8,
+      7,
+      11,
+      11,
+      10,
+      9,
+      7,
+      11,
+      8,
+      6,
+      2,
+      11,
+      7,
+      9,
+      11,
+      10,
+      5,
+      4,
+      1,
+      3,
+      4,
+      2,
+      1,
+      3,
+      6,
+      4,
+      5,
+      2,
+      10,
+      10,
+      9,
+      5,
+      6,
+      7,
+      9,
+      11,
+      2,
+      1,
+      6,
+      5,
+      4,
+      3,
+      2,
+      6,
+      10,
+      9,
+      10,
+      1,
+      4,
+      7,
+      9,
+      7,
+      11,
+      11,
+      1,
+      5,
+      3,
+      3,
+      5,
+      6,
+      8,
+      9,
+      8,
+      8,
+      10,
+      8,
+      11,
+      10,
+      5,
+      2,
+      5,
+      2,
+      3,
+      4,
+      6,
+      6,
+      3,
+      1,
+      6,
+      2,
+      1,
+      5,
+      0,
+      1,
+      2,
+      0,
+      1,
+      0,
+      3,
+      3
+    ],
+    "typeName": "Tilemap18"
+  },
+  "entities": [
     {
-      "name": "图层 0",
-      "overriden": 0,
-      "subLayers": [],
-      "instances": [
-        {
-          "type": "Tilemap18",
-          "uid": 940,
-          "world": {
-            "x": 0,
-            "y": 0,
-            "width": 800,
-            "height": 800,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {},
-          "instanceVariables": {},
-          "ownData": {
-            "tilemapData": {
-              "width": 16,
-              "height": 16,
-              "max-width": 16,
-              "max-height": 16,
-              "data": "1,2x4,6,3,6,4,1,3,2x2,0,4,5,6,2,6,2x0,2x1,0,2,6,5,6,2,0,5,3,5,2,2x6,0,1,6,5,4,1,2x10,8,3x6,5,4,1,2,5,1,2x8,9,4x8,11,8,11,9,0,4,6,3,4,11,10,9,2x1,7,1,6,8,2x9,6,0,3,4,3,4,0,2x5,6,9,3,4,3,2,3,1,2x4,0,5,1,9,3x11,8,11,7,2x9,10,1,4,11,9,2x7,10,11,8,9,10,1,9,8,10,11,1,2,11,2x7,11,10,9,8,9,8,4,2x9,2x8,3,4,8,10,8,11,7,8,7,11,2x9,2x11,2x9,0,6,11,2x10,9,2x8,7,2x11,10,9,7,11,8,6,2,11,7,9,11,10,5,4,1,3,4,2,1,3,6,4,5,2,2x10,9,5,6,7,9,11,2,1,6,5,4,3,2,6,10,9,10,1,4,7,9,7,2x11,1,5,2x3,5,6,8,9,2x8,10,8,11,10,5,2,5,2,3,4,2x6,3,1,6,2,1,5,0,1,2,0,1,0,2x3"
-            },
-            "tile-width": 50,
-            "tile-height": 50,
-            "tile-x-offset": 0,
-            "tile-y-offset": 0,
-            "tile-x-spacing": 0,
-            "tile-y-spacing": 0
-          }
-        },
-        {
-          "type": "bornPlace",
-          "uid": 980,
-          "world": {
-            "x": 150,
-            "y": 650,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {},
-          "instanceVariables": {}
-        },
-        {
-          "type": "lock",
-          "uid": 982,
-          "world": {
-            "x": 150,
-            "y": 550,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "yellow",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "key",
-          "uid": 983,
-          "world": {
-            "x": 400,
-            "y": 650,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "yellow",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 984,
-          "world": {
-            "x": 500,
-            "y": 650,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "channel",
-          "uid": 985,
-          "world": {
-            "x": 550,
-            "y": 650,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "close",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barX",
-          "uid": 986,
-          "world": {
-            "x": 200,
-            "y": 550,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barRightBottom",
-          "uid": 987,
-          "world": {
-            "x": 250,
-            "y": 550,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barY",
-          "uid": 989,
-          "world": {
-            "x": 250,
-            "y": 500,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barX",
-          "uid": 988,
-          "world": {
-            "x": 100,
-            "y": 550,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barLeftBottom",
-          "uid": 990,
-          "world": {
-            "x": 50,
-            "y": 550,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barY",
-          "uid": 991,
-          "world": {
-            "x": 50,
-            "y": 500,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barY",
-          "uid": 992,
-          "world": {
-            "x": 50,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "barY",
-          "uid": 993,
-          "world": {
-            "x": 50,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "stoneButton",
-          "uid": 994,
-          "world": {
-            "x": 200,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "false",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "open": 0
-          }
-        },
-        {
-          "type": "stoneButton",
-          "uid": 995,
-          "world": {
-            "x": 150,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "true",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "open": 1
-          }
-        },
-        {
-          "type": "carrot1",
-          "uid": 996,
-          "world": {
-            "x": 100,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 997,
-          "world": {
-            "x": 150,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 998,
-          "world": {
-            "x": 200,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 999,
-          "world": {
-            "x": 100,
-            "y": 500,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1000,
-          "world": {
-            "x": 150,
-            "y": 500,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1001,
-          "world": {
-            "x": 200,
-            "y": 500,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "stoneButton",
-          "uid": 1002,
-          "world": {
-            "x": 450,
-            "y": 250,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "false",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "open": 0
-          }
-        },
-        {
-          "type": "lock",
-          "uid": 1003,
-          "world": {
-            "x": 350,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "red",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
-        },
-        {
-          "type": "lock",
-          "uid": 1004,
-          "world": {
-            "x": 550,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "blue",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 3
-          }
-        },
-        {
-          "type": "carrot1",
-          "uid": 1005,
-          "world": {
-            "x": 200,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1006,
-          "world": {
-            "x": 250,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1007,
-          "world": {
-            "x": 300,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1008,
-          "world": {
-            "x": 200,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1009,
-          "world": {
-            "x": 250,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1010,
-          "world": {
-            "x": 300,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1011,
-          "world": {
-            "x": 600,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1012,
-          "world": {
-            "x": 650,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1013,
-          "world": {
-            "x": 700,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1014,
-          "world": {
-            "x": 600,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1015,
-          "world": {
-            "x": 650,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 1016,
-          "world": {
-            "x": 700,
-            "y": 200,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "stone",
-          "uid": 1017,
-          "world": {
-            "x": 400,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1018,
-          "world": {
-            "x": 600,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1019,
-          "world": {
-            "x": 500,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1020,
-          "world": {
-            "x": 550,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1021,
-          "world": {
-            "x": 600,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1022,
-          "world": {
-            "x": 450,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1023,
-          "world": {
-            "x": 400,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1024,
-          "world": {
-            "x": 350,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "4",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 4
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1025,
-          "world": {
-            "x": 650,
-            "y": 450,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "3",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 3
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1026,
-          "world": {
-            "x": 350,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1027,
-          "world": {
-            "x": 450,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "2",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1028,
-          "world": {
-            "x": 550,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 1
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1029,
-          "world": {
-            "x": 650,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "2",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1030,
-          "world": {
-            "x": 650,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "2",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
-        },
-        {
-          "type": "stone",
-          "uid": 1031,
-          "world": {
-            "x": 350,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "2",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1032,
-          "world": {
-            "x": 450,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "3",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 3
-          }
-        },
-        {
-          "type": "stoneAngle",
-          "uid": 1033,
-          "world": {
-            "x": 550,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "4",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 4
-          }
-        },
-        {
-          "type": "key",
-          "uid": 1034,
-          "world": {
-            "x": 400,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "blue",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 3
-          }
-        },
-        {
-          "type": "key",
-          "uid": 1035,
-          "world": {
-            "x": 600,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "red",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "sign": 2
-          }
+      "id": 980,
+      "kind": "bornPlace",
+      "typeName": "bornPlace",
+      "pos": {
+        "x": 150,
+        "y": 650
+      },
+      "cell": {
+        "col": 3,
+        "row": 13,
+        "offset": {
+          "x": 0,
+          "y": 0
         }
-      ]
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {},
+      "angle": 0
     },
     {
-      "name": "图层 1",
-      "overriden": 1,
-      "subLayers": [],
-      "instances": [
-        {
-          "type": "bobby",
-          "uid": 981,
-          "world": {
-            "x": 150,
-            "y": 650,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "downStop",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "directionX": 0,
-            "directionY": 0,
-            "变量1": 0,
-            "isXY": 0
-          }
-        },
-      ]
+      "id": 982,
+      "kind": "lock",
+      "typeName": "lock",
+      "pos": {
+        "x": 150,
+        "y": 550
+      },
+      "cell": {
+        "col": 3,
+        "row": 11,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "yellow",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
     },
     {
-      "name": "图层 2",
-      "overriden": 2,
-      "subLayers": [],
-      "instances": []
+      "id": 983,
+      "kind": "key",
+      "typeName": "key",
+      "pos": {
+        "x": 400,
+        "y": 650
+      },
+      "cell": {
+        "col": 8,
+        "row": 13,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "yellow",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 984,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 500,
+        "y": 650
+      },
+      "cell": {
+        "col": 10,
+        "row": 13,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 985,
+      "kind": "channel",
+      "typeName": "channel",
+      "pos": {
+        "x": 550,
+        "y": 650
+      },
+      "cell": {
+        "col": 11,
+        "row": 13,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "close",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 986,
+      "kind": "wall",
+      "typeName": "barX",
+      "pos": {
+        "x": 200,
+        "y": 550
+      },
+      "cell": {
+        "col": 4,
+        "row": 11,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 987,
+      "kind": "wall",
+      "typeName": "barRightBottom",
+      "pos": {
+        "x": 250,
+        "y": 550
+      },
+      "cell": {
+        "col": 5,
+        "row": 11,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 989,
+      "kind": "wall",
+      "typeName": "barY",
+      "pos": {
+        "x": 250,
+        "y": 500
+      },
+      "cell": {
+        "col": 5,
+        "row": 10,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 988,
+      "kind": "wall",
+      "typeName": "barX",
+      "pos": {
+        "x": 100,
+        "y": 550
+      },
+      "cell": {
+        "col": 2,
+        "row": 11,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 990,
+      "kind": "wall",
+      "typeName": "barLeftBottom",
+      "pos": {
+        "x": 50,
+        "y": 550
+      },
+      "cell": {
+        "col": 1,
+        "row": 11,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 991,
+      "kind": "wall",
+      "typeName": "barY",
+      "pos": {
+        "x": 50,
+        "y": 500
+      },
+      "cell": {
+        "col": 1,
+        "row": 10,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 992,
+      "kind": "wall",
+      "typeName": "barY",
+      "pos": {
+        "x": 50,
+        "y": 450
+      },
+      "cell": {
+        "col": 1,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 993,
+      "kind": "wall",
+      "typeName": "barY",
+      "pos": {
+        "x": 50,
+        "y": 400
+      },
+      "cell": {
+        "col": 1,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 994,
+      "kind": "stoneButton",
+      "typeName": "stoneButton",
+      "pos": {
+        "x": 200,
+        "y": 350
+      },
+      "cell": {
+        "col": 4,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "false",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "open": 0
+      },
+      "angle": 0
+    },
+    {
+      "id": 995,
+      "kind": "stoneButton",
+      "typeName": "stoneButton",
+      "pos": {
+        "x": 150,
+        "y": 350
+      },
+      "cell": {
+        "col": 3,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "true",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "open": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 996,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 100,
+        "y": 450
+      },
+      "cell": {
+        "col": 2,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 997,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 150,
+        "y": 450
+      },
+      "cell": {
+        "col": 3,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 998,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 200,
+        "y": 450
+      },
+      "cell": {
+        "col": 4,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 999,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 100,
+        "y": 500
+      },
+      "cell": {
+        "col": 2,
+        "row": 10,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1000,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 150,
+        "y": 500
+      },
+      "cell": {
+        "col": 3,
+        "row": 10,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1001,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 200,
+        "y": 500
+      },
+      "cell": {
+        "col": 4,
+        "row": 10,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1002,
+      "kind": "stoneButton",
+      "typeName": "stoneButton",
+      "pos": {
+        "x": 450,
+        "y": 250
+      },
+      "cell": {
+        "col": 9,
+        "row": 5,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "false",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "open": 0
+      },
+      "angle": 0
+    },
+    {
+      "id": 1003,
+      "kind": "lock",
+      "typeName": "lock",
+      "pos": {
+        "x": 350,
+        "y": 150
+      },
+      "cell": {
+        "col": 7,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "red",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 1004,
+      "kind": "lock",
+      "typeName": "lock",
+      "pos": {
+        "x": 550,
+        "y": 150
+      },
+      "cell": {
+        "col": 11,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "blue",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 3
+      },
+      "angle": 0
+    },
+    {
+      "id": 1005,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 200,
+        "y": 150
+      },
+      "cell": {
+        "col": 4,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1006,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 250,
+        "y": 150
+      },
+      "cell": {
+        "col": 5,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1007,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 300,
+        "y": 150
+      },
+      "cell": {
+        "col": 6,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1008,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 200,
+        "y": 200
+      },
+      "cell": {
+        "col": 4,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1009,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 250,
+        "y": 200
+      },
+      "cell": {
+        "col": 5,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1010,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 300,
+        "y": 200
+      },
+      "cell": {
+        "col": 6,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1011,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 600,
+        "y": 150
+      },
+      "cell": {
+        "col": 12,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1012,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 650,
+        "y": 150
+      },
+      "cell": {
+        "col": 13,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1013,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 700,
+        "y": 150
+      },
+      "cell": {
+        "col": 14,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1014,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 600,
+        "y": 200
+      },
+      "cell": {
+        "col": 12,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1015,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 650,
+        "y": 200
+      },
+      "cell": {
+        "col": 13,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1016,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 700,
+        "y": 200
+      },
+      "cell": {
+        "col": 14,
+        "row": 4,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 1017,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 400,
+        "y": 350
+      },
+      "cell": {
+        "col": 8,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1018,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 600,
+        "y": 350
+      },
+      "cell": {
+        "col": 12,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1019,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 500,
+        "y": 450
+      },
+      "cell": {
+        "col": 10,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1020,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 550,
+        "y": 450
+      },
+      "cell": {
+        "col": 11,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1021,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 600,
+        "y": 450
+      },
+      "cell": {
+        "col": 12,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1022,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 450,
+        "y": 450
+      },
+      "cell": {
+        "col": 9,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1023,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 400,
+        "y": 450
+      },
+      "cell": {
+        "col": 8,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1024,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 350,
+        "y": 450
+      },
+      "cell": {
+        "col": 7,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "4",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 4
+      },
+      "angle": 0
+    },
+    {
+      "id": 1025,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 650,
+        "y": 450
+      },
+      "cell": {
+        "col": 13,
+        "row": 9,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "3",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 3
+      },
+      "angle": 0
+    },
+    {
+      "id": 1026,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 350,
+        "y": 350
+      },
+      "cell": {
+        "col": 7,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1027,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 450,
+        "y": 350
+      },
+      "cell": {
+        "col": 9,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "2",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 1028,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 550,
+        "y": 350
+      },
+      "cell": {
+        "col": 11,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "1",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 1
+      },
+      "angle": 0
+    },
+    {
+      "id": 1029,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 650,
+        "y": 350
+      },
+      "cell": {
+        "col": 13,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "2",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 1030,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 650,
+        "y": 400
+      },
+      "cell": {
+        "col": 13,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "2",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 1031,
+      "kind": "stone",
+      "typeName": "stone",
+      "pos": {
+        "x": 350,
+        "y": 400
+      },
+      "cell": {
+        "col": 7,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "2",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 1032,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 450,
+        "y": 400
+      },
+      "cell": {
+        "col": 9,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "3",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 3
+      },
+      "angle": 0
+    },
+    {
+      "id": 1033,
+      "kind": "stoneAngle",
+      "typeName": "stoneAngle",
+      "pos": {
+        "x": 550,
+        "y": 400
+      },
+      "cell": {
+        "col": 11,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "4",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 4
+      },
+      "angle": 0
+    },
+    {
+      "id": 1034,
+      "kind": "key",
+      "typeName": "key",
+      "pos": {
+        "x": 400,
+        "y": 400
+      },
+      "cell": {
+        "col": 8,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "blue",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 3
+      },
+      "angle": 0
+    },
+    {
+      "id": 1035,
+      "kind": "key",
+      "typeName": "key",
+      "pos": {
+        "x": 600,
+        "y": 400
+      },
+      "cell": {
+        "col": 12,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "red",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "sign": 2
+      },
+      "angle": 0
+    },
+    {
+      "id": 981,
+      "kind": "player",
+      "typeName": "bobby",
+      "pos": {
+        "x": 150,
+        "y": 650
+      },
+      "cell": {
+        "col": 3,
+        "row": 13,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "downStop",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "directionX": 0,
+        "directionY": 0,
+        "变量1": 0,
+        "isXY": 0
+      },
+      "angle": 0
     }
   ]
 };

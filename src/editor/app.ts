@@ -10,7 +10,6 @@ import {
   type CommunityLevel,
   type CommunityLevelDifficulty,
 } from '../game/communityLevel';
-import { gameStateFromLevelDefinition } from '../game/levelAdapter';
 import {
   editorGroupLabel,
   editorTileLabel,
@@ -28,6 +27,7 @@ import { validateLevelDefinition } from '../game/levelValidation';
 import { appUrl } from '../game/paths';
 import { Renderer } from '../game/render';
 import { GameSimulation } from '../game/simulation';
+import { gameStateFromLevelDefinition } from '../game/stateFactory';
 import { SpriteLoader } from '../game/sprites';
 import {
   cloneCommunityLevel,

@@ -1,445 +1,768 @@
-import type { Layout } from '../../game/layout';
+import type { LevelDefinition } from '../../game/levelDefinition';
 
-export const map3: Layout = {
+export const map3: LevelDefinition = {
   "name": "map3",
-  "width": 750,
-  "height": 800,
-  "sid": 516336423931759,
-  "layers": [
+  "pixelSize": {
+    "x": 750,
+    "y": 800
+  },
+  "requiredCarrots": 12,
+  "tilemap": {
+    "cols": 15,
+    "rows": 16,
+    "width": 750,
+    "height": 800,
+    "tileSize": 50,
+    "data": [
+      1,
+      1,
+      4,
+      2,
+      3,
+      6,
+      1,
+      4,
+      1,
+      1,
+      3,
+      4,
+      6,
+      3,
+      1,
+      2,
+      2,
+      1,
+      3,
+      1,
+      4,
+      2,
+      4,
+      1,
+      5,
+      2,
+      0,
+      0,
+      4,
+      2,
+      4,
+      1,
+      2,
+      4,
+      0,
+      2,
+      1,
+      11,
+      0,
+      2,
+      6,
+      2,
+      2,
+      5,
+      1,
+      6,
+      1,
+      1,
+      3,
+      0,
+      1,
+      10,
+      7,
+      8,
+      3,
+      3,
+      4,
+      1,
+      2,
+      0,
+      3,
+      5,
+      3,
+      5,
+      10,
+      8,
+      11,
+      9,
+      8,
+      7,
+      8,
+      2,
+      0,
+      4,
+      2,
+      5,
+      6,
+      3,
+      4,
+      0,
+      5,
+      1,
+      8,
+      1,
+      5,
+      0,
+      1,
+      0,
+      3,
+      3,
+      3,
+      4,
+      6,
+      2,
+      3,
+      7,
+      9,
+      8,
+      8,
+      11,
+      1,
+      3,
+      3,
+      2,
+      1,
+      1,
+      4,
+      1,
+      4,
+      0,
+      9,
+      7,
+      10,
+      7,
+      9,
+      4,
+      4,
+      5,
+      2,
+      2,
+      4,
+      0,
+      0,
+      0,
+      4,
+      8,
+      9,
+      10,
+      10,
+      7,
+      1,
+      1,
+      5,
+      2,
+      5,
+      4,
+      5,
+      3,
+      1,
+      2,
+      0,
+      3,
+      7,
+      2,
+      2,
+      4,
+      1,
+      1,
+      4,
+      2,
+      0,
+      6,
+      0,
+      4,
+      4,
+      3,
+      2,
+      8,
+      4,
+      3,
+      6,
+      2,
+      3,
+      0,
+      4,
+      4,
+      3,
+      2,
+      1,
+      3,
+      4,
+      11,
+      11,
+      9,
+      6,
+      4,
+      5,
+      6,
+      4,
+      0,
+      0,
+      0,
+      3,
+      4,
+      6,
+      0,
+      8,
+      8,
+      10,
+      4,
+      5,
+      6,
+      6,
+      2,
+      2,
+      0,
+      6,
+      2,
+      5,
+      1,
+      3,
+      8,
+      10,
+      10,
+      4,
+      1,
+      0,
+      6,
+      5,
+      5,
+      6,
+      6,
+      6,
+      4,
+      6,
+      2,
+      3,
+      4,
+      5,
+      3,
+      5,
+      1,
+      0,
+      4,
+      2,
+      3,
+      4,
+      0,
+      5,
+      5,
+      4,
+      1,
+      3,
+      3,
+      4,
+      4,
+      4,
+      5,
+      5,
+      2
+    ],
+    "typeName": "Tilemap3"
+  },
+  "entities": [
     {
-      "name": "图层 0",
-      "overriden": 0,
-      "subLayers": [],
-      "instances": [
-        {
-          "type": "Tilemap3",
-          "uid": 53,
-          "world": {
-            "x": 0,
-            "y": 0,
-            "width": 750,
-            "height": 800,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {},
-          "instanceVariables": {},
-          "ownData": {
-            "tilemapData": {
-              "width": 15,
-              "height": 16,
-              "max-width": 15,
-              "max-height": 16,
-              "data": "2x1,4,2,3,6,1,4,2x1,3,4,6,3,1,2x2,1,3,1,4,2,4,1,5,2,2x0,4,2,4,1,2,4,0,2,1,11,0,2,6,2x2,5,1,6,2x1,3,0,1,10,7,8,2x3,4,1,2,0,3,5,3,5,10,8,11,9,8,7,8,2,0,4,2,5,6,3,4,0,5,1,8,1,5,0,1,0,3x3,4,6,2,3,7,9,2x8,11,1,2x3,2,2x1,4,1,4,0,9,7,10,7,9,2x4,5,2x2,4,3x0,4,8,9,2x10,7,2x1,5,2,5,4,5,3,1,2,0,3,7,2x2,4,2x1,4,2,0,6,0,2x4,3,2,8,4,3,6,2,3,0,2x4,3,2,1,3,4,2x11,9,6,4,5,6,4,3x0,3,4,6,0,2x8,10,4,5,2x6,2x2,0,6,2,5,1,3,8,2x10,4,1,0,6,2x5,3x6,4,6,2,3,4,5,3,5,1,0,4,2,3,4,0,2x5,4,1,2x3,3x4,2x5,2"
-            },
-            "tile-width": 50,
-            "tile-height": 50,
-            "tile-x-offset": 0,
-            "tile-y-offset": 0,
-            "tile-x-spacing": 0,
-            "tile-y-spacing": 0
-          }
-        },
-        {
-          "type": "carrot1",
-          "uid": 121,
-          "world": {
-            "x": 450,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 122,
-          "world": {
-            "x": 250,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 416,
-          "world": {
-            "x": 250,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 417,
-          "world": {
-            "x": 300,
-            "y": 300,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 418,
-          "world": {
-            "x": 450,
-            "y": 300,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 419,
-          "world": {
-            "x": 300,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 420,
-          "world": {
-            "x": 400,
-            "y": 300,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 421,
-          "world": {
-            "x": 400,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 422,
-          "world": {
-            "x": 400,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 423,
-          "world": {
-            "x": 450,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 119,
-          "world": {
-            "x": 250,
-            "y": 300,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "carrot1",
-          "uid": 120,
-          "world": {
-            "x": 300,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "Animation 1",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
-        },
-        {
-          "type": "trap",
-          "uid": 424,
-          "world": {
-            "x": 350,
-            "y": 300,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "notSharp",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "isSharp": 0
-          }
-        },
-        {
-          "type": "trap",
-          "uid": 425,
-          "world": {
-            "x": 350,
-            "y": 350,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "notSharp",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "isSharp": 0
-          }
-        },
-        {
-          "type": "trap",
-          "uid": 426,
-          "world": {
-            "x": 350,
-            "y": 400,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "notSharp",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "isSharp": 0
-          }
-        },
-        {
-          "type": "bornPlace",
-          "uid": 2087,
-          "world": {
-            "x": 350,
-            "y": 600,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {},
-          "instanceVariables": {}
-        },
-        {
-          "type": "channel",
-          "uid": 70,
-          "world": {
-            "x": 350,
-            "y": 150,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "close",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {}
+      "id": 121,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 450,
+        "y": 350
+      },
+      "cell": {
+        "col": 9,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
         }
-      ]
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
     },
     {
-      "name": "图层 1",
-      "overriden": 1,
-      "subLayers": [],
-      "instances": [
-        {
-          "type": "bobby",
-          "uid": 54,
-          "world": {
-            "x": 350,
-            "y": 600,
-            "width": 50,
-            "height": 50,
-            "angle": 0,
-            "originX": 0,
-            "originY": 0,
-            "zElevation": 0
-          },
-          "properties": {
-            "initially-visible": true,
-            "initial-animation": "downStop",
-            "initial-frame": 0,
-            "enable-collisions": true
-          },
-          "instanceVariables": {
-            "directionX": 0,
-            "directionY": 0,
-            "变量1": 0,
-            "isXY": 0
-          }
+      "id": 122,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 250,
+        "y": 400
+      },
+      "cell": {
+        "col": 5,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
         }
-      ]
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
     },
     {
-      "name": "图层 2",
-      "overriden": 2,
-      "subLayers": [],
-      "instances": []
+      "id": 416,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 250,
+        "y": 350
+      },
+      "cell": {
+        "col": 5,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 417,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 300,
+        "y": 300
+      },
+      "cell": {
+        "col": 6,
+        "row": 6,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 418,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 450,
+        "y": 300
+      },
+      "cell": {
+        "col": 9,
+        "row": 6,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 419,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 300,
+        "y": 400
+      },
+      "cell": {
+        "col": 6,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 420,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 400,
+        "y": 300
+      },
+      "cell": {
+        "col": 8,
+        "row": 6,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 421,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 400,
+        "y": 350
+      },
+      "cell": {
+        "col": 8,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 422,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 400,
+        "y": 400
+      },
+      "cell": {
+        "col": 8,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 423,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 450,
+        "y": 400
+      },
+      "cell": {
+        "col": 9,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 119,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 250,
+        "y": 300
+      },
+      "cell": {
+        "col": 5,
+        "row": 6,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 120,
+      "kind": "carrot",
+      "typeName": "carrot1",
+      "pos": {
+        "x": 300,
+        "y": 350
+      },
+      "cell": {
+        "col": 6,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "Animation 1",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 424,
+      "kind": "trap",
+      "typeName": "trap",
+      "pos": {
+        "x": 350,
+        "y": 300
+      },
+      "cell": {
+        "col": 7,
+        "row": 6,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "notSharp",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "isSharp": 0
+      },
+      "angle": 0
+    },
+    {
+      "id": 425,
+      "kind": "trap",
+      "typeName": "trap",
+      "pos": {
+        "x": 350,
+        "y": 350
+      },
+      "cell": {
+        "col": 7,
+        "row": 7,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "notSharp",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "isSharp": 0
+      },
+      "angle": 0
+    },
+    {
+      "id": 426,
+      "kind": "trap",
+      "typeName": "trap",
+      "pos": {
+        "x": 350,
+        "y": 400
+      },
+      "cell": {
+        "col": 7,
+        "row": 8,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "notSharp",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "isSharp": 0
+      },
+      "angle": 0
+    },
+    {
+      "id": 2087,
+      "kind": "bornPlace",
+      "typeName": "bornPlace",
+      "pos": {
+        "x": 350,
+        "y": 600
+      },
+      "cell": {
+        "col": 7,
+        "row": 12,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {},
+      "angle": 0
+    },
+    {
+      "id": 70,
+      "kind": "channel",
+      "typeName": "channel",
+      "pos": {
+        "x": 350,
+        "y": 150
+      },
+      "cell": {
+        "col": 7,
+        "row": 3,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "close",
+        "initial-frame": 0,
+        "enable-collisions": true
+      },
+      "angle": 0
+    },
+    {
+      "id": 54,
+      "kind": "player",
+      "typeName": "bobby",
+      "pos": {
+        "x": 350,
+        "y": 600
+      },
+      "cell": {
+        "col": 7,
+        "row": 12,
+        "offset": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "size": {
+        "x": 50,
+        "y": 50
+      },
+      "data": {
+        "initially-visible": true,
+        "initial-animation": "downStop",
+        "initial-frame": 0,
+        "enable-collisions": true,
+        "directionX": 0,
+        "directionY": 0,
+        "变量1": 0,
+        "isXY": 0
+      },
+      "angle": 0
     }
   ]
 };

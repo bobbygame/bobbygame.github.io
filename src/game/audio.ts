@@ -160,12 +160,12 @@ class AudioManager {
 
   private createAudioContext(): AudioContext | undefined {
     if (typeof window === 'undefined') return undefined;
-    const AudioContextConstructor = window.AudioContext
+    const AudioContextClass = window.AudioContext
       ?? (window as AudioContextWindow).webkitAudioContext;
-    if (!AudioContextConstructor) return undefined;
+    if (!AudioContextClass) return undefined;
 
     try {
-      return new AudioContextConstructor();
+      return new AudioContextClass();
     } catch {
       return undefined;
     }

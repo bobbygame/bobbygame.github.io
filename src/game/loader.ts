@@ -1,12 +1,10 @@
-import { loadLayout } from './layout';
-import { gameStateFromLevelDefinition, layoutToLevelDefinition } from './levelAdapter';
+import { loadLevel } from '../content';
 import type { LevelDefinition } from './levelDefinition';
-import type { GameState, LayoutFile } from './types';
-import { getRequiredCarrots } from './config';
+import { gameStateFromLevelDefinition } from './stateFactory';
+import type { GameState } from './types';
 
 export async function loadLevelDefinition(mapName: string): Promise<LevelDefinition> {
-  const layout = await loadLayout(mapName) as LayoutFile;
-  return layoutToLevelDefinition(layout, getRequiredCarrots(mapName));
+  return loadLevel(mapName);
 }
 
 export async function loadGame(mapName: string): Promise<GameState> {

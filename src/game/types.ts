@@ -66,19 +66,3 @@ export interface GameState {
     deathElapsed?: number;
   };
 }
-
-export interface LayoutFile {
-  width?: number;
-  height?: number;
-  name: string;
-  layers: Array<{
-    instances: Array<{
-      type: string;
-      uid: number;
-      world: { x: number; y: number; width: number; height: number; angle?: number };
-      properties?: Record<string, unknown>;
-      instanceVariables?: Record<string, unknown>;
-      ownData?: { tilemapData?: { width: number; height: number; data: string } };
-    }>;
-  }>;
-}

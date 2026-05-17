@@ -1,29 +1,29 @@
 # Bobby Carrot Game Details
 
-Observed against `https://game.snapre.online` in Chrome on 2026-05-09 and cross-checked with the unpacked Construct 3 JSON under `public/c3`.
+Observed against `https://game.snapre.online` in Chrome on 2026-05-09 and checked against the current in-repo level data.
 
 ## Flow
 
-- The game is a 30-level tile puzzle. Completing level 30 advances to the `end` layout.
+- The game is a 30-level tile puzzle. Completing level 30 advances to the end screen.
 - Each level starts with Bobby at `bornPlace`; the HUD shows `Time`, `Level`, and `Remain`.
-- The player collects every `carrot1` on the map. `Remain` is backed by the `CarrotN` array.
+- The player collects every `carrot1` on the map. `Remain` is backed by the level's required carrot count.
 - When the remaining carrot count reaches 0, the `channel` switches to its open animation.
-- Entering the open channel shows the `SUCCESS!` overlay with `Time Use`, `Steps`, `Continue`, and success audio. Any key or touching Continue advances to the next layout.
+- Entering the open channel shows the `SUCCESS!` overlay with `Time Use`, `Steps`, `Continue`, and success audio. Any key or touching Continue advances to the next level.
 - The end screen displays `THE END`, a large Bobby image, `SUCCESS!`, `DLUT`, `Restart`, `Continue`, and `MyBlog(Click Me)`.
 
 ## Controls And Feedback
 
 - Keyboard movement uses `W/A/S/D`; touch controls use the on-screen direction buttons.
-- `Alt` or touching `Restart` restarts the current layout.
+- `Alt` or touching `Restart` restarts the current level.
 - Bobby has waiting, directional movement, and dead animations.
-- Audio assets used by the event sheet are `main`, `go`, `dead`, `success`, and `lock2`.
+- Runtime audio assets are `main`, `go`, `dead`, `success`, and `lock2`.
 - The canvas is centered on a black page, with the tile art/grass background filling the game viewport.
 
 ## Mechanics
 
 - Bobby can move only on the dark stone ground tile IDs `7-11`; grass/decorative ground tile IDs `0-6` are not walkable.
 - Bar objects block movement as visible fence entities.
-- Traps kill Bobby only when their `isSharp` instance variable is set; death plays the dead animation/audio and restarts the layout.
+- Traps kill Bobby only when their `isSharp` instance variable is set; death plays the dead animation/audio and restarts the level.
 - Horizontal and vertical conveyor belts are one-way movement gates: entering a belt against its `direction1` is blocked.
 - Conveyor belt buttons toggle every conveyor button and flip all belt directions.
 - Stones are directional floor tiles, not pushable boxes. `stone.sign = 1` allows horizontal movement, `stone.sign = 2` allows vertical movement, and the sign advances after Bobby leaves the tile.
