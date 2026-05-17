@@ -31,6 +31,7 @@ export interface BrowserGameRuntimeOptions {
   container: HTMLElement;
   initialMap: string;
   initialCommunityId?: string;
+  restoreSavedGame?: boolean;
   validateLevels?: boolean;
 }
 
@@ -69,7 +70,9 @@ export class BrowserGameRuntime {
       void this.dispatch(action);
     });
     this.input.bindKeyboard();
-    const restored = this.restoreSavedGame();
+    const restored = this.options.restoreSavedGame === false
+      ? { ok: false, message: t('game.save.none'), slot: null }
+      : this.restoreSavedGame();
     if (restored.ok) {
       this.renderer?.setSaveSlot(this.saveSlot, t('game.save.autorestored'));
     } else if (this.options.initialCommunityId) {
@@ -136,7 +139,7 @@ export class BrowserGameRuntime {
       const state = gameStateFromLevelDefinition(level);
       this.currentMap = mapName;
       this.currentCommunityId = null;
-      this.syncUrl(mapName);
+      this.syncUrl();
       this.deathTimer = 0;
       this.simulation = new GameSimulation(state);
 
@@ -169,7 +172,7 @@ export class BrowserGameRuntime {
       const state = gameStateFromLevelDefinition(level);
       this.currentMap = level.name;
       this.currentCommunityId = id;
-      this.syncCommunityUrl(id);
+      this.syncUrl();
       this.deathTimer = 0;
       this.simulation = new GameSimulation(state);
 
@@ -186,18 +189,11 @@ export class BrowserGameRuntime {
     }
   }
 
-  private syncUrl(mapName: string) {
+  private syncUrl() {
     const url = new URL(window.location.href);
-    url.searchParams.set('map', mapName);
-    url.searchParams.delete('community');
-    window.history.replaceState(null, '', url);
-  }
-
-  private syncCommunityUrl(id: string) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('community', id);
     url.searchParams.delete('map');
-    window.history.replaceState(null, '', url);
+    url.searchParams.delete('community');
+    if (url.href !== window.location.href) window.history.replaceState(null, '', url);
   }
 
   private createRenderer(state: GameState) {
@@ -272,8 +268,7 @@ export class BrowserGameRuntime {
 
     this.currentMap = this.saveSlot.currentMap;
     this.currentCommunityId = this.saveSlot.currentCommunityId;
-    if (this.currentCommunityId) this.syncCommunityUrl(this.currentCommunityId);
-    else this.syncUrl(this.currentMap);
+    this.syncUrl();
     this.deathTimer = 0;
     this.simulation = new GameSimulation(state);
     if (this.renderer) this.renderer.setState(state);

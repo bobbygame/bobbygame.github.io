@@ -4,8 +4,9 @@ import { FIRST_LEVEL } from './game/levelProgression';
 import { currentRoutePath } from './game/paths';
 
 const params = new URLSearchParams(window.location.search);
-const mapName = params.get('map') ?? FIRST_LEVEL;
-const communityId = params.get('community') ?? undefined;
+const hasLevelQuery = params.has('map') || params.has('community');
+const mapName = params.get('map') || FIRST_LEVEL;
+const communityId = params.get('community') || undefined;
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('App container missing');
@@ -25,6 +26,7 @@ async function main() {
     container,
     initialMap: mapName,
     initialCommunityId: communityId,
+    restoreSavedGame: !hasLevelQuery,
   });
   await runtime.start();
 }
