@@ -1225,9 +1225,13 @@
     }
 
     .editor-host {
+      --editor-system-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --game-ui-font: var(--editor-system-font);
+      --game-display-font: var(--editor-system-font);
       place-items: stretch !important;
       background: #151610 !important;
       color: #f5f0df;
+      font-family: var(--editor-system-font);
       touch-action: auto;
     }
 
@@ -1245,6 +1249,7 @@
       grid-template-rows: 56px 1fr;
       background: #151610;
       color: var(--text);
+      font-family: var(--editor-system-font);
       letter-spacing: 0;
     }
 

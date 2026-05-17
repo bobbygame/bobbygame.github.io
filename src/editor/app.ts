@@ -61,6 +61,7 @@ const ENTITY_STYLE: Record<string, { label: string; fill: string; stroke: string
   key: { label: 'K', fill: '#e0f2fe', stroke: '#0369a1' },
   lock: { label: 'L', fill: '#bae6fd', stroke: '#075985' },
 };
+const EDITOR_SYSTEM_FONT = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
 function q<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
@@ -1077,7 +1078,7 @@ class LevelEditor {
     this.ctx.lineWidth = selected ? 4 : 2;
     this.ctx.fillRect(x + inset, y + inset, entity.size.x - inset * 2, entity.size.y - inset * 2);
     this.ctx.strokeRect(x + inset, y + inset, entity.size.x - inset * 2, entity.size.y - inset * 2);
-    this.ctx.font = 'bold 16px ui-monospace, Menlo, monospace';
+    this.ctx.font = `bold 16px ${EDITOR_SYSTEM_FONT}`;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillStyle = '#111827';
