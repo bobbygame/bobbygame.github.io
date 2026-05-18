@@ -2,6 +2,7 @@ import { installFonts } from './game/fonts';
 import { BrowserGameRuntime } from './game/runtime';
 import { FIRST_LEVEL } from './game/levelProgression';
 import { currentRoutePath } from './game/paths';
+import { trackFrontendError } from './game/analytics';
 
 const params = new URLSearchParams(window.location.search);
 const hasLevelQuery = params.has('map') || params.has('community');
@@ -32,5 +33,6 @@ async function main() {
 }
 
 main().catch((err) => {
+  trackFrontendError(err);
   if (app) app.textContent = err instanceof Error ? err.message : String(err);
 });

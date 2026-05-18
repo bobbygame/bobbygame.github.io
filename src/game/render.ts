@@ -1,6 +1,9 @@
-import type { GameState, Entity } from './types';
+import type { GameState } from './types';
+import { trackButtonClick, trackShareClick } from './analytics';
+import { createShareCard, type ShareCardResult } from './shareCard';
 import { SpriteLoader } from './sprites';
 import { appUrl } from './paths';
+import { drawGameWorld } from './sceneCanvas';
 import type { GameSaveSlot, SaveActionResult } from './saveSystem';
 import { language, languageToggleLabel, languageToggleText, t, toggleLanguage } from './i18n';
 
@@ -30,16 +33,15 @@ interface AudioControls {
   onToggleMute: () => boolean;
 }
 
-function fallbackColor(kind: string): string {
-  switch (kind) {
-    case 'player': return '#7dd3fc';
-    case 'wall': return '#6b5b3e';
-    case 'carrot': return '#f97316';
-    case 'goal':
-    case 'channel': return '#ffffff';
-    case 'trap': return '#ef4444';
-    default: return '#94a3b8';
-  }
+interface ShareDialogElements {
+  root: HTMLElement;
+  title: HTMLElement;
+  close: HTMLButtonElement;
+  image: HTMLImageElement;
+  status: HTMLElement;
+  download: HTMLAnchorElement;
+  nativeShare: HTMLButtonElement;
+  mobileHint: HTMLElement;
 }
 
 function keyAnimationName(sign: string): string {
@@ -73,7 +75,11 @@ export class Renderer {
   private readonly editorLink?: HTMLAnchorElement;
   private readonly languageButton?: HTMLButtonElement;
   private readonly restartButton?: HTMLButtonElement;
+  private readonly shareButton?: HTMLButtonElement;
   private readonly soundButton?: HTMLButtonElement;
+  private shareDialog?: ShareDialogElements;
+  private shareCard?: ShareCardResult;
+  private shareBusy = false;
   private renderedLanguage = language();
   private deathOverlayVisible = false;
   public readonly canvas: HTMLCanvasElement;
@@ -151,8 +157,10 @@ export class Renderer {
         this.editorLink = sceneActions.editorLink;
         this.languageButton = sceneActions.languageButton;
         this.restartButton = sceneActions.restartButton;
+        this.shareButton = sceneActions.shareButton;
         this.soundButton = sceneActions.soundButton;
-        scene.append(sceneActions.root);
+        const shareDialog = this.createShareDialog();
+        scene.append(sceneActions.root, shareDialog.root);
       }
       screen.append(this.stage);
       device.append(leftRope, rightRope, screen);
@@ -236,20 +244,37 @@ export class Renderer {
     editorLink.href = appUrl('editor');
     editorLink.textContent = t('game.editor');
     editorLink.setAttribute('aria-label', t('game.editor'));
+    editorLink.addEventListener('click', () => trackButtonClick('editor'));
 
     const languageButton = document.createElement('button');
     languageButton.type = 'button';
     languageButton.className = 'game-scene-link game-scene-link--language';
     languageButton.textContent = languageToggleText();
     languageButton.setAttribute('aria-label', languageToggleLabel());
-    languageButton.addEventListener('click', () => toggleLanguage());
+    languageButton.addEventListener('click', () => {
+      trackButtonClick('language');
+      toggleLanguage();
+    });
 
     const restartButton = document.createElement('button');
     restartButton.type = 'button';
     restartButton.className = 'game-scene-link game-scene-link--restart';
     restartButton.textContent = t('game.restart.open');
     restartButton.setAttribute('aria-label', t('game.restart.open'));
-    restartButton.addEventListener('click', () => this.openRestartDialog());
+    restartButton.addEventListener('click', () => {
+      trackButtonClick('restart_open');
+      this.openRestartDialog();
+    });
+
+    const shareButton = document.createElement('button');
+    shareButton.type = 'button';
+    shareButton.className = 'game-scene-link game-scene-link--share';
+    shareButton.setAttribute('aria-label', t('game.share.open'));
+    shareButton.append(this.createShareIcon(), document.createTextNode(t('game.share.open')));
+    shareButton.addEventListener('click', () => {
+      trackShareClick();
+      this.openShareDialog();
+    });
 
     const githubLink = document.createElement('a');
     githubLink.className = 'game-scene-link game-scene-link--github';
@@ -257,11 +282,25 @@ export class Renderer {
     githubLink.target = '_blank';
     githubLink.rel = 'noopener noreferrer';
     githubLink.setAttribute('aria-label', t('game.github'));
+    githubLink.addEventListener('click', () => trackButtonClick('github'));
     githubLink.append(this.createGithubIcon(), document.createTextNode('GitHub'));
 
-    actions.append(editorLink, languageButton, restartButton, githubLink);
+    actions.append(shareButton, editorLink, languageButton, restartButton, githubLink);
     if (soundButton) actions.append(soundButton);
-    return { root: actions, editorLink, languageButton, restartButton, soundButton };
+    return { root: actions, editorLink, languageButton, restartButton, shareButton, soundButton };
+  }
+
+  private createShareIcon() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'game-scene-link__icon game-scene-link__icon--stroke');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('focusable', 'false');
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'M18 8a3 3 0 1 0-2.83-4H15a3 3 0 0 0 .18 1.02L8.91 8.66a3 3 0 1 0 0 6.68l6.27 3.64A3 3 0 1 0 16.2 17L9.93 13.36a3.2 3.2 0 0 0 0-2.72L16.2 7A3 3 0 0 0 18 8Z');
+    svg.append(path);
+    return svg;
   }
 
   private createSoundButton() {
@@ -270,6 +309,7 @@ export class Renderer {
     button.className = 'game-scene-link game-scene-link--sound';
     button.append(this.createSoundIcon());
     button.addEventListener('click', () => {
+      trackButtonClick('sound');
       this.audioControls?.onToggleMute();
       this.updateSoundButton();
     });
@@ -310,6 +350,141 @@ export class Renderer {
     return svg;
   }
 
+  private createShareDialog(): ShareDialogElements {
+    const root = document.createElement('div');
+    root.className = 'game-share';
+    root.setAttribute('aria-live', 'polite');
+    root.addEventListener('click', (event) => {
+      if (event.target === root) this.closeShareDialog();
+    });
+    root.addEventListener('keydown', (event) => {
+      event.stopPropagation();
+      if (event.key === 'Escape') this.closeShareDialog();
+    });
+
+    const panel = document.createElement('div');
+    panel.className = 'game-share__panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'game-share-title');
+
+    const header = document.createElement('div');
+    header.className = 'game-share__header';
+    const title = document.createElement('strong');
+    title.id = 'game-share-title';
+    title.className = 'game-share__title';
+    title.textContent = t('game.share.title');
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'game-share__close';
+    close.setAttribute('aria-label', t('game.share.close'));
+    close.textContent = 'x';
+    close.addEventListener('click', () => {
+      trackButtonClick('share_close');
+      this.closeShareDialog();
+    });
+    header.append(title, close);
+
+    const preview = document.createElement('div');
+    preview.className = 'game-share__preview';
+    const image = document.createElement('img');
+    image.className = 'game-share__image';
+    image.alt = t('game.share.imageAlt');
+    image.draggable = false;
+    image.tabIndex = -1;
+    const status = document.createElement('p');
+    status.className = 'game-share__status';
+    status.textContent = t('game.share.loading');
+    preview.append(image, status);
+
+    const actions = document.createElement('div');
+    actions.className = 'game-share__actions';
+    const download = document.createElement('a');
+    download.className = 'game-share__button game-share__button--primary';
+    download.textContent = t('game.share.save');
+    download.setAttribute('role', 'button');
+    download.addEventListener('click', () => trackButtonClick('share_save'));
+
+    const nativeShare = document.createElement('button');
+    nativeShare.type = 'button';
+    nativeShare.className = 'game-share__button game-share__button--ghost';
+    nativeShare.textContent = t('game.share.native');
+    nativeShare.disabled = true;
+    nativeShare.addEventListener('click', () => {
+      void this.shareNative();
+    });
+    actions.append(download, nativeShare);
+
+    const mobileHint = document.createElement('p');
+    mobileHint.className = 'game-share__hint';
+    mobileHint.textContent = t('game.share.mobileHint');
+
+    panel.append(header, preview, actions, mobileHint);
+    root.append(panel);
+    this.shareDialog = { root, title, close, image, status, download, nativeShare, mobileHint };
+    return this.shareDialog;
+  }
+
+  private openShareDialog() {
+    if (!this.shareDialog) return;
+    document.body.classList.add('game-share-modal-open');
+    this.shareDialog.root.classList.add('game-share--open');
+    this.shareDialog.status.textContent = t('game.share.loading');
+    this.shareDialog.nativeShare.disabled = true;
+    this.shareDialog.download.removeAttribute('href');
+    this.shareDialog.download.removeAttribute('download');
+    this.shareDialog.image.removeAttribute('src');
+    void this.ensureShareCard();
+  }
+
+  private closeShareDialog() {
+    document.body.classList.remove('game-share-modal-open');
+    this.shareDialog?.root.classList.remove('game-share--open');
+  }
+
+  private async ensureShareCard() {
+    if (!this.shareDialog || this.shareBusy) return;
+
+    this.shareBusy = true;
+    this.shareDialog.status.textContent = t('game.share.loading');
+    try {
+      const card = await createShareCard();
+      this.shareCard = card;
+      this.renderShareCard(card);
+    } catch {
+      this.shareDialog.status.textContent = t('game.share.error');
+    } finally {
+      this.shareBusy = false;
+    }
+  }
+
+  private renderShareCard(card: ShareCardResult) {
+    if (!this.shareDialog) return;
+    this.shareDialog.image.src = card.dataUrl;
+    this.shareDialog.status.textContent = t('game.share.ready');
+    this.shareDialog.download.href = card.dataUrl;
+    this.shareDialog.download.download = card.filename;
+    this.shareDialog.nativeShare.disabled = !this.canNativeShare(card);
+  }
+
+  private canNativeShare(card: ShareCardResult): boolean {
+    if (!navigator.share || typeof File === 'undefined') return false;
+    const file = new File([card.blob], card.filename, { type: card.blob.type });
+    return !navigator.canShare || navigator.canShare({ files: [file] });
+  }
+
+  private async shareNative() {
+    if (!this.shareCard || !this.canNativeShare(this.shareCard)) return;
+    trackButtonClick('share_native');
+    const file = new File([this.shareCard.blob], this.shareCard.filename, { type: this.shareCard.blob.type });
+    await navigator.share({
+      files: [file],
+      title: t('game.share.cardTitle'),
+      text: t('game.share.cardSubtitle'),
+      url: this.shareCard.siteUrl,
+    });
+  }
+
   setSaveSlot(slot: GameSaveSlot | null, message = '') {
     this.saveSlot = slot;
     void message;
@@ -348,8 +523,14 @@ export class Renderer {
 
     const currentButton = this.createRestartButton(t('game.restart.current'), 'primary');
     const startOverButton = this.createRestartButton(t('game.restart.startOver'), 'ghost');
-    currentButton.addEventListener('click', () => this.runRestartAction(controls.onRestartLevel));
-    startOverButton.addEventListener('click', () => this.runRestartAction(controls.onStartOver));
+    currentButton.addEventListener('click', () => {
+      trackButtonClick('restart_level');
+      this.runRestartAction(controls.onRestartLevel);
+    });
+    startOverButton.addEventListener('click', () => {
+      trackButtonClick('start_over');
+      this.runRestartAction(controls.onStartOver);
+    });
     actions.append(currentButton, startOverButton);
     panel.append(title, body, actions);
     root.append(panel);
@@ -412,80 +593,10 @@ export class Renderer {
     if (this.renderedLanguage !== language()) this.updateLanguage();
     const { ctx } = this;
     ctx.imageSmoothingEnabled = false;
-    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.drawTilemap();
-    this.drawEntities();
+    drawGameWorld(ctx, this.state, this.sprites, this.canvas.width, this.canvas.height);
     this.drawHud();
     this.drawOverlay();
     this.updateRestartDialog();
-  }
-
-  private drawTilemap() {
-    const { ctx, state } = this;
-    const tileFrame = this.sprites.getFrame(state.tilemap.typeName);
-
-    ctx.fillStyle = '#1fa33a';
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-    if (!tileFrame) return;
-
-    const tileSize = state.tileSize;
-    const sheet = this.sprites.getObject(state.tilemap.typeName)?.frame?.sheet;
-    if (!sheet) return;
-
-    const tilesPerRow = Math.max(1, Math.floor(tileFrame.w / tileSize));
-    const maxTileIndex = Math.max(0, Math.floor(tileFrame.w / tileSize) * Math.floor(tileFrame.h / tileSize) - 1);
-
-    for (let row = 0; row < state.tilemap.rows; row += 1) {
-      for (let col = 0; col < state.tilemap.cols; col += 1) {
-        const tileId = state.tilemap.data[row * state.tilemap.cols + col] ?? 0;
-        const frameIndex = Math.max(0, tileId > maxTileIndex ? tileId - 1 : tileId);
-        const sx = tileFrame.x + (frameIndex % tilesPerRow) * tileSize;
-        const sy = tileFrame.y + Math.floor(frameIndex / tilesPerRow) * tileSize;
-
-        this.sprites.drawSprite(
-          ctx,
-          { sheet, x: sx, y: sy, w: tileSize, h: tileSize },
-          col * tileSize,
-          row * tileSize,
-          tileSize,
-          tileSize
-        );
-      }
-    }
-  }
-
-  private drawEntities() {
-    const ordered = this.state.entities
-      .filter((entity) => entity.kind === 'player' || !entity.dead)
-      .sort((a, b) => {
-        if (a.kind === 'player') return 1;
-        if (b.kind === 'player') return -1;
-        return a.pos.y - b.pos.y;
-      });
-
-    for (const entity of ordered) this.drawEntity(entity);
-  }
-
-  private drawEntity(entity: Entity) {
-    const frame = this.sprites.frameForEntity(entity, this.state);
-    if (frame) {
-      this.sprites.drawSprite(
-        this.ctx,
-        frame,
-        Math.round(entity.pos.x),
-        Math.round(entity.pos.y),
-        entity.size.x,
-        entity.size.y,
-        entity.angle
-      );
-      return;
-    }
-
-    if (entity.kind === 'other') return;
-
-    this.ctx.fillStyle = fallbackColor(entity.kind);
-    this.ctx.fillRect(Math.round(entity.pos.x), Math.round(entity.pos.y), entity.size.x, entity.size.y);
   }
 
   private drawHud() {
@@ -582,7 +693,10 @@ export class Renderer {
     button.type = 'button';
     button.textContent = t('game.win.continue');
     button.disabled = true;
-    button.addEventListener('click', () => this.onAdvance());
+    button.addEventListener('click', () => {
+      trackButtonClick('continue');
+      this.onAdvance();
+    });
 
     panel.append(title, stats, button);
     root.append(panel);
@@ -644,6 +758,10 @@ export class Renderer {
       this.restartButton.textContent = t('game.restart.open');
       this.restartButton.setAttribute('aria-label', t('game.restart.open'));
     }
+    if (this.shareButton) {
+      this.shareButton.replaceChildren(this.createShareIcon(), document.createTextNode(t('game.share.open')));
+      this.shareButton.setAttribute('aria-label', t('game.share.open'));
+    }
     this.updateSoundButton();
     if (this.restartDialog) {
       this.restartDialog.title.textContent = t('game.restart.title');
@@ -651,6 +769,15 @@ export class Renderer {
       this.restartDialog.currentButton.textContent = t('game.restart.current');
       this.restartDialog.startOverButton.textContent = t('game.restart.startOver');
       this.updateRestartDialog();
+    }
+    if (this.shareDialog) {
+      this.shareDialog.title.textContent = t('game.share.title');
+      this.shareDialog.close.setAttribute('aria-label', t('game.share.close'));
+      this.shareDialog.status.textContent = this.shareCard ? t('game.share.ready') : t('game.share.loading');
+      this.shareDialog.download.textContent = t('game.share.save');
+      this.shareDialog.nativeShare.textContent = t('game.share.native');
+      this.shareDialog.mobileHint.textContent = t('game.share.mobileHint');
+      this.shareDialog.image.alt = t('game.share.imageAlt');
     }
   }
 

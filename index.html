@@ -8,6 +8,13 @@
   <link rel="apple-touch-icon" sizes="256x256" href="assets/icons/icon-256.png" />
   <link rel="apple-touch-icon" sizes="512x512" href="assets/icons/icon-512.png" />
   <link rel="icon" type="image/png" href="assets/icons/icon-512.png" />
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "wsz8bncsbj");
+  </script>
   <style>
     :root {
       --game-ui-font: comic, "bobby-cn", comicbd, bgothm, sans-serif;
@@ -641,6 +648,164 @@
       pointer-events: auto;
     }
 
+    .game-share {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      box-sizing: border-box;
+      background:
+        linear-gradient(145deg, rgba(4, 18, 12, 0.82), rgba(18, 53, 32, 0.70)),
+        rgba(0, 0, 0, 0.55);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .game-share--open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+
+    .game-share__panel {
+      width: min(1120px, calc(100vw - 36px));
+      max-height: calc(100dvh - 36px);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
+      gap: 14px;
+      padding: 18px;
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      border-radius: 24px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.30), rgba(255, 255, 255, 0.08) 44%, rgba(222, 255, 187, 0.18)),
+        rgba(7, 32, 23, 0.78);
+      box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.46),
+        inset 0 1px 0 rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(20px) saturate(1.28);
+      -webkit-backdrop-filter: blur(20px) saturate(1.28);
+      color: #fff;
+      font-family: var(--game-ui-font);
+    }
+
+    .game-share__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .game-share__title {
+      color: #fff45a;
+      font: 900 clamp(28px, 4.6vw, 48px)/0.98 var(--game-display-font);
+      letter-spacing: 0;
+      text-shadow:
+        0 3px 0 rgba(24, 92, 20, 0.88),
+        0 8px 18px rgba(0, 0, 0, 0.36);
+    }
+
+    .game-share__close {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      border-radius: 999px;
+      background: rgba(6, 30, 22, 0.44);
+      color: #fff;
+      cursor: pointer;
+      font: 900 22px/1 var(--game-display-font);
+      text-transform: uppercase;
+    }
+
+    .game-share__preview {
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    .game-share__image {
+      max-width: 100%;
+      max-height: min(62dvh, 610px);
+      display: block;
+      border-radius: 18px;
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.38),
+        0 0 0 1px rgba(255, 255, 255, 0.22);
+      -webkit-touch-callout: default;
+      user-select: auto;
+      touch-action: manipulation;
+    }
+
+    .game-share__status,
+    .game-share__hint {
+      margin: 0;
+      color: rgba(242, 255, 232, 0.82);
+      font-size: clamp(13px, 2vw, 16px);
+      line-height: 1.35;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.42);
+    }
+
+    .game-share__actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .game-share__button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      border-radius: 16px;
+      box-sizing: border-box;
+      cursor: pointer;
+      font: 900 clamp(18px, 3vw, 24px)/1 var(--game-display-font);
+      letter-spacing: 0;
+      text-align: center;
+      text-decoration: none;
+      touch-action: manipulation;
+    }
+
+    .game-share__button--primary {
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 42%, rgba(0, 0, 0, 0.12)),
+        linear-gradient(180deg, #ffed4a, #ffb703);
+      color: #12350d;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.46);
+    }
+
+    .game-share__button--ghost {
+      background:
+        linear-gradient(180deg, rgba(235, 255, 202, 0.28), rgba(117, 176, 86, 0.16)),
+        rgba(9, 38, 28, 0.46);
+      color: #faffea;
+    }
+
+    .game-share__button:disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .game-share__button:not(:disabled):active,
+    .game-share__close:active {
+      transform: translateY(1px);
+    }
+
+    body.game-share-modal-open .touch-dpad {
+      display: none;
+    }
+
     .game-win__panel,
     .game-death__panel {
       width: min(430px, 82%);
@@ -906,6 +1071,34 @@
 
       .game-restart__actions {
         gap: 8px;
+      }
+
+      .game-share {
+        padding: 0;
+        place-items: stretch;
+      }
+
+      .game-share__panel {
+        width: 100vw;
+        min-height: 100dvh;
+        max-height: none;
+        border-radius: 0;
+        border-width: 0;
+        padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+        gap: 12px;
+      }
+
+      .game-share__image {
+        max-height: 68dvh;
+        border-radius: 14px;
+      }
+
+      .game-share__actions {
+        grid-template-columns: 1fr;
+      }
+
+      .game-share__button {
+        min-height: 46px;
       }
     }
 

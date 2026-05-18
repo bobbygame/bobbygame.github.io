@@ -1,4 +1,5 @@
 import { loadAssetManifest } from './assets';
+import { trackAnalyticsEvent, trackGameOver, trackGameStart, trackGameWin } from './analytics';
 import { audio } from './audio';
 import { soundForGameEvent } from './audioEvents';
 import { getCommunityLevel } from './communityLevel';
@@ -150,6 +151,7 @@ export class BrowserGameRuntime {
       }
       this.renderer?.draw();
       this.autoSaveCurrentGame(true);
+      trackGameStart(state, 'built_in');
       audio.resumeBgMusic();
     } finally {
       this.loadingLevel = false;
@@ -183,6 +185,7 @@ export class BrowserGameRuntime {
       }
       this.renderer?.draw();
       this.autoSaveCurrentGame(true);
+      trackGameStart(state, 'community');
       audio.resumeBgMusic();
     } finally {
       this.loadingLevel = false;
@@ -277,6 +280,7 @@ export class BrowserGameRuntime {
     this.autoSaveLastWrite = Date.now();
     this.renderer?.setSaveSlot(this.saveSlot, t('game.save.autorestored'));
     this.renderer?.draw();
+    trackGameStart(state, this.currentCommunityId ? 'community' : 'built_in');
     return { ok: true, message: t('game.save.autorestored'), slot: this.saveSlot };
   }
 
@@ -319,6 +323,7 @@ export class BrowserGameRuntime {
         for (const event of step.events) {
           const sound = soundForGameEvent(event);
           if (sound) audio.play(sound);
+          this.trackSimulationEvent(event);
         }
         if (this.simulation.status() === 'dead') {
           this.deathTimer = 0;
@@ -333,4 +338,17 @@ export class BrowserGameRuntime {
 
     this.animationFrame = requestAnimationFrame(this.tick);
   };
+
+  private trackSimulationEvent(event: string) {
+    if (!this.simulation) return;
+    if (event === 'Goal reached' || event === 'Level complete!') {
+      trackGameWin(this.simulation.state);
+    } else if (event === 'Hit trap') {
+      trackGameOver(this.simulation.state);
+    } else if (event === 'Conveyor button toggled') {
+      trackAnalyticsEvent('game_conveyor_button');
+    } else if (event === 'Stone button toggled') {
+      trackAnalyticsEvent('game_stone_button');
+    }
+  }
 }
