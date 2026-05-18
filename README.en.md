@@ -5,7 +5,7 @@ Architecture docs: [中文](docs/architecture.md) | [English](docs/architecture.
 
 Bobby Carrot is a grid-based puzzle game built with Vite and TypeScript. The player guides Bobby through 50px tile maps, collects the required carrots, understands each mechanism, and reaches the exit.
 
-![Bobby Carrot gameplay](./public/game.png)
+![Bobby Carrot gameplay](./public/cover.png)
 
 Play online: [https://g.snapre.fun/](https://g.snapre.fun/)
 

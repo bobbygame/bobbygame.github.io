@@ -5,7 +5,7 @@
 
 Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家控制兔子在 50px 网格地图中移动，收集每关要求的胡萝卜，理解机关规则，最终抵达出口。
 
-![image](./public/game.png)
+![image](./public/cover.png)
 
 在线试玩：[https://g.snapre.fun/](https://g.snapre.fun/)
 
