@@ -7,7 +7,7 @@ Bobby Carrot 是一个纯 Vite + TypeScript 实现的网格解谜游戏。玩家
 
 ![image](./public/game.png)
 
-在线试玩：[https://g.snapre.online/](https://g.snapre.online/)
+在线试玩：[https://g.snapre.fun/](https://g.snapre.fun/)
 
 终端版已发布到 npm：
 

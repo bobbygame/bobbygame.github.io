@@ -7,7 +7,7 @@ Bobby Carrot is a grid-based puzzle game built with Vite and TypeScript. The pla
 
 ![Bobby Carrot gameplay](./public/game.png)
 
-Play online: [https://g.snapre.online/](https://g.snapre.online/)
+Play online: [https://g.snapre.fun/](https://g.snapre.fun/)
 
 The terminal edition is available on npm:
 
