@@ -550,7 +550,6 @@ function readInitialLanguage(): Language {
   if (typeof window !== 'undefined') {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored === 'en' || stored === 'zh') return stored;
-    if (window.navigator.language.toLowerCase().startsWith('zh')) return 'zh';
   }
   return 'en';
 }
